@@ -68,7 +68,7 @@ If successful, you'll see:
 
     Hi <username>! You've successfully authenticated, but GitHub does not provide shell access.
 
-✅ Done! You can now use `git clone`, `git push`, etc., with SSH URLs
+Done! You can now use `git clone`, `git push`, etc., with SSH URLs
 (they look like `git@github.com:user/repo.git`).
 
 ------------------------------------------------------------------------
