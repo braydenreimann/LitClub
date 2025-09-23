@@ -123,7 +123,8 @@ Navigate to the newly cloned directory, and `cd` into `frontend`. From there, ru
 ```powershell
 npx expo start
 ```
-> You may have to agree to installing additional dependencies.\
+> You may have to agree to installing additional dependencies.
+
 After running the above command:
 1. The development server will start, and you'll see a QR code inside the terminal window.
 2. Scan the QR code to open the app on the device. On Android, use the Expo Go > **Scan QR code** option. On iOS, use the default camera app.
