@@ -1,228 +1,114 @@
-\## LitClub Repository Setup Guide
+## LitClub Repository Setup Guide
 
+## 1. Configure a secure SSH key so your computer can authenticate with GitHub without a password
+### 1. Open a terminal
 
-
-\## 1. Configure a secure SSH key so your computer can authenticate with GitHub without a password
-
-\### 1. Open a terminal
-
-
-
-You can use \*\*PowerShell\*\* or \*\*Git Bash\*\* (comes with Git for
-
-Windows).\\
-
+You can use **PowerShell** or **Git Bash** (comes with Git for
+Windows).\
 For consistency, these instructions use PowerShell.
-
-
 
 ------------------------------------------------------------------------
 
-
-
-\### 2. Generate a new SSH key
-
-
+### 2. Generate a new SSH key
 
 Run this command (replace your GitHub email with yours):
 
-
-
 ``` powershell
-
-ssh-keygen -t ed25519 -C "your\_email@example.com"
-
+ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
-
-
 
 If your system doesn't support `ed25519`, use `rsa` instead:
 
-
-
 ``` powershell
-
-ssh-keygen -t rsa -b 4096 -C "your\_email@example.com"
-
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 ```
 
-
-
-When prompted: - \*\*Save location:\*\* Press \*\*Enter\*\* to accept default
-
-(`C:\\Users\\<YourUser>\\.ssh\\id\_ed25519`).
-
-\- \*\*Passphrase:\*\* Optional. Adds extra security, but you'll need to
-
+When prompted: - **Save location:** Press **Enter** to accept default
+(`C:\Users\<YourUser>\.ssh\id_ed25519`).
+- **Passphrase:** Optional. Adds extra security, but you'll need to
 enter it whenever you use the key (or cache it with an agent).
-
-
 
 ------------------------------------------------------------------------
 
-
-
-\### 3. Start the SSH agent
-
-
+### 3. Start the SSH agent
 
 Run the following in PowerShell:
 
-
-
 ``` powershell
-
 Start-Service ssh-agent
-
-ssh-add ~\\.ssh\\id\_ed25519
-
+ssh-add ~\.ssh\id_ed25519
 ```
-
-
 
 > If you see an error, you may need to run PowerShell as Administrator.
 
-
-
 ------------------------------------------------------------------------
 
-
-
-\### 4. Copy your public key
-
-
+### 4. Copy your public key
 
 Your public key is stored at:
 
-
-
-&nbsp;   C:\\Users\\<YourUser>\\.ssh\\id\_ed25519.pub
-
-
+    C:\Users\<YourUser>\.ssh\id_ed25519.pub
 
 Copy it to the clipboard with:
 
-
-
 ``` powershell
-
-Get-Content ~\\.ssh\\id\_ed25519.pub | Set-Clipboard
-
+Get-Content ~\.ssh\id_ed25519.pub | Set-Clipboard
 ```
 
+------------------------------------------------------------------------
 
+### 5. Add the key to GitHub
+
+1.  Go to [GitHub SSH settings](https://github.com/settings/keys).
+2.  Click **New SSH key** → give it a title (e.g., *My Laptop*).
+3.  Paste your key from the clipboard.
+4.  Save.
 
 ------------------------------------------------------------------------
 
-
-
-\### 5. Add the key to GitHub
-
-
-
-1\.  Go to \[GitHub SSH settings](https://github.com/settings/keys).
-
-2\.  Click \*\*New SSH key\*\* → give it a title (e.g., \*My Laptop\*).
-
-3\.  Paste your key from the clipboard.
-
-4\.  Save.
-
-
-
-------------------------------------------------------------------------
-
-
-
-\### 6. Test the connection
-
-
+### 6. Test the connection
 
 Run this command:
 
-
-
 ``` powershell
-
 ssh -T git@github.com
-
 ```
-
-
 
 If successful, you'll see:
 
-
-
-&nbsp;   Hi <username>! You've successfully authenticated, but GitHub does not provide shell access.
-
-
+    Hi <username>! You've successfully authenticated, but GitHub does not provide shell access.
 
 ------------------------------------------------------------------------
-
-
 
 ✅ Done! You can now use `git clone`, `git push`, etc., with SSH URLs
-
 (they look like `git@github.com:user/repo.git`).
-
-
 
 ------------------------------------------------------------------------
 
-
-
-\## 2. Install required dependencies
-
-\### 1. Download Noad.js
-
-Navigate to \[nodejs.org/en/download](nodejs.org/en/download), and select the following attributes in the drop down menus:
-
-\- \*\*v22.19.0 (LTS)\*\*, for
-
-\- \*\*Windows\*\*, using
-
-\- \*\*Chocolatey\*\*, with
-
-\- \*\*Yarn\*\*
-
-
+## 2. Install required dependencies
+### 1. Download Noad.js
+Navigate to [nodejs.org/en/download](nodejs.org/en/download), and select the following attributes in the drop down menus:
+- **v22.19.0 (LTS)**, for
+- **Windows**, using
+- **Chocolatey**, with
+- **Yarn**
 
 Do not execute the commands until you complete the following step.
 
-
-
-\### 2. Modify your execution policy
-
+### 2. Modify your execution policy
 Run the following script in Powershell to allow local scripts for your user.
-
 ```powershell
-
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
-
 ```
+Once completed, close Powershell and then run again with **Admin privileges**.
 
-Once completed, close Powershell and then run again with \*\*Admin privileges\*\*.
-
-
-
-\### 3. Run the commands to install Node.js
-
+### 3. Run the commands to install Node.js
 Refer to the commands generated in the first step.
 
-
-
-\## 3. Clone the LitClub repository
-
-
+## 3. Clone the LitClub repository
 
 Navigate to the directory where you would like to place the LitClub repository, then clone it using SSH:
-
 ```powershell
-
 git clone git@github.com:{username}/LitClub.git
-
 ```
-
 Don't forget to replace `{username}` with your GitHub username.
-
