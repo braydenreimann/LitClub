@@ -108,6 +108,9 @@ Refer to the commands generated in the first step.
 ### 4. Install Git for Windows (if not already installed)
 Navigate to [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win) and click the download link at the very top of the page (the most recent and maintained build).
 
+### 5. Install the Expo Go app on your phone
+We will use this app to test our React Native app during the development process!
+
 ## 3. Clone the LitClub repository
 
 Navigate to the directory where you would like to place the LitClub repository, then clone it using SSH:
