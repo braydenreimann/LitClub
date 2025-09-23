@@ -111,12 +111,13 @@ Don't forget to replace `{username}` with your GitHub username.
 ------------------------------------------------------------------------
 
 ## 4. Run the Expo app
-1. Install dependencies
+1. `cd` into `\LitClub\frontend`. This is where our Expo app lives.
+2. Install dependencies
 
    ```bash
    npm install
    ```
-2. Start the app
+3. Start the app
    ```bash
    npx expo start
    ```
