@@ -112,9 +112,18 @@ Navigate to [https://git-scm.com/downloads/win](https://git-scm.com/downloads/wi
 We will use this app to test our React Native app during the development process!
 
 ## 3. Clone the LitClub repository
-
 Navigate to the directory where you would like to place the LitClub repository, then clone it using SSH:
 ```powershell
 git clone git@github.com:{username}/LitClub.git
 ```
 Don't forget to replace `{username}` with your GitHub username.
+
+## 4. Run the Expo app
+Navigate to the newly cloned directory, and `cd` into `frontend`. From there, run the following command to start the development server from the terminal:
+```powershell
+npx expo start
+```
+After running the above command:
+1. The development server will start, and you'll see a QR code inside the terminal window.
+2. Scan the QR code to open the app on the device. On Android, use the Expo Go > **Scan QR code** option. On iOS, use the default camera app.
+3. You should then be able to view and interact with the running application!
