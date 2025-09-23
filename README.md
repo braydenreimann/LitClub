@@ -106,7 +106,7 @@ Once completed, close Powershell and then run again with **Admin privileges**.
 Refer to the commands generated in the first step.
 
 ### 4. Install Git for Windows (if not already installed)
-Navigate to [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win) and click the download link at the very top of the page (the most recent and maintained build).
+Navigate to [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win) and click the download link at the very top of the page (the most recent and maintained build). Once downloaded, execute and follow the instructions for installation.
 
 ### 5. Install the Expo Go app on your phone
 We will use this app to test our React Native app during the development process!
