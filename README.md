@@ -111,13 +111,18 @@ Don't forget to replace `{username}` with your GitHub username.
 ------------------------------------------------------------------------
 
 ## 4. Run the Expo app
-Navigate to the newly cloned directory, and `cd` into `frontend`. From there, run the following command to start the development server from the terminal:
-```powershell
-npx expo start
-```
-> You may have to agree to installing additional dependencies.
+1. Install dependencies
 
-After running the above command:
-1. The development server will start, and you'll see a QR code inside the terminal window.
-2. Scan the QR code to open the app on the device. On Android, use the Expo Go > **Scan QR code** option. On iOS, use the default camera app.
-3. You should then be able to view and interact with the running application!
+   ```bash
+   npm install
+   ```
+2. Start the app
+   ```bash
+   npx expo start
+   ```
+In the output, you'll find options to open the app in a
+
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
