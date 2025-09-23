@@ -105,7 +105,7 @@ Once completed, close Powershell and then run again with **Admin privileges**.
 ### 3. Run the commands to install Node.js
 Refer to the commands generated in the first step.
 
-### 4. Install Git for Windows if you do not already have it installed
+### 4. Install Git for Windows (if not already installed)
 Navigate to [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win) and click the download link at the very top of the page (the most recent and maintained build).
 
 ## 3. Clone the LitClub repository
