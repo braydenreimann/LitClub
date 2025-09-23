@@ -124,6 +124,7 @@ Navigate to the newly cloned directory, and `cd` into `frontend`. From there, ru
 npx expo start
 ```
 After running the above command:
+0. You may have to agree to installing additional dependencies
 1. The development server will start, and you'll see a QR code inside the terminal window.
 2. Scan the QR code to open the app on the device. On Android, use the Expo Go > **Scan QR code** option. On iOS, use the default camera app.
 3. You should then be able to view and interact with the running application!
