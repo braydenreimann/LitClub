@@ -2,12 +2,16 @@
   "expo": {
     "name": "LitClub",
     "slug": "LitClub",
+    "owner": "litclub-dev-team",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "frontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -43,6 +47,15 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "360c4608-deab-41ea-93ac-6b2805167c0c"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/360c4608-deab-41ea-93ac-6b2805167c0c"
     }
   }
 }
