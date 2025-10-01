@@ -76,7 +76,7 @@ Done! You can now use `git clone`, `git push`, etc., with SSH URLs
 ## 2. Install required dependencies
 ### 1. Download Noad.js
 Navigate to [nodejs.org/en/download](https://nodejs.org/en/download), and select the following attributes in the drop down menus:
-- **v22.19.0 (LTS)**, for
+- **v22.20.0 (LTS)**, for
 - **Windows**, using
 - **Chocolatey**, with
 - **Yarn**
