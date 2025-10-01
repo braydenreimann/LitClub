@@ -104,10 +104,8 @@ We will use this app to test our React Native app during the development process
 ## 3. Clone the LitClub repository
 Navigate to the directory where you would like to place the LitClub repository, then clone it using SSH:
 ```powershell
-git clone git@github.com:{username}/LitClub.git
+git clone git@github.com:braydenreimann/LitClub.git
 ```
-Don't forget to replace `{username}` with your GitHub username.
-
 ------------------------------------------------------------------------
 
 ## 4. Run the Expo app
