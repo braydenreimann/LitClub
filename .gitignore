@@ -3,5 +3,6 @@
 ################################################################################
 
 /backend/LitClubApi/obj
+/backend/LitClubApi/bin
 /.vs
 /backend/LitClubApi/.vs/LitClubApi
