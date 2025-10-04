@@ -400,3 +400,49 @@ public class GetMyProfile : EndpointBaseAsync
 | **Development** | Client-provided | `userId` in body or route | `request.UserId` | Includes `UserId` |
 | **Production** | Azure AD (JWT) | `Authorization: Bearer <token>` | `User.FindFirstValue(ClaimTypes.NameIdentifier)` | `UserId` removed |
 
+---
+
+## API Response Guidelines
+
+ASP.NET Core (via `ControllerBase`) provides several built-in response helpers that return the proper HTTP status codes.  
+These can be used in both controllers and REPR-style endpoints.
+
+### Common Success Responses
+| Purpose | Method | HTTP |
+|----------|---------|------|
+| Return resource or data | `Ok(object)` | **200 OK** |
+| Resource created (with link) | `CreatedAtAction(action, routeValues, value)` | **201 Created** |
+| Resource created (simple) | `Created(uri, value)` | **201 Created** |
+| Accepted async request | `Accepted(uri)` | **202 Accepted** |
+| Successful update/delete (no body) | `NoContent()` | **204 No Content** |
+
+### Client Errors
+| Purpose | Method | HTTP |
+|----------|---------|------|
+| Invalid input | `BadRequest(object)` | **400 Bad Request** |
+| Missing/invalid credentials | `Unauthorized()` | **401 Unauthorized** |
+| Authenticated but forbidden | `Forbid()` | **403 Forbidden** |
+| Resource not found | `NotFound()` | **404 Not Found** |
+| Duplicate/conflict | `Conflict(object)` | **409 Conflict** |
+
+### Server & Misc
+| Purpose | Method | HTTP |
+|----------|---------|------|
+| Generic / custom code | `StatusCode(code, object?)` | any |
+
+### Typical REST Mapping
+| Verb | Common Responses |
+|------|------------------|
+| **GET** | `Ok()`, `NotFound()` |
+| **POST** | `CreatedAtAction()`, `BadRequest()` |
+| **PUT / PATCH** | `Ok()`, `NoContent()`, `BadRequest()` |
+| **DELETE** | `NoContent()`, `NotFound()` |
+
+### Examples
+```csharp
+return Ok(book);
+return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
+return NoContent();
+return BadRequest("Invalid data.");
+return NotFound();
+return StatusCode(500, "Unexpected error.");
