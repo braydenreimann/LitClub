@@ -53,7 +53,7 @@ DTOs should:
 **REPR (Request–Endpoint–Response)**
 - Treats each operation as a **single endpoint class** with its own Request DTO and Response DTO.
 - Pros: strong **single-responsibility**, better **testability**, natural **vertical slicing** by feature.  
-- Cons: can feel **boilerplate‑y** without conventions; requires good folder/org patterns.
+- Cons: can feel **boilerplate-y** without conventions; requires good folder/org patterns.
 
 For LitClub, we use **REST for the external interface** and **REPR for internal organization**.
 
@@ -91,7 +91,7 @@ This models the *resource* (`books`) rather than exposing an action like `addBoo
 
 ## REPR Implementation with Ardalis.ApiEndpoints (Cosmos DB)
 
-Below is a REPR‑style endpoint using **Ardalis.ApiEndpoints**.  
+Below is a REPR-style endpoint using **Ardalis.ApiEndpoints**.  
 It uses an **Azure Cosmos DB** container directly (DI provides a `Container` for the `Books` collection).
 
 > **Note on IDs:** Cosmos DB expects an `id` field of type `string`. We generate a GUID for new items.
@@ -208,5 +208,195 @@ public class Add : EndpointBaseAsync
     /Update
     /Delete
 ```
-
 This demonstrates the REPR pattern in action: a **Request DTO**, an **Endpoint** class handling the logic, and a **Response DTO**, all dedicated to a single operation, with Cosmos DB persistence.
+
+---
+
+## Authentication
+
+### Overview
+The LitClub API uses a **two-phase approach**:
+- **Development (no real auth yet):** the client supplies a `userId` in requests to simulate identity.
+- **Production (with Azure AD / Microsoft Entra ID):** the client authenticates, receives a JWT, and sends it in the `Authorization` header. The server derives identity from token claims. The client **must stop** sending `userId` in the body.
+
+---
+
+### Development Authentication Strategy (Mock Phase)
+- **Identity source:** Client-provided `userId` in request payloads or route params.
+- **Security:** For learning and integration testing only (not production-safe).
+
+**Example — Add Book (Client sends `userId`):**
+```json
+{
+  "title": "The Great Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "publishedYear": 1925,
+  "userId": "user-alpha"
+}
+```
+
+**Server usage (temporary):**
+```csharp
+var userId = request.UserId ?? "dev-fallback"; // optional fallback during local dev
+```
+
+---
+
+### Production Authentication Strategy (Azure AD / Microsoft Entra ID)
+- **Identity source:** JWT token claims issued by Azure AD after login.
+- **Client behavior:** Include the token on each request.
+  
+  ```http
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...
+  ```
+- **Server configuration (Program.cs):**
+  ```csharp
+  builder.Services.AddAuthentication("Bearer")
+      .AddJwtBearer(options =>
+      {
+          options.Authority = "https://login.microsoftonline.com/{tenantId}/v2.0";
+          options.Audience = "api://litclub-api-id";
+      });
+
+  app.UseAuthentication();
+  app.UseAuthorization();
+  ```
+- **Identity access in code:**
+  ```csharp
+  var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+  ```
+- **Client request bodies:** **Must not** include `userId`. The DTOs will no longer define it; any such field is ignored or rejected by validation.
+
+---
+
+### Access Levels
+| Endpoint Type | Example | Authentication Required | Notes |
+|----------------|----------|--------------------------|-------|
+| Public | `GET /books/search` | No | Publicly accessible resources |
+| Semi-Public | `GET /users/{id}` | Optional | Shows limited info |
+| Authenticated | `POST /books` | Yes | Requires valid JWT |
+| Admin-Only | `DELETE /litclubs/{id}` | Yes (Admin role) | Role-based restriction |
+
+---
+
+### Example: AddBookRequest — Before & After
+
+**Before (Development — client provides `userId`)**
+```csharp
+public class AddBookRequest
+{
+    public string Title { get; set; } = default!;
+    public string Author { get; set; } = default!;
+    public int PublishedYear { get; set; }
+
+    // Temporary: supplied by the client during mock phase
+    public string? UserId { get; set; }
+}
+```
+
+**After (Production — identity from JWT; client stops sending `userId`)**
+```csharp
+public class AddBookRequest
+{
+    public string Title { get; set; } = default!;
+    public string Author { get; set; } = default!;
+    public int PublishedYear { get; set; }
+}
+
+// In the endpoint:
+var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+```
+
+---
+
+### Example: Get Profile Endpoint — Before & After
+
+**Before (Development — client supplies userId via route)**  
+Route: `GET /users/{userId}`
+```csharp
+using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Mvc;
+
+namespace LitClub.Api.Endpoints.Users;
+
+public class GetProfileRequest
+{
+    [FromRoute] public string UserId { get; set; } = default!;
+}
+
+public class GetProfileResponse
+{
+    public string UserId { get; set; } = default!;
+    public string Username { get; set; } = default!;
+    public string FullName { get; set; } = default!;
+    public DateTime JoinedDate { get; set; }
+    public int ClubsJoined { get; set; }
+}
+
+[ApiController]
+public class GetProfile : EndpointBaseAsync
+    .WithRequest<GetProfileRequest>
+    .WithActionResult<GetProfileResponse>
+{
+    [HttpGet("users/{userId}")]
+    public override async Task<ActionResult<GetProfileResponse>> HandleAsync(
+        [FromRoute] GetProfileRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = new GetProfileResponse
+        {
+            UserId = request.UserId,
+            Username = "reader_joe",
+            FullName = "Joe Reader",
+            JoinedDate = new DateTime(2025, 1, 5),
+            ClubsJoined = 3
+        };
+
+        return Ok(user);
+    }
+}
+```
+
+**After (Production — server derives identity from JWT)**  
+Route: `GET /users/me`
+```csharp
+using System.Security.Claims;
+using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace LitClub.Api.Endpoints.Users;
+
+[Authorize]
+public class GetMyProfile : EndpointBaseAsync
+    .WithoutRequest
+    .WithActionResult<GetProfileResponse>
+{
+    [HttpGet("users/me")]
+    public override async Task<ActionResult<GetProfileResponse>> HandleAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var user = new GetProfileResponse
+        {
+            UserId = userId!,
+            Username = "reader_joe",
+            FullName = "Joe Reader",
+            JoinedDate = new DateTime(2025, 1, 5),
+            ClubsJoined = 3
+        };
+
+        return Ok(user);
+    }
+}
+```
+
+---
+
+### Summary
+| Phase | Identity Source | Client Sends | Server Reads | DTO Shape |
+|------|------------------|--------------|--------------|-----------|
+| **Development** | Client-provided | `userId` in body or route | `request.UserId` | Includes `UserId` |
+| **Production** | Azure AD (JWT) | `Authorization: Bearer <token>` | `User.FindFirstValue(ClaimTypes.NameIdentifier)` | `UserId` removed |
+
