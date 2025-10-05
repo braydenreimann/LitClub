@@ -274,7 +274,7 @@ var userId = request.UserId ?? "dev-fallback"; // optional fallback during local
 |----------------|----------|--------------------------|-------|
 | Public | `GET /books/search` | No | Publicly accessible resources |
 | Semi-Public | `GET /users/{id}` | Optional | Shows limited info |
-| Authenticated | `POST /books` | Yes | Requires valid JWT |
+| Authenticated | `PATCH /users/{id}` | Yes | Requires valid JWT |
 | Admin-Only | `DELETE /litclubs/{id}` | Yes (Admin role) | Role-based restriction |
 
 ---
