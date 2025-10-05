@@ -1,16 +1,17 @@
 using Microsoft.Azure.Cosmos;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Endpoints.Books;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LitClubApi.Endpoints.Books.AddBook;
 
 public class Add(Container booksContainer) : EndpointBaseAsync
     .WithRequest<AddBookRequest>
-    .WithActionResult<AddBookResponse>
+    .WithActionResult<BookResponse>
 {
     [HttpPost("books")]
-    public override async Task<ActionResult<AddBookResponse>> HandleAsync(AddBookRequest request,
+    public override async Task<ActionResult<BookResponse>> HandleAsync(AddBookRequest request,
     CancellationToken cancellationToken = default)
     {
         // Map the request to domain book object
@@ -27,8 +28,8 @@ public class Add(Container booksContainer) : EndpointBaseAsync
             return StatusCode(500, "Unable to access database");
         }
 
-        // Map the domain book to a responses
-        AddBookResponse response = AddBookMapper.ToResponse(book);
+        // Map the domain book to a response
+        BookResponse response = book.ToResponse();
 
         return CreatedAtRoute("books", new { bookId = response.Id }, response);
     }
