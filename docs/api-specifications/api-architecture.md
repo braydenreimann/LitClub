@@ -411,7 +411,7 @@ These can be used in both controllers and REPR-style endpoints.
 | Purpose | Method | HTTP |
 |----------|---------|------|
 | Return resource or data | `Ok(object)` | **200 OK** |
-| Resource created (with link) | `CreatedAtRoute(routeName, routeValues, value)` | **201 Created** |
+| Resource created (with link) | `CreatedAtAction(action, routeValues, value)` | **201 Created** |
 | Resource created (simple) | `Created(uri, value)` | **201 Created** |
 | Accepted async request | `Accepted(uri)` | **202 Accepted** |
 | Successful update/delete (no body) | `NoContent()` | **204 No Content** |
@@ -434,14 +434,14 @@ These can be used in both controllers and REPR-style endpoints.
 | Verb | Common Responses |
 |------|------------------|
 | **GET** | `Ok()`, `NotFound()` |
-| **POST** | `CreatedAtRoute()`, `BadRequest()` |
+| **POST** | `CreatedAtAction()`, `BadRequest()` |
 | **PUT / PATCH** | `Ok()`, `NoContent()`, `BadRequest()` |
 | **DELETE** | `NoContent()`, `NotFound()` |
 
 ### Examples
 ```csharp
 return Ok(book);
-return CreatedAtRoute("book-editions-get", new { id = book.Id }, book);
+return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
 return NoContent();
 return BadRequest("Invalid data.");
 return NotFound();
