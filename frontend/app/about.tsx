@@ -1,3 +1,6 @@
+//initial set up code borrowed from expo router template
+// https://docs.expo.dev/tutorial/create-your-first-app/
+
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function AboutScreen() {
