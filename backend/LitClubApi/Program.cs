@@ -1,5 +1,4 @@
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.AddBook;
 using Microsoft.Azure.Cosmos;
 
 var builder = WebApplication.CreateBuilder(args);

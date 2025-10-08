@@ -1,122 +1,168 @@
 ## LitClub Repository Setup Guide
 
-## 1. Configure a secure SSH key so your computer can authenticate with GitHub without a password
-### 1. Open a terminal
+### 1. Install Required Dependencies
 
-You can use **PowerShell** or **Git Bash** (comes with Git for
-Windows).\
-For consistency, these instructions use PowerShell.
+#### 1. Install Node.js
+Visit [nodejs.org](https://nodejs.org/en/download) and follow the installation instructions for your operating system. Choose the **LTS (Long-Term Support)** version.
 
-### 2. Generate a new SSH key
+#### 2. Install Git
+Download and install Git from [git-scm.com/downloads](https://git-scm.com/downloads). Follow the installation wizard for your OS.
 
-Run this command (replace your GitHub email with yours):
+#### 3. Install .NET 8 LTS
+LitClub’s backend is built on **.NET 8 (Long-Term Support)**.
 
-``` powershell
-ssh-keygen -t ed25519 -C "your_email@example.com"
+Download and install it from the official Microsoft website:  
+[https://dotnet.microsoft.com/en-us/download/dotnet/8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+
+After installation, verify it with:
+```bash
+dotnet --version
 ```
+You should see a version beginning with `8.` (e.g., `8.0.303`).
 
-If your system doesn't support `ed25519`, use `rsa` instead:
+#### 4. Install Visual Studio Code
+Download **VS Code** from [code.visualstudio.com](https://code.visualstudio.com/) and follow the setup instructions for your operating system.
 
-``` powershell
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-```
+##### Recommended Extensions
+Once VS Code is installed, open it and install the following extensions:
+1. **C# Dev Kit** (Microsoft)  
+   Provides a full-featured C# development environment.
+3. **C#** (Microsoft)  
+   Adds language support, syntax highlighting, and IntelliSense for C#.
 
-When prompted: - **Save location:** Press **Enter** to accept default
-(`C:\Users\<YourUser>\.ssh\id_ed25519`).
-- **Passphrase:** Optional. Adds extra security, but you'll need to
-enter it whenever you use the key (or cache it with an agent).
+#### 5. Install the Expo Go App
+Download **Expo Go** on your smartphone (from the iOS App Store or Google Play). You’ll use it to preview and test the app during development.
 
-### 3. Start the SSH agent
+---
 
-Run the following in PowerShell:
-
-``` powershell
-Start-Service ssh-agent
-ssh-add ~\.ssh\id_ed25519
-```
-
-> If you see an error, you may need to run PowerShell as Administrator.
-
-### 4. Copy your public key
-
-Your public key is stored at:
-
-    C:\Users\<YourUser>\.ssh\id_ed25519.pub
-
-Copy it to the clipboard with:
-
-``` powershell
-Get-Content ~\.ssh\id_ed25519.pub | Set-Clipboard
-```
-
-### 5. Add the key to GitHub
-
-1.  Go to [GitHub SSH settings](https://github.com/settings/keys).
-2.  Click **New SSH key** → give it a title (e.g., *My Laptop*).
-3.  Paste your key from the clipboard.
-4.  Save.
-
-### 6. Test the connection
-
-Run this command:
-
-``` powershell
-ssh -T git@github.com
-```
-
-If successful, you'll see:
-
-    Hi <username>! You've successfully authenticated, but GitHub does not provide shell access.
-
-Done! You can now use `git clone`, `git push`, etc., with SSH URLs
-(they look like `git@github.com:user/repo.git`).
-
-------------------------------------------------------------------------
-
-## 2. Install required dependencies
-### 1. Download Noad.js
-Navigate to [nodejs.org/en/download](https://nodejs.org/en/download), and select the following attributes in the drop down menus:
-- **v22.20.0 (LTS)**, for
-- **Windows**, using
-- **Chocolatey**, with
-- **Yarn**
-
-Do not execute the commands until you complete the following step.
-
-### 2. Modify your execution policy
-Run the following script in Powershell to allow local scripts for your user.
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
-```
-Once completed, close Powershell and then run again with **Admin privileges**.
-
-### 3. Run the commands to install Node.js
-Refer to the commands generated in the first step.
-
-### 4. Install Git for Windows (if not already installed)
-Navigate to [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win) and click the download link at the very top of the page (the most recent and maintained build). Execute the downloaded file and follow the instructions for installation.
-
-### 5. Install the Expo Go app on your phone
-We will use this app to test our React Native app during the development process!
-
-------------------------------------------------------------------------
-
-## 3. Clone the LitClub repository
-Navigate to the directory where you would like to place the LitClub repository, then clone it using SSH:
+### 2. Clone the LitClub Repository
+Navigate to your desired directory and run:
 ```powershell
 git clone git@github.com:braydenreimann/LitClub.git
 ```
-------------------------------------------------------------------------
 
-## 4. Run the Expo app
-1. `cd` into `\LitClub\frontend`. This is where our Expo app lives.
-2. Install dependencies
+---
 
+### 3. Run the Expo App
+1. Navigate to the frontend:
+   ```bash
+   cd LitClub/frontend
+   ```
+2. Install dependencies:
    ```bash
    npm install
    ```
-3. Start the app
+3. Start the app:
    ```bash
    npx expo start
    ```
-In the output, follow the instructions to open the app in Expo Go.
+Follow the on-screen instructions to open the app in Expo Go.
+
+---
+
+## 4. Set Up the Cosmos DB Emulator (for the API Backend)
+
+This emulator lets you run the LitClub API locally without connecting to Azure.
+
+### 1. Install Docker
+
+#### macOS
+1. Install **Docker Desktop for Mac** from [Docker’s site](https://www.docker.com/products/docker-desktop/).
+2. Start Docker Desktop.
+3. Verify installation:
+   ```bash
+   docker --version
+   ```
+
+#### Windows
+1. Install **Docker Desktop for Windows** from [Docker’s site](https://www.docker.com/products/docker-desktop/).
+2. Start Docker Desktop.
+3. Enable **WSL 2 backend** when prompted.
+4. Verify installation:
+   ```powershell
+   docker --version
+   ```
+
+---
+
+### 2. Pull the Cosmos DB Emulator Image
+```bash
+docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+```
+
+---
+
+### 3. Run the Cosmos DB Emulator
+
+#### macOS
+```bash
+docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmos-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview --protocol https
+```
+
+Open [http://localhost:1234](http://localhost:1234) to view the interactive database explorer.
+
+Any time you remove the `cosmos-emulator` container from Docker, you will have to run this command again to initialize the container.
+
+---
+
+### 4. Configure the LitClub API Client
+In `Program.cs`, confirm this setup:
+
+```csharp
+// Configure the client's options to disable TSL/SSL validation before creating the client
+CosmosClientOptions options = new()
+{
+    HttpClientFactory = () => new HttpClient(new HttpClientHandler()
+    {
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    }),
+    ConnectionMode = ConnectionMode.Gateway
+};
+
+// Create a new instance of CosmosClient using the emulator's credentials
+using CosmosClient client = new(
+    accountEndpoint: "https://localhost:8081",
+    authKeyOrResourceToken: "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+    clientOptions: options
+);
+```
+
+---
+
+### 6. Emulator Management
+```bash
+docker stop cosmos-emulator
+docker start cosmos-emulator
+docker rm cosmos-emulator
+```
+
+You can run these commands in the terminal to stop, start, and remove the `cosmos-emulator` container. You can also do this using the GUI interface of the Docker Desktop application.
+
+You only need to start the container once per local development session, as the container keeps running in the background until you stop it or shut down your machine.
+
+When you're done for the day, or don't need the backend anymore, you should stop the container to free up system resources again.
+
+---
+
+### 7. Run the API
+1. Navigate to the backend:
+   ```bash
+   cd LitClub/backend/LitClubApi
+   ```
+2. Restore and build dependencies:
+   ```bash
+   dotnet restore
+   dotnet build
+   ```
+3. Run the API:
+   ```bash
+   dotnet run
+   ```
+
+You should see a successful API connection string in your console log. A window should also open in your default browser with an explorer for viewing and interacting with the LitClubApi endpoints.
+
+You can also run the API by navigating to `LitClub/backend/LitClubApi/Program.cs` and clicking the play button in VS Code.
+
+---
+
+**You’re now fully set up to develop and test LitClub locally with the ASP.NET Core Web API and Cosmos DB Emulator!**
