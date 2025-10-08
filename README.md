@@ -86,10 +86,11 @@ This emulator lets you run the LitClub API locally without connecting to Azure.
 ---
 
 ### 2. Pull the Cosmos DB Emulator Image
+Before running the command below, make sure you have the Docker Desktop application open.
+
 ```bash
 docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
 ```
-
 ---
 
 ### 3. Run the Cosmos DB Emulator
