@@ -52,7 +52,7 @@ namespace LitClubApi.Endpoints.Books.AddBook
                     PublicationDate = new DateOnly(int.Parse(date[2]), int.Parse(date[0]), int.Parse(date[1])),
                     Format = (BookFormat)format,
                     PrintLength = int.Parse(col[5]),
-                    Isbn13s = col[6]
+                    Isbn13s = new List<string> { col[6] }
                 };
 
                 Book book = new Book
@@ -61,7 +61,7 @@ namespace LitClubApi.Endpoints.Books.AddBook
                     Author = col[1],
                     TotalChapters = int.Parse(col[7]),
                     Genre = col[8],
-                    Edition = edition
+                    Editions = new List<Edition> { edition }
                     // Description not currently represented in csv, subject to change
                 };
              
