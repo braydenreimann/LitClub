@@ -6,38 +6,30 @@ namespace LitClubApi.Endpoints.Books.AddBook
 {
     public class CSVParserInsert
     {
-        public void parseinsert(string csvpath)
+        public List<Book>? Parse(string csvpath) //Returns List of Books from CSV 
         {   
-            try //Check for file existence
+             //Check for file existence
+            
+            if (!File.Exists(csvpath))
             {
-                if (!File.Exists(csvpath))
-                {
-                    Console.WriteLine("Error: File does not exist... Are you using the correct path?");
-                    return;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Unexpected error: {ex.Message}");
+                Console.WriteLine("Error: File does not exist... Are you using the correct path?");
+                return null;
             }
 
             // Reads all lines from CSV
             // *NOT GOOD for massive csv, but will work fine with our smaller files
             string[] lines = File.ReadAllLines(csvpath);
 
+            List<Book>? booklist = new List<Book> { };
+
             //start at i=1 to skip header
             for (int i = 1; i < lines.Length; i++) {
                 string line = lines[i];
                 string[] col = line.Split(',');
 
-                // IF (ISBN already in Database){ continue;}. That logic will go here.
-
-
-                //
                 string[] date = col[3].Split('/');
 
-                int format = 0;
+                int format;
 
                 if (col[4].Equals("Physical")) { format = 0; } //current sample csv does not differentiate hardcover and paper back
                 else if (col[4].Equals("Hardcover")) { format = 0; }
@@ -65,12 +57,10 @@ namespace LitClubApi.Endpoints.Books.AddBook
                     // Description not currently represented in csv, subject to change
                 };
              
-                var id = book.Id;
-
-                //add book to database logicS
+                booklist.Add(book);
 
             }
-
+            return booklist;
         }
     }
 }
