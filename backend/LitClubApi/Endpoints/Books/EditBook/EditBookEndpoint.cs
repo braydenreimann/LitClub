@@ -1,8 +1,9 @@
-using Microsoft.Azure.Cosmos;
 using Ardalis.ApiEndpoints;
+using Microsoft.Azure.Cosmos;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.Books;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.EditBook;
 
@@ -11,6 +12,8 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
     .WithActionResult<BookResponse>
 {
     [HttpPatch("books/{bookId}")]
+    [ProducesResponseType(typeof(BookResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<BookResponse>> HandleAsync(EditBookRequest request,
         CancellationToken cancellationToken = default)
     {

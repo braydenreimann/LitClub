@@ -5,6 +5,7 @@ using LitClubApi.Domain;
 using LitClubApi.Endpoints.Books.Editions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.Editions.GetEdition;
 
@@ -13,6 +14,9 @@ public class Get(Container booksContainer) : EndpointBaseAsync
     .WithActionResult<EditionResponse>
 {
     [HttpGet("books/{bookId}/editions/{editionId}", Name = "book-editions-get")]
+    [ProducesResponseType(typeof(EditionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
         GetEditionRequest request,
         CancellationToken cancellationToken = default)

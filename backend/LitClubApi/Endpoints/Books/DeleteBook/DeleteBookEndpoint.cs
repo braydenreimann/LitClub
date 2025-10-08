@@ -3,6 +3,7 @@ using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.DeleteBook;
 
@@ -11,6 +12,9 @@ public class Delete(Container booksContainer) : EndpointBaseAsync
     .WithActionResult
 {
     [HttpDelete("books/{bookId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult> HandleAsync(
         [FromRoute] DeleteBookRequest request,
         CancellationToken cancellationToken = default)

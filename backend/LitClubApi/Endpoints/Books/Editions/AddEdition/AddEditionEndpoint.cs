@@ -4,6 +4,7 @@ using LitClubApi.Domain;
 using LitClubApi.Endpoints.Books.Editions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.Editions.AddEdition;
 
@@ -12,6 +13,9 @@ public class Add(Container booksContainer) : EndpointBaseAsync
     .WithActionResult<EditionResponse>
 {
     [HttpPost("books/{bookId}/editions")]
+    [ProducesResponseType(typeof(EditionResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
         AddEditionRequest request,
         CancellationToken cancellationToken = default)

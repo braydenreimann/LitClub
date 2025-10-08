@@ -1,8 +1,9 @@
-using Microsoft.Azure.Cosmos;
 using Ardalis.ApiEndpoints;
+using Microsoft.Azure.Cosmos;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.Books;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.AddBook;
 
@@ -11,6 +12,8 @@ public class Add(Container booksContainer) : EndpointBaseAsync
     .WithActionResult<BookResponse>
 {
     [HttpPost("books")]
+    [ProducesResponseType(typeof(BookResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<BookResponse>> HandleAsync(AddBookRequest request,
     CancellationToken cancellationToken = default)
     {

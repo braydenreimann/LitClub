@@ -2,6 +2,7 @@ using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.ListBooks;
 
@@ -10,6 +11,8 @@ public class List(Container booksContainer) : EndpointBaseAsync
     .WithActionResult<ListBooksResponse>
 {
     [HttpGet("books")]
+    [ProducesResponseType(typeof(ListBooksResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<ListBooksResponse>> HandleAsync(
         [FromQuery] ListBooksRequest request,
         CancellationToken cancellationToken = default)
