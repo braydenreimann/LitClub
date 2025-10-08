@@ -9,7 +9,7 @@ public class Book
     public required string Title { get; set; }
     public required string Author { get; set; }
     public required int TotalChapters { get; set; }
-    public List<string> Genres { get; set; } = [];
+    public required string Genre { get; set; }
     public string? Description { get; set; }
-    public List<Edition> Editions { get; set; } = [];
+    public required Edition Edition { get; set; }
 }

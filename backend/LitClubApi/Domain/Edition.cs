@@ -9,5 +9,5 @@ public class Edition
     public required string Publisher { get; set; }
     public required DateOnly PublicationDate { get; set; }
     public int? PrintLength { get; set; }
-    public List<string> Isbn13s { get; set; } = [];
+    public required string Isbn13s { get; set; }
 }
