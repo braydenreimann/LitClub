@@ -8,7 +8,7 @@ Visit [nodejs.org](https://nodejs.org/en/download) and follow the installation i
 #### 2. Install Git
 Download and install Git from [git-scm.com/downloads](https://git-scm.com/downloads). Follow the installation wizard for your OS.
 
-#### 3. Install .NET 8 LTS
+#### 3. Install .NET 8 LTS *
 LitClub’s backend is built on **.NET 8 (Long-Term Support)**.
 
 Download and install it from the official Microsoft website:  
@@ -20,10 +20,10 @@ dotnet --version
 ```
 You should see a version beginning with `8.` (e.g., `8.0.303`).
 
-#### 4. Install Visual Studio Code
+#### 4. Install VS Code and C# Extensions *
 Download **VS Code** from [code.visualstudio.com](https://code.visualstudio.com/) and follow the setup instructions for your operating system.
 
-##### Recommended Extensions
+##### Recommended Extensions *
 Once VS Code is installed, open it and install the following extensions:
 1. **C# Dev Kit** (Microsoft)  
    Provides a full-featured C# development environment.
@@ -60,11 +60,11 @@ Follow the on-screen instructions to open the app in Expo Go.
 
 ---
 
-## 4. Set Up the Cosmos DB Emulator (for the API Backend)
+## 4. Set Up the Cosmos DB Emulator (for the API Backend) *
 
 This emulator lets you run the LitClub API locally without connecting to Azure.
 
-### 1. Install Docker
+### 1. Install Docker *
 
 #### macOS
 1. Install **Docker Desktop for Mac** from [Docker’s site](https://www.docker.com/products/docker-desktop/).
@@ -85,7 +85,7 @@ This emulator lets you run the LitClub API locally without connecting to Azure.
 
 ---
 
-### 2. Pull the Cosmos DB Emulator Image
+### 2. Pull the Cosmos DB Emulator Image *
 Before running the command below, make sure you have the Docker Desktop application open.
 
 ```bash
@@ -93,7 +93,7 @@ docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
 ```
 ---
 
-### 3. Run the Cosmos DB Emulator
+### 3. Run the Cosmos DB Emulator *
 
 #### macOS
 ```bash
@@ -106,8 +106,8 @@ Any time you remove the `cosmos-emulator` container from Docker, you will have t
 
 ---
 
-### 4. Configure the LitClub API Client
-In `Program.cs`, confirm this setup:
+### 4. Configure the LitClub API Client *
+Navigate to the backend (`LitClub/backend/LitClubApi`). In `Program.cs`, confirm this setup:
 
 ```csharp
 // Configure the client's options to disable TSL/SSL validation before creating the client
