@@ -39,8 +39,8 @@ namespace LitClubApi.Endpoints.Books.AddBook
 
                 for (int j = 0; j < col.Length; j++)
                 {
-                    col[j].TrimStart(); //Fixes accidental spacing issues
-                    col[j].TrimEnd();
+                    col[j] = col[j].TrimStart(); //Fixes accidental spacing issues
+                    col[j] = col[j].TrimEnd();
                 }
 
                 string[] date = col[3].Split('/'); //MM/DD/YYYY
