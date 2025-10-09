@@ -1,5 +1,4 @@
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.AddBook;
 using Microsoft.Azure.Cosmos;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,7 +45,7 @@ Book book = new()
     Title = "The Fault in Our Stars",
     Author = "John Green",
     TotalChapters = 25,
-    Genres = ["Young adult novel", "Realistic fiction"],
+    Genre = "Young adult novel",
     Description = "A book about two sick young lovers.",
     Editions = [
         new Edition {

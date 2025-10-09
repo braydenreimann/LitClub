@@ -1,0 +1,16 @@
+2025-10-09T21:11:52.1610258+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION Version: 1.4.3+c252b64ad913ea9411fc5d17bfd5580d2d061497
+2025-10-09T21:11:52.1705956+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION Logging mode: asynchronous
+2025-10-09T21:11:52.1718076+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION Logging level: Information
+2025-10-09T21:11:52.1718138+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION CreateBuilderAsync entry time: 21:11:52.075
+2025-10-09T21:11:52.2308312+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION PID: 33252
+2025-10-09T21:11:52.2309041+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION Runtime information: win-x64 - .NET 9.0.9
+2025-10-09T21:11:52.2309371+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION Runtime location: C:\Program Files\dotnet\shared\Microsoft.NETCore.App\9.0.9\System.Private.CoreLib.dll
+2025-10-09T21:11:52.2309649+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION IsDynamicCodeSupported: True
+2025-10-09T21:11:52.2309714+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION Test module: C:\Users\benja\Source\Repos\LitClub\backend\TestProject\bin\Debug\net9.0\TestProject.dll
+2025-10-09T21:11:52.2310805+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION Command line arguments: '--server --diagnostic --diagnostic-verbosity Information --diagnostic-output-directory C:\Users\benja\Source\Repos\LitClub\backend\TestProject\bin\Debug\net9.0\Log --results-directory C:\Users\benja\Source\Repos\LitClub\backend\LitClubApi\TestResults --client-port 54125'
+2025-10-09T21:11:52.2328315+00:00 Microsoft.Testing.Platform.Builder.TestApplication INFORMATION TESTINGPLATFORM_DEFAULT_HANG_TIMEOUT: ''
+2025-10-09T21:11:52.3604916+00:00 Microsoft.Testing.Platform.Hosts.TestHostBuilder INFORMATION Setting RegisterEnvironmentVariablesConfigurationSource: 'True'
+2025-10-09T21:11:52.3639846+00:00 Microsoft.Testing.Platform.Configurations.JsonConfigurationSource+JsonConfigurationProvider INFORMATION Config file 'C:\Users\benja\Source\Repos\LitClub\backend\TestProject\bin\Debug\net9.0\TestProject.testconfig.json' not found.
+2025-10-09T21:11:52.3654195+00:00 Microsoft.Testing.Platform.Hosts.TestHostBuilder INFORMATION Setting PlatformExitProcessOnUnhandledException: 'False', config file: False environment variable:  VSTest mode: False
+2025-10-09T21:11:52.9119321+00:00 Microsoft.Testing.Platform.Requests.TestHostTestFrameworkInvoker INFORMATION Test framework UID: 'MSTest.Sdk' Version: '3.6.4' DisplayName: 'MSTest' Description: 'MSTest Framework for Microsoft Testing Platform'
+2025-10-09T21:11:53.0592851+00:00 Microsoft.Testing.Extensions.VSTestBridge.ObjectModel.MessageLoggerAdapter INFORMATION Test Parallelization enabled for C:\Users\benja\Source\Repos\LitClub\backend\TestProject\bin\Debug\net9.0\TestProject.dll (Workers: 20, Scope: MethodLevel)
