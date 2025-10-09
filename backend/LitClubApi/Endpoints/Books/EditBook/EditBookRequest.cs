@@ -9,6 +9,6 @@ public sealed class EditBookRequest
     public string? Title { get; init; }
     public string? Author { get; init; }
     public int? TotalChapters { get; init; }
-    public List<string>? Genres { get; init; }
+    public string? Genre { get; init; }
     public string? Description { get; init; }
 }
