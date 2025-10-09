@@ -25,10 +25,17 @@ namespace LitClubApi.Endpoints.Books.AddBook
             //start at i=1 to skip header
             for (int i = 1; i < lines.Length; i++) {
                 string line = lines[i];
-                line = line.Replace("\t", "");
+                if (string.IsNullOrWhiteSpace(line)) { continue; } //skip empty lines
+                line = line.Replace("\t", ""); //Remove tabs if they exist
                 string[] col = line.Split(',');
 
-                string[] date = col[3].Split('/');
+                if (col.Length < 9) //Check for correct number of columns
+                {
+                    Console.WriteLine("Error: Invalid number of fields for " + col[0] + ". This book will not be inserted, continuting csv parse");
+                    continue;
+                }
+
+                string[] date = col[3].Split('/'); //MM/DD/YYYY
 
                 int format;
 

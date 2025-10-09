@@ -25,7 +25,7 @@ namespace TestProject //dotnet test
             Assert.AreEqual("Bryn Donovan", books[0].Author);
             Assert.AreEqual(352, books[0].Editions[0].PrintLength);
             Assert.AreEqual(BookFormat.Hardcover, books[0].Editions[0].Format);
-            Assert.AreEqual("978 - 0593816592", books[0].Editions[0].Isbn13s[0]);
+            Assert.AreEqual("978-0593816592", books[0].Editions[0].Isbn13s[0]);
 
             Console.WriteLine("Parse Test Complete");
 
