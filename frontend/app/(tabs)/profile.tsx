@@ -15,6 +15,7 @@ export default function ProfileScreen() {
     return (
         // TO DO: insert header at the top, which will include the logo and search bar
         
+        
         <ParallaxScrollView
             headerImage={
                 <Image 
@@ -23,8 +24,8 @@ export default function ProfileScreen() {
                 />
             }
             headerBackgroundColor={{
-                dark: '#211F3E',
-                light: '#E4D7C8',
+                dark: '#94a694',
+                light: '#e4dbc8',
             }}
         >
             <ThemedView style={styles.container}>

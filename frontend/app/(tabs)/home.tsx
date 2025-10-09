@@ -2,26 +2,42 @@
 // https://docs.expo.dev/tutorial/create-your-first-app/
 
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { useState } from 'react';
+
 
 export default function HomeScreen() {
+
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#629FAE', dark: '#224B6F' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/color logo w background.png')}
-          style={styles.reactLogo}
-        />
-      }>
+    <View style={{ flex: 1 }}>
+          <View style={styles.header}>
+            <Image
+              source={require('@/assets/images/small logo.png')}
+              style={styles.headerImage}
+              contentFit="contain"
+            />
+            <TextInput
+              style={styles.searchBar}
+              placeholder="Search"
+              placeholderTextColor="#555"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+    
+          </View>
+
+    <ParallaxScrollView>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome to LitClub!</ThemedText>
+        <ThemedText type="title">Bookshelf</ThemedText>
       </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -76,6 +92,7 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
+    </View>
   );
 }
 
@@ -89,11 +106,33 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: '#E4D7C8',
+    justifyContent: 'flex-start',
   },
+  headerImage: {
+    width: 80,
+    height: 180,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+  },
+  header: {
+    backgroundColor: '#94a694',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    paddingTop: 70,
+    paddingLeft: 20,
+    height: 120,
+  },
+  searchBar: {
+    marginTop: 10,
+    backgroundColor: '#fff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    width: '90%',
+    color: '#000',
+    fontSize: 16,
+  }
 });
