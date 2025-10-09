@@ -1,24 +1,24 @@
-using System.Linq;
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.Editions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.Editions.EditEdition;
 
+[ApiController]
 public class Edit(Container booksContainer) : EndpointBaseAsync
     .WithRequest<EditEditionRequest>
     .WithActionResult<EditionResponse>
 {
     [HttpPatch("books/{bookId}/editions/{editionId}")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(EditionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
-        EditEditionRequest request,
+        [FromRoute] EditEditionRequest request,
         CancellationToken cancellationToken = default)
     {
         Book? book;
@@ -46,29 +46,29 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
             return NotFound();
         }
 
-        if (request.Format.HasValue)
+        if (request.Body.Format.HasValue)
         {
-            edition.Format = request.Format.Value.ToDomain();
+            edition.Format = request.Body.Format.Value.ToDomain();
         }
 
-        if (request.Publisher is not null)
+        if (request.Body.Publisher is not null)
         {
-            edition.Publisher = request.Publisher;
+            edition.Publisher = request.Body.Publisher;
         }
 
-        if (request.PublicationDate.HasValue)
+        if (request.Body.PublicationDate.HasValue)
         {
-            edition.PublicationDate = request.PublicationDate.Value;
+            edition.PublicationDate = request.Body.PublicationDate.Value;
         }
 
-        if (request.PrintLength.HasValue)
+        if (request.Body.PrintLength.HasValue)
         {
-            edition.PrintLength = request.PrintLength;
+            edition.PrintLength = request.Body.PrintLength;
         }
 
-        if (request.Isbn13s is not null)
+        if (request.Body.Isbn13s is not null)
         {
-            edition.Isbn13s = [.. request.Isbn13s];
+            edition.Isbn13s = [.. request.Body.Isbn13s];
         }
 
         try

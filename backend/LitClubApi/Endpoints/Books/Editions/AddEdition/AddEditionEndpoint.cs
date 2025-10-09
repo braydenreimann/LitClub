@@ -1,23 +1,24 @@
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.Editions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.Editions.AddEdition;
 
+[ApiController]
 public class Add(Container booksContainer) : EndpointBaseAsync
-    .WithRequest<AddEditionRequest>
-    .WithActionResult<EditionResponse>
+.WithRequest<AddEditionRequest>
+.WithActionResult<EditionResponse>
 {
     [HttpPost("books/{bookId}/editions")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(EditionResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
-        AddEditionRequest request,
+        [FromRoute] AddEditionRequest request,
         CancellationToken cancellationToken = default)
     {
         Book? book;
@@ -39,13 +40,15 @@ public class Add(Container booksContainer) : EndpointBaseAsync
             return StatusCode(500, "Unable to access database");
         }
 
+        var b = request.Body;
+
         Edition newEdition = new()
         {
-            Format = request.Format.ToDomain(),
-            Publisher = request.Publisher,
-            PublicationDate = request.PublicationDate,
-            PrintLength = request.PrintLength,
-            Isbn13s = [.. request.Isbn13s]
+            Format = b.Format.ToDomain(),
+            Publisher = b.Publisher,
+            PublicationDate = b.PublicationDate,
+            PrintLength = b.PrintLength,
+            Isbn13s = [.. b.Isbn13s]
         };
 
         book.Editions.Add(newEdition);
@@ -63,7 +66,9 @@ public class Add(Container booksContainer) : EndpointBaseAsync
             return StatusCode(500, "Unable to access database");
         }
 
-        EditionResponse responseBody = newEdition.ToResponse();
-        return CreatedAtRoute("book-editions-get", new { bookId = book.Id, editionId = newEdition.Id }, responseBody);
+        return CreatedAtRoute(
+            routeName: "book-editions-get",
+            routeValues: new { bookId = book.Id, editionId = newEdition.Id },
+            value: newEdition.ToResponse());
     }
 }

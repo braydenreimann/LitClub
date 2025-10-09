@@ -2,19 +2,21 @@ using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.ListBooks;
 
+[ApiController]
 public class List(Container booksContainer) : EndpointBaseAsync
     .WithRequest<ListBooksRequest>
     .WithActionResult<ListBooksResponse>
 {
     [HttpGet("books")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(ListBooksResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<ListBooksResponse>> HandleAsync(
-        [FromQuery] ListBooksRequest request,
+        ListBooksRequest request,
         CancellationToken cancellationToken = default)
     {
         int pageSize = request.ClampPageSize();

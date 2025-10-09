@@ -2,16 +2,18 @@ using Ardalis.ApiEndpoints;
 using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using LitClubApi.Domain;
-using Microsoft.AspNetCore.Http;
 
 namespace LitClubApi.Endpoints.Books.GetBook;
 
+[ApiController]
 public class Get(Container booksContainer) : EndpointBaseAsync
     .WithRequest<GetBookRequest>
     .WithActionResult<BookResponse>
 {
 
     [HttpGet("books/{bookId}", Name = "books")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(BookResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<BookResponse>> HandleAsync(
