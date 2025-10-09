@@ -4,5 +4,7 @@
 
 /backend/LitClubApi/obj
 /backend/LitClubApi/bin
+/backend/TestProject/bin
+/backend/TestProject/obj
 /.vs
 /backend/LitClubApi/.vs/LitClubApi
