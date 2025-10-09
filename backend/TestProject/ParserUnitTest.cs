@@ -13,7 +13,6 @@ namespace TestProject //dotnet test
             string nonexist = "000";
             List<Book> books = CSVParserInsert.Parse(nonexist);
             Assert.AreEqual(0, books.Count);
-            Console.WriteLine("Non Exist Test Complete");
 
             string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
             string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
@@ -26,8 +25,6 @@ namespace TestProject //dotnet test
             Assert.AreEqual(352, books[0].Editions[0].PrintLength);
             Assert.AreEqual(BookFormat.Hardcover, books[0].Editions[0].Format);
             Assert.AreEqual("978-0593816592", books[0].Editions[0].Isbn13s[0]);
-
-            Console.WriteLine("Parse Test Complete");
 
         }
     }
