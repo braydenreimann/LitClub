@@ -26,13 +26,21 @@ namespace LitClubApi.Endpoints.Books.AddBook
             for (int i = 1; i < lines.Length; i++) {
                 string line = lines[i];
                 if (string.IsNullOrWhiteSpace(line)) { continue; } //skip empty lines
-                line = line.Replace("\t", ""); //Remove tabs if they exist
+                line = line.Replace("\t", "");
+                line = line.TrimStart(); //Remove tabs if they exist
+
                 string[] col = line.Split(',');
 
-                if (col.Length < 9) //Check for correct number of columns
+                if (col.Length != 9) //Check for correct number of columns
                 {
                     Console.WriteLine("Error: Invalid number of fields for " + col[0] + ". This book will not be inserted, continuting csv parse");
                     continue;
+                }
+
+                for (int j = 0; j < col.Length; j++)
+                {
+                    col[j].TrimStart(); //Fixes accidental spacing issues
+                    col[j].TrimEnd();
                 }
 
                 string[] date = col[3].Split('/'); //MM/DD/YYYY
@@ -44,6 +52,7 @@ namespace LitClubApi.Endpoints.Books.AddBook
                 else if (col[4].Equals("Paperback")) { format = 1; }
                 else if (col[4].Equals("E-book")) { format = 2; }
                 else if (col[4].Equals("Audiobook")) { format = 3; }
+                else if (col[4].Equals("Mixed Media")) { format = 4; }
                 else { Console.WriteLine("Invalid Book Format for " + col[0] + ". This book will not be inserted, continuting csv parse"); continue; }
 
                 Edition edition = new Edition

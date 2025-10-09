@@ -20,11 +20,17 @@ namespace TestProject //dotnet test
 
             books = CSVParserInsert.Parse(exist);
             Assert.AreNotEqual(0, books.Count);
-            Assert.AreEqual("Her Knight at the Museum", books[0].Title);
+            Assert.AreEqual("Her Knight at the Museum", books[0].Title); //First book in sample csv
             Assert.AreEqual("Bryn Donovan", books[0].Author);
             Assert.AreEqual(352, books[0].Editions[0].PrintLength);
             Assert.AreEqual(BookFormat.Hardcover, books[0].Editions[0].Format);
             Assert.AreEqual("978-0593816592", books[0].Editions[0].Isbn13s[0]);
+
+            Assert.AreEqual("Unbroken", books[22].Title);
+            Assert.AreEqual("Laura Hillenbrand", books[22].Author);
+            Assert.AreEqual(473, books[0].Editions[0].PrintLength);
+            Assert.AreEqual(BookFormat.Hardcover, books[0].Editions[0].Format);
+            Assert.AreEqual("978-1400064168", books[0].Editions[0].Isbn13s[0]);
 
         }
     }
