@@ -94,8 +94,6 @@ docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
 ---
 
 ### 3. Run the Cosmos DB Emulator *
-
-#### macOS
 ```bash
 docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmos-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview --protocol https
 ```
