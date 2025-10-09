@@ -6,14 +6,14 @@ namespace LitClubApi.Endpoints.Books.AddBook
 {
     public class CSVParserInsert
     {
-        public List<Book>? Parse(string csvpath) //Returns List of Books from CSV 
+        public static List<Book> Parse(string csvpath) //Returns List of Books from CSV 
         {   
              //Check for file existence
             
             if (!File.Exists(csvpath))
             {
                 Console.WriteLine("Error: File does not exist... Are you using the correct path?");
-                return null;
+                return new List<Book> { };
             }
 
             // Reads all lines from CSV
@@ -25,6 +25,7 @@ namespace LitClubApi.Endpoints.Books.AddBook
             //start at i=1 to skip header
             for (int i = 1; i < lines.Length; i++) {
                 string line = lines[i];
+                line = line.Replace("\t", "");
                 string[] col = line.Split(',');
 
                 string[] date = col[3].Split('/');

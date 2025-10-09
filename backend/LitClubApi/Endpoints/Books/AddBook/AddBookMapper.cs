@@ -9,7 +9,7 @@ public static class AddBookMapper
         Title = request.Title,
         Author = request.Author,
         TotalChapters = request.TotalChapters,
-        Genres = request.Genres,
+        Genre = request.Genre,
         Description = request.Description
     };
 }

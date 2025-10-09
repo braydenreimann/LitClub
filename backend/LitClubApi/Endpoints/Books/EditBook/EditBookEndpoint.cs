@@ -34,7 +34,7 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
         if (request.Title is not null) updatedBook.Title = request.Title;
         if (request.Author is not null) updatedBook.Author = request.Author;
         if (request.TotalChapters is not null) updatedBook.TotalChapters = request.TotalChapters.Value;
-        if (request.Genres is not null) updatedBook.Genres = [.. request.Genres];
+        if (request.Genre is not null) updatedBook.Genre =  request.Genre;
         if (request.Description is not null) updatedBook.Description = request.Description;
         try
         {
