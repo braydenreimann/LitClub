@@ -1,3 +1,6 @@
+//initial set up code borrowed from expo router template
+// https://docs.expo.dev/tutorial/create-your-first-app/
+
 import { Link } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
