@@ -31,20 +31,32 @@ export default function profile() {
      
     );
 }
-function BookSection({ title, books }) {
+
+type Books = { //allow the books to be displayed on the screen
+    title: string;
+    coverUrl: string;
+}
+
+type SectionProps = { //a section has a title ans list of books in that section
+    name: string;
+    list: Books[];
+}
+
+function BookSection({name, list}: SectionProps) {
     return (
-        <div>
-            <h1>
-            title
-            </h1>
+        <View style={StyleSheet }>
+            <Heading> {name}</Heading>
             //implement scrollable menu like https://www.w3schools.com/howto/howto_css_menu_horizontal_scroll.asp in CSS
-            <p>
+            {
+                for(let i = 0; i < list.length; i++) {
+
+            }
                 book1
                 book2
                 book3
             </p>
 
-        </div>
+        </View>
     );
 }
 
