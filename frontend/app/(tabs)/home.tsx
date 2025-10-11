@@ -1,26 +1,29 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+//initial set up code borrowed from expo router template
+// https://docs.expo.dev/tutorial/create-your-first-app/
 
-import { HelloWave } from '@/components/hello-wave';
+import { Image } from 'expo-image';
+import { Platform, StyleSheet, TextInput, View } from 'react-native';
+
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { useState } from 'react';
+import SearchBar from '@/components/SearchBar';
+import Header from '../headerWithSearch';
+
 
 export default function HomeScreen() {
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
+    <View style={{ flex: 1 }}>
+      <Header />
+
+    <ParallaxScrollView>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome to LitClub!</ThemedText>
-        <HelloWave />
+        <ThemedText type="title">Bookshelf</ThemedText>
       </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -75,6 +78,7 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
+    </View>
   );
 }
 
@@ -88,11 +92,23 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: '#E4D7C8',
+    justifyContent: 'flex-start',
+  },
+  headerImage: {
+    width: 80,
+    height: 180,
+    resizeMode: 'contain',
+  },
+  header: {
+    backgroundColor: '#94a694',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingTop: 70,
+    paddingLeft: 20,
+    height: 120,
   },
 });

@@ -12,7 +12,7 @@ public static class BookMapper
         Title = book.Title,
         Author = book.Author,
         TotalChapters = book.TotalChapters,
-        Genres = [.. book.Genres],
+        Genre = book.Genre,
         Description = book.Description,
         Editions = [.. book.Editions.Select(edition => edition.ToResponse())]
     };

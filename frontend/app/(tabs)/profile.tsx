@@ -97,23 +97,15 @@ import { Link } from 'expo-router';
 import { View } from 'react-native';
 import { Image } from 'expo-image';
 //import ProfilePic from '@../../assets/images/userprofile_icon.png';
+import SearchBar from '@/components/SearchBar';
+import Header from '../headerWithSearch';
 
 export default function ProfileScreen() {
     return (
         // TO DO: insert header at the top, which will include the logo and search bar
-
-        <ParallaxScrollView
-            headerImage={
-                <Image
-                    source={require('@/assets/images/header-image-temporary.png')}
-                    style={styles.headerImage}
-                />
-            }
-            headerBackgroundColor={{
-                dark: '#211F3E',
-                light: '#E4D7C8',
-            }}
-        >
+        <View>
+         <Header />
+        <ParallaxScrollView>
             <ThemedView style={styles.container}>
                 <View style={styles.imageContainer}>
                     <Image
@@ -123,9 +115,10 @@ export default function ProfileScreen() {
                 </View>
                 <ThemedText type="title">Firstname Lastname</ThemedText>
                 <ThemedText type="subtitle">@username</ThemedText>
-
+                
             </ThemedView>
         </ParallaxScrollView>
+        </View>
     );
 }
 
@@ -136,25 +129,48 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
     },
-    imageContainer: {
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        marginBottom: 20,
-    },
-    image: {
-        width: 150,
-        height: 150,
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        alignContent: 'flex-start',
-        borderRadius: 75,
-    },
-    text: {
-        color: '#211F3E',
-    },
-    headerImage: {
+  imageContainer: {
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  image: {
+    width: 150,
+    height: 150,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    alignContent: 'flex-start',
+    borderRadius: 75,
+  },
+  text: {
+    color: '#211F3E',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  stepContainer: {
+    gap: 8,
+    marginBottom: 8,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#E4D7C8',
+    justifyContent: 'flex-start',
+  },
+  headerImage: {
         width: '100%',
         height: 140,
-        resizeMode: 'contain',
-    },
+    resizeMode: 'contain',
+  },
+  header: {
+    backgroundColor: '#94a694',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingTop: 70,
+    paddingLeft: 20,
+    height: 120,
+  },
 });
