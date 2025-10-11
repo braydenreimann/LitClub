@@ -67,8 +67,9 @@ const styles = StyleSheet.create({
     color: '#211F3E',
   },
   headerImage: {
-    width: '100%',
-    height: 140,
-    resizeMode: 'contain',
+    width: 80,
+    height: 180,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
 });

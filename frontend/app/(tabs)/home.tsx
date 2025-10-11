@@ -9,11 +9,10 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 import { useState } from 'react';
+import SearchBar from '@/components/SearchBar';
 
 
 export default function HomeScreen() {
-
-  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <View style={{ flex: 1 }}>
@@ -23,13 +22,11 @@ export default function HomeScreen() {
               style={styles.headerImage}
               contentFit="contain"
             />
-            <TextInput
-              style={styles.searchBar}
-              placeholder="Search"
-              placeholderTextColor="#555"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
+
+            <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 20 }}>
+              <SearchBar />
+            </View>
+            
     
           </View>
 
@@ -114,25 +111,15 @@ const styles = StyleSheet.create({
   headerImage: {
     width: 80,
     height: 180,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    resizeMode: 'contain',
   },
   header: {
     backgroundColor: '#94a694',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
     paddingTop: 70,
     paddingLeft: 20,
     height: 120,
   },
-  searchBar: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-    width: '90%',
-    color: '#000',
-    fontSize: 16,
-  }
 });

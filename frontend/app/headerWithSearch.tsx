@@ -36,6 +36,7 @@ export default function HomeScreen() {
           style={styles.headerImage}
           contentFit="contain"
         />
+        
         <TextInput
           style={styles.searchBar}
           placeholder="Search"
@@ -66,6 +67,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     marginTop: 10,
+    
   }
 });
 
