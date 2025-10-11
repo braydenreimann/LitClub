@@ -10,25 +10,14 @@ import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import SearchBar from '@/components/SearchBar';
+import Header from '../headerWithSearch';
 
 
 export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-          <View style={styles.header}>
-            <Image
-              source={require('@/assets/images/small logo.png')}
-              style={styles.headerImage}
-              contentFit="contain"
-            />
-
-            <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 20 }}>
-              <SearchBar />
-            </View>
-            
-    
-          </View>
+      <Header />
 
     <ParallaxScrollView>
       <ThemedView style={styles.titleContainer}>

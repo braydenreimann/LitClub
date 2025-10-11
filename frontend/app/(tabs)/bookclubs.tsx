@@ -2,7 +2,7 @@
 // https://docs.expo.dev/tutorial/create-your-first-app/
 
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 import { Collapsible } from '@/components/ui/collapsible';
 import { ExternalLink } from '@/components/external-link';
@@ -11,9 +11,14 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
+import SearchBar from '@/components/SearchBar';
+import Header from '../headerWithSearch';
 
 export default function TabTwoScreen() {
   return (
+    <View>
+      <Header />
+      
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
       headerImage={
@@ -98,18 +103,37 @@ export default function TabTwoScreen() {
         })}
       </Collapsible>
     </ParallaxScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
   titleContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
+  },
+  stepContainer: {
+    gap: 8,
+    marginBottom: 8,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#E4D7C8',
+    justifyContent: 'flex-start',
+  },
+  headerImage: {
+    width: 80,
+    height: 180,
+    resizeMode: 'contain',
+  },
+  header: {
+    backgroundColor: '#94a694',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingTop: 70,
+    paddingLeft: 20,
+    height: 120,
   },
 });
