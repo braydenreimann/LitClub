@@ -38,7 +38,7 @@ Container booksContainer = await database.CreateContainerIfNotExistsAsync(
     partitionKeyPath: "/id"
 );
 
-// Create a new item
+// Seed the database
 Book book = new()
 {
     Id = "1",

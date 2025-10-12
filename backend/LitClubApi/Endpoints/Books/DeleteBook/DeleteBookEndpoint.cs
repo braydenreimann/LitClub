@@ -6,11 +6,17 @@ using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.DeleteBook;
 
+[ApiController]
 public class Delete(Container booksContainer) : EndpointBaseAsync
     .WithRequest<DeleteBookRequest>
     .WithActionResult
 {
     [HttpDelete("books/{bookId}")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult> HandleAsync(
         [FromRoute] DeleteBookRequest request,
         CancellationToken cancellationToken = default)

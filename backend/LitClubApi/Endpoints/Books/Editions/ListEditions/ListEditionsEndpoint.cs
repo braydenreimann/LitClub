@@ -1,18 +1,22 @@
 using System.Net;
-using System.Linq;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.Editions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.Editions.ListEditions;
 
+[ApiController]
 public class List(Container booksContainer) : EndpointBaseAsync
     .WithRequest<ListEditionsRequest>
     .WithActionResult<ListEditionsResponse>
 {
     [HttpGet("books/{bookId}/editions")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(ListEditionsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<ListEditionsResponse>> HandleAsync(
         ListEditionsRequest request,
         CancellationToken cancellationToken = default)
