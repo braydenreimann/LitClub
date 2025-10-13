@@ -1,42 +1,50 @@
-import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
-import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
-import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
-import * as SplashScreen from 'expo-splash-screen';
-import React from 'react';
-import { View } from 'react-native';
-import BodyText from '../components/BodyText';
-import Heading from '../components/Heading';
-import Subheading from '../components/Subheading';
+import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useSession } from '../auth/authContext';
 import { globalStyles } from '../styles/globalStyles';
-import { colors } from '../theme';
-
-
-SplashScreen.preventAutoHideAsync();
+import { colors, fonts } from '../theme';
 
 export default function index() {
+  const { session, isLoading } = useSession();
+  const router = useRouter();
 
-  const [fontsLoaded] = useFonts({
-    Fraunces_700Bold,
-    ChivoMono_500Medium,
-    NotoSansMono_400Regular,
-  });
+  useEffect(() => {
+    if (!isLoading) {
+      if (session) {
+        router.replace('/home');
+      } else {
+        router.replace('/auth/login'); //Not logged in - going to login
+      }
+    }
+  }, [isLoading, session]);
 
-  React.useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) return null;
-  
+  if (isLoading) {
     return (
-      <View style={globalStyles.container}>
-        <Heading style={{ color: colors.midBlue}}>Example of Heading (for the index!)</Heading>
-        <Subheading style={{ color: colors.sage }}>Example of Subheading</Subheading>
-        <Subheading>If you don't specify style, this is the default subheading color!</Subheading>
-  
-        <BodyText>
-          This body text automatically uses your Noto Sans Mono font and color scheme.
-          Isn't it great? I love body text.
-        </BodyText>
+      <View style={[globalStyles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color={colors.midBlue} />
+        <Text style={styles.loadingText}>Checking session...</Text>
       </View>
     );
+  }
+
+  // Optional fallback while redirecting
+  return (
+    <View style={[globalStyles.container, styles.loadingContainer]}>
+      <Text style={styles.loadingText}>Redirecting...</Text>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontFamily: fonts.body,
+    color: colors.darkest,
+    fontSize: 18,
+    marginTop: 12,
+  },
+});
