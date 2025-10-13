@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import StyleSheet from '../../styles/globalStyles';
 import Foundation from '@expo/vector-icons/Foundation'; //imported from react
-import { Platform, StyleSheet } from 'react-native';
+import { Platform} from 'react-native';
 import ParallaxScrollView from '../../components/parallax-scroll-view';
 import { ThemedText } from '../../components/themed-text';
 import { ThemedView } from '../../components/themed-view';
@@ -11,7 +11,6 @@ import { Image } from 'expo-image';
 //import ProfilePic from '@../../assets/images/userprofile_icon.png';
 import SearchBar from '@/components/SearchBar';
 import Header from '../headerWithSearch';
-import { StyleSheet } from 'react-native';
 import { colors, fonts } from '../theme';
 
 
@@ -99,13 +98,8 @@ export default function ProfileScreen() {
                 </View>
                 <heading type="title">Firstname Lastname</heading>
                 <ThemedText type="subtitle">@username</ThemedText>
-                <EditButton />
-                
-            </ThemedView>
-        </ParallaxScrollView>
-        </View>
-    );
-}
+                <EditButton />   
+          
 
 
 <BookSection
@@ -134,23 +128,12 @@ list{{}
 />
 
 
-//overall profile page
-export default function profile() {
-    return (
-        //header
-        <div>
-            <h1>firstname lastname</h1>
-            <img className="profile"/> 
-            <h2>@user.username</h2>
-            <p> user.bio</p>
-            <EditButton />
-        </div>
-        //book sections
-        <div>
-        </div>
-     
+  </ThemedView>
+        </ParallaxScrollView>
+        </View>
     );
 }
+
 
 
 
