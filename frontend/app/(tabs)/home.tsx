@@ -10,29 +10,67 @@ import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import SearchBar from '@/components/SearchBar';
-import Header from '../headerWithSearch';
+import Header from '../../components/headerWithSearch';
+import ReadingList from '@/components/ReadingList';
+import { ScrollView } from 'react-native';
 
 
 export default function HomeScreen() {
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}>
       <Header />
-      <ParallaxScrollView>
-      
-      </ParallaxScrollView>
+      <ScrollView>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title" style={{ fontFamily: 'System' }}>
+            My Bookshelf
+          </ThemedText>
+        </ThemedView>
+
+        { /*Shelf One*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingTop: 45, paddingHorizontal: 25 }}>
+          Currently Reading
+        </ThemedText>
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
+
+        { /*Shelf Two*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+          Dog-Eared Books
+        </ThemedText>
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
+
+        { /*Shelf Three*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+          Past Reads
+        </ThemedText>
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
+
+        { /*Shelf Four*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+          My Personalized Bookshelf
+        </ThemedText>
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
+
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+    paddingHorizontal: 25,
+    paddingTop: 50,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
   },
   container: {
     flex: 1,

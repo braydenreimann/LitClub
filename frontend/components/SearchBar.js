@@ -67,7 +67,7 @@ container: {
     flex: 1,
     paddingLeft: 20,
     alignContent: 'center',
-    marginTop: 5,
+    marginTop: 20,
 },
 searchBar: {
     borderRadius: 10,

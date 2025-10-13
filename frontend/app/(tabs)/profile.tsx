@@ -11,28 +11,28 @@ import { View } from 'react-native';
 import { Image } from 'expo-image';
 //import ProfilePic from '@../../assets/images/userprofile_icon.png';
 import SearchBar from '@/components/SearchBar';
-import Header from '../headerWithSearch';
+import Header from '../../components/headerWithSearch';
 
 export default function ProfileScreen() {
-    return (
-        // TO DO: insert header at the top, which will include the logo and search bar
-        <View>
-         <Header />
-        <ParallaxScrollView>
-            <ThemedView style={styles.container}>
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={require('@/assets/images/userprofile_icon.png')}
-                        style={styles.image}
-                    />
-                </View>
-                <ThemedText type="title">Firstname Lastname</ThemedText>
-                <ThemedText type="subtitle">@username</ThemedText>
-                
-            </ThemedView>
-        </ParallaxScrollView>
+  return (
+    // TO DO: insert header at the top, which will include the logo and search bar
+    <View style={{ flex: 1 }}>
+      <Header />
+
+      <ThemedView style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={require('@/assets/images/userprofile_icon.png')}
+            style={styles.image}
+          />
         </View>
-    );
+        <ThemedText type="title">Firstname Lastname</ThemedText>
+        <ThemedText type="subtitle">@username</ThemedText>
+
+      </ThemedView>
+
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
