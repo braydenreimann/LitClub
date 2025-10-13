@@ -1,5 +1,6 @@
 ﻿import React from 'react';
-
+import StyleSheet from '../../styles/globalStyles';
+import Foundation from '@expo/vector-icons/Foundation'; //imported from react
 
 //here is me playing around with shit that I don't understand
 
@@ -8,7 +9,7 @@
 function EditButton() {
     return (
         <button>
-        //image:pencil
+            <Foundation name="pencil" size={24} color="black" />
             Edit
         </button>
     );
@@ -44,12 +45,12 @@ type SectionProps = { //a section has a title ans list of books in that section
 
 function BookSection({name, list}: SectionProps) {
     return (
-        <View style={StyleSheet }>
+        <View style={styles}>
             <Heading> {name}</Heading>
             //implement scrollable menu like https://www.w3schools.com/howto/howto_css_menu_horizontal_scroll.asp in CSS
             {
                 for(let i = 0; i < list.length; i++) {
-
+                    <View style={}
             }
                 book1
                 book2
@@ -122,55 +123,31 @@ export default function ProfileScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#E4D7C8',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-    },
-  imageContainer: {
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  image: {
-    width: 150,
-    height: 150,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    alignContent: 'flex-start',
-    borderRadius: 75,
-  },
-  text: {
-    color: '#211F3E',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
+import { StyleSheet } from 'react-native';
+import { colors, fonts } from '../theme';
+
+export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E4D7C8',
-    justifyContent: 'flex-start',
+    backgroundColor: colors.cream,
+    padding: 16,
   },
-  headerImage: {
-        width: '100%',
-        height: 140,
-    resizeMode: 'contain',
+  heading: {
+    fontFamily: fonts.heading,
+    fontSize: 32,
+    color: colors.midBlue,
+    marginBottom: 8,
   },
-  header: {
-    backgroundColor: '#94a694',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    paddingTop: 70,
-    paddingLeft: 20,
-    height: 120,
+  subheading: {
+    fontFamily: fonts.subheading,
+    fontSize: 22,
+    color: colors.midBlue,
+    marginBottom: 6,
+  },
+  body: {
+    fontFamily: fonts.body,
+    fontSize: 14,
+    color: colors.darkest,
+    lineHeight: 22,
   },
 });
