@@ -8,7 +8,7 @@ namespace LitClubApi.Endpoints.Libraries.DeleteLibrary;
 
 [ApiController]
 
-public class Delete(Container libraryContainer) : EndpointBaseAsync
+public class Delete(Container librariesContainer) : EndpointBaseAsync
         .WithRequest<DeleteLibraryRequest>
         .WithActionResult
 {
@@ -24,7 +24,7 @@ public class Delete(Container libraryContainer) : EndpointBaseAsync
     {
         try
         {
-            await libraryContainer.DeleteItemAsync<Library>(
+            await librariesContainer.DeleteItemAsync<Library>(
                 id: request.UserId,
                 partitionKey: new PartitionKey(request.UserId),
                 cancellationToken: cancellationToken);
