@@ -6758,11 +6758,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\benja\\Source\\Repos\\LitClub\\backend\\TestProject\\TestProject.csproj",
+      "projectUniqueName": "C:\\Users\\benja\\source\\repos\\LitClub\\backend\\TestProject\\TestProject.csproj",
       "projectName": "TestProject",
-      "projectPath": "C:\\Users\\benja\\Source\\Repos\\LitClub\\backend\\TestProject\\TestProject.csproj",
+      "projectPath": "C:\\Users\\benja\\source\\repos\\LitClub\\backend\\TestProject\\TestProject.csproj",
       "packagesPath": "C:\\Users\\benja\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\benja\\source\\repos\\LitClub\\backend\\TestProject\\obj\\",
+      "outputPath": "C:\\Users\\benja\\Source\\Repos\\LitClub\\backend\\TestProject\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -6783,8 +6783,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\benja\\Source\\Repos\\LitClub\\backend\\LitClubApi\\LitClubApi.csproj": {
-              "projectPath": "C:\\Users\\benja\\Source\\Repos\\LitClub\\backend\\LitClubApi\\LitClubApi.csproj"
+            "C:\\Users\\benja\\source\\repos\\LitClub\\backend\\LitClubApi\\LitClubApi.csproj": {
+              "projectPath": "C:\\Users\\benja\\source\\repos\\LitClub\\backend\\LitClubApi\\LitClubApi.csproj"
             }
           }
         }

@@ -8,5 +8,7 @@ public enum EditionFormatContract
 {
     Paperback,
     Hardcover,
-    eBook
+    eBook,
+    Audiobook,
+    Mixed Media
 }
