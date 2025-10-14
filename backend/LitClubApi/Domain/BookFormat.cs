@@ -6,5 +6,5 @@ public enum BookFormat
     Paperback,
     eBook,
     Audiobook,
-    Mixed Media
+    MixedMedia
 }

@@ -1,10 +1,9 @@
-﻿using LitClubApi.Domain
+﻿using LitClubApi.Domain;
 
-namespace LitClubApi.Endpoints.Libraries
+namespace LitClubApi.Endpoints.Libraries;
+
+public sealed class LibraryResponse
 {
-    public sealed class LibraryResponse
-    {
-        public required string UserId { get; init; }
-        public List<Library>
-    }
+    public required string UserId { get; init; }
+    public List<LibBook> LibBooks { get; init; } = [];
 }

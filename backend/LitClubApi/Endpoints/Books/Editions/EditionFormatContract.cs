@@ -10,5 +10,5 @@ public enum EditionFormatContract
     Hardcover,
     eBook,
     Audiobook,
-    Mixed Media
+    MixedMedia
 }
