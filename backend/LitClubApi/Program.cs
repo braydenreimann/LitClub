@@ -73,7 +73,7 @@ Library library = new()
 
 // Add service to container
 builder.Services.AddSingleton(booksContainer);
-builder.Services.AddSingleton(LibraryContainer);
+builder.Services.AddSingleton(librariesContainer);
 
 var app = builder.Build();
 
