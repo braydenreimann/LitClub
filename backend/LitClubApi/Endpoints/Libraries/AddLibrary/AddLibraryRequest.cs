@@ -2,5 +2,6 @@
 {
     public class AddLibraryRequest
     {
+        public required string UserId { get; init; }
     }
 }
