@@ -1,8 +1,7 @@
 ﻿namespace LitClubApi.Domain
 {
-    public class LibBook
+    public class LibraryBook
     {
-        public required string UserId { get; set; }
         public required string isbn13 { get; set; }
         public required ShelfStatus Status { get; set; }
         public DateOnly? StartedReading { get; set; }
