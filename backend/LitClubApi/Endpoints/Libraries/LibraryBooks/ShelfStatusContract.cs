@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-namespace LitClubApi.Endpoints.Libraries.LibraryBooks
+
+namespace LitClubApi.Endpoints.Libraries.LibraryBooks;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum ShelfStatusContract

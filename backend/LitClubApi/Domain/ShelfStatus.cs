@@ -5,6 +5,6 @@
         hasRead,
         currentlyReading,
         Hiatus,
-        WantToRead,
+        WantToRead
     }
 }

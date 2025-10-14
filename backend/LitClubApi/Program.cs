@@ -68,7 +68,7 @@ await booksContainer.UpsertItemAsync(book, new PartitionKey(book.Id));
 Library library = new()
 {
     UserId = "Steve Bookreader",
-    Books = []
+    LibraryBooks = []
 };
 
 // Add service to container

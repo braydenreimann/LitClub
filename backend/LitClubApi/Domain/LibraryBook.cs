@@ -2,7 +2,7 @@
 {
     public class LibraryBook
     {
-        public required string isbn13 { get; set; }
+        public required string Isbn13 { get; set; }
         public required ShelfStatus Status { get; set; }
         public DateOnly? StartedReading { get; set; }
         public DateOnly? FinishedReading { get; set; }

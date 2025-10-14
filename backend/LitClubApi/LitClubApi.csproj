@@ -14,11 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\Libraries\AddLibrary\" />
-    <Folder Include="Endpoints\Libraries\DeleteLibrary\" />
-    <Folder Include="Endpoints\Libraries\EditLibrary\" />
-    <Folder Include="Endpoints\Libraries\GetLibrary\" />
-    <Folder Include="Endpoints\Libraries\LibraryBooks\AddLibraryBook\" />
     <Folder Include="Endpoints\Libraries\LibraryBooks\DeleteLibraryBook\" />
     <Folder Include="Endpoints\Libraries\LibraryBooks\EditLibraryBook\" />
     <Folder Include="Endpoints\Libraries\LibraryBooks\GetLibraryBook\" />
