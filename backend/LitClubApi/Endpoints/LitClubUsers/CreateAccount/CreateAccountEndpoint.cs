@@ -1,7 +1,5 @@
-using System.Linq;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.LitClubUsers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 

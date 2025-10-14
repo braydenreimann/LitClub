@@ -23,20 +23,20 @@ public static class UserMapper
 
     public static void ApplyUpdates(LitClubUser user, EditUserRequest request)
     {
-        if (request.FirstName is not null) user.FirstName = request.FirstName;
-        if (request.LastName is not null) user.LastName = request.LastName;
-        if (request.UserName is not null) user.UserName = request.UserName;
-        if (request.Email is not null) user.Email = request.Email;
-        if (request.Password is not null) user.PasswordHash = PasswordHasher.HashPassword(request.Password);
-        if (request.Bio is not null) user.Bio = request.Bio;
-        if (request.ProfilePhotoUrl is not null) user.ProfilePhotoUrl = request.ProfilePhotoUrl;
-        if (request.PreferredGenres is not null) user.PreferredGenres = request.PreferredGenres.ToList();
-        if (request.PrivateAccount is not null) user.PrivateAccount = request.PrivateAccount.Value;
-        if (request.PublicInteractionRestricted is not null) user.PublicInteractionRestricted = request.PublicInteractionRestricted.Value;
-        if (request.FollowingUserIds is not null) user.FollowingUserIds = request.FollowingUserIds.ToList();
-        if (request.FollowerUserIds is not null) user.FollowerUserIds = request.FollowerUserIds.ToList();
-        if (request.BlockedUserIds is not null) user.BlockedUserIds = request.BlockedUserIds.ToList();
-        if (request.LitClubIds is not null) user.LitClubIds = request.LitClubIds.ToList();
+        if (request.Body.FirstName is not null) user.FirstName = request.Body.FirstName;
+        if (request.Body.LastName is not null) user.LastName = request.Body.LastName;
+        if (request.Body.UserName is not null) user.UserName = request.Body.UserName;
+        if (request.Body.Email is not null) user.Email = request.Body.Email;
+        if (request.Body.Password is not null) user.PasswordHash = PasswordHasher.HashPassword(request.Body.Password);
+        if (request.Body.Bio is not null) user.Bio = request.Body.Bio;
+        if (request.Body.ProfilePhotoUrl is not null) user.ProfilePhotoUrl = request.Body.ProfilePhotoUrl;
+        if (request.Body.PreferredGenres is not null) user.PreferredGenres = request.Body.PreferredGenres.ToList();
+        if (request.Body.PrivateAccount is not null) user.PrivateAccount = request.Body.PrivateAccount.Value;
+        if (request.Body.PublicInteractionRestricted is not null) user.PublicInteractionRestricted = request.Body.PublicInteractionRestricted.Value;
+        if (request.Body.FollowingUserIds is not null) user.FollowingUserIds = request.Body.FollowingUserIds.ToList();
+        if (request.Body.FollowerUserIds is not null) user.FollowerUserIds = request.Body.FollowerUserIds.ToList();
+        if (request.Body.BlockedUserIds is not null) user.BlockedUserIds = request.Body.BlockedUserIds.ToList();
+        if (request.Body.LitClubIds is not null) user.LitClubIds = request.Body.LitClubIds.ToList();
     }
 
     public static UserResponse ToResponse(this LitClubUser user) => new()

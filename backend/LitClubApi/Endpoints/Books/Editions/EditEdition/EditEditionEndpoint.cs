@@ -18,7 +18,7 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
-        [FromRoute] EditEditionRequest request,
+        EditEditionRequest request,
         CancellationToken cancellationToken = default)
     {
         Book? book;

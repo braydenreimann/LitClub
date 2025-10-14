@@ -18,7 +18,7 @@ public class Delete(Container booksContainer) : EndpointBaseAsync
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult> HandleAsync(
-        [FromRoute] DeleteBookRequest request,
+        DeleteBookRequest request,
         CancellationToken cancellationToken = default)
     {
         try

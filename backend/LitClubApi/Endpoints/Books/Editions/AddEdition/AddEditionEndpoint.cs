@@ -18,7 +18,7 @@ public class Add(Container booksContainer) : EndpointBaseAsync
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
-        [FromRoute] AddEditionRequest request,
+        AddEditionRequest request,
         CancellationToken cancellationToken = default)
     {
         Book? book;

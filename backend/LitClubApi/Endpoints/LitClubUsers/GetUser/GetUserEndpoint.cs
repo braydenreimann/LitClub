@@ -17,7 +17,7 @@ public class Get(Container usersContainer) : EndpointBaseAsync
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<UserResponse>> HandleAsync(
-        [FromRoute] GetUserRequest request,
+        GetUserRequest request,
         CancellationToken cancellationToken = default)
     {
         try

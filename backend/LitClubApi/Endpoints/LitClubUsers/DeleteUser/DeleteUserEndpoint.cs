@@ -18,7 +18,7 @@ public class Delete(Container usersContainer) : EndpointBaseAsync
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult> HandleAsync(
-        [FromRoute] DeleteUserRequest request,
+        DeleteUserRequest request,
         CancellationToken cancellationToken = default)
     {
         try

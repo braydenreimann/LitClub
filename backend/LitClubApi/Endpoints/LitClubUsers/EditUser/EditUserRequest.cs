@@ -7,6 +7,12 @@ public sealed class EditUserRequest
     [FromRoute(Name = "userId")]
     public required string UserId { get; init; }
 
+    [FromBody]
+    public required EditUserBody Body { get; init; }
+}
+
+public sealed class EditUserBody
+{
     public string? FirstName { get; init; }
     public string? LastName { get; init; }
     public string? UserName { get; init; }

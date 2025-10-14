@@ -17,7 +17,7 @@ public class Edit(Container usersContainer) : EndpointBaseAsync
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<UserResponse>> HandleAsync(
-        [FromRoute] EditUserRequest request,
+        EditUserRequest request,
         CancellationToken cancellationToken = default)
     {
         LitClubUser user;
