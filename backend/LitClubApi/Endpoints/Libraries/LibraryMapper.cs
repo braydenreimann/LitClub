@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using LitClubApi.Domain;
+﻿using LitClubApi.Domain;
 using LitClubApi.Endpoints.Libraries.LibraryBooks;
 
 namespace LitClubApi.Endpoints.Libraries
@@ -9,7 +8,7 @@ namespace LitClubApi.Endpoints.Libraries
         public static LibraryResponse ToResponse(this Library library) => new()
         {
             UserId = library.UserId,
-            LibraryBooks = [..library.LibraryBooks.Select(librarybook => librarybook.ToResponse())]
+            LibraryBooks = [.. library.LibraryBooks.Select(librarybook => librarybook.ToResponse())]
         };
     }
 }

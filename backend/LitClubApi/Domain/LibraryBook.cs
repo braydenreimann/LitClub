@@ -6,7 +6,7 @@
         public required ShelfStatus Status { get; set; }
         public DateOnly? StartedReading { get; set; }
         public DateOnly? FinishedReading { get; set; }
-        public int? Currentpage { get; set; }
+        public int? CurrentPage { get; set; }
         public int? PercentComplete { get; set; }
         public bool OnPedastal { get; set; }
     }

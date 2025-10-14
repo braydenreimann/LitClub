@@ -9,5 +9,5 @@ public enum ShelfStatusContract
     hasRead,
     currentlyReading,
     Hiatus,
-    WantToRead,
+    WantToRead
 }

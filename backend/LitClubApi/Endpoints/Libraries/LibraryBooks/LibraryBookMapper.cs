@@ -6,11 +6,11 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks
     {
         public static LibraryBookResponse ToResponse(this LibraryBook librarybook) => new()
         {
-            Isbn13 = librarybook.isbn13,
-            ShelfStatus = librarybook.ShelfStatus.ToContract(),
+            Isbn13 = librarybook.Isbn13,
+            Status = librarybook.Status.ToContract(),
             StartedReading = librarybook.StartedReading,
             FinishedReading = librarybook.FinishedReading,
-            Currentpage = librarybook.Currentpage,
+            CurrentPage = librarybook.CurrentPage,
             PercentComplete = librarybook.PercentComplete,
             OnPedastal = librarybook.OnPedastal
         };
