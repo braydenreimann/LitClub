@@ -4,29 +4,29 @@ using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
-namespace LitClubApi.Endpoints.Libraries.LibraryBooks.GetLibraryBook;
+namespace LitClubApi.Endpoints.Libraries.LibraryBooks.ListLibraryBooks;
 
 [ApiController]
-public class Get(Container librariesContainer) : EndpointBaseAsync
-    .WithRequest<GetLibraryBookRequest>
-    .WithActionResult<LibraryBookResponse>
+public class List(Container librariesContainer) : EndpointBaseAsync
+    .WithRequest<ListLibraryBooksRequest>
+    .WithActionResult<ListLibraryBooksResponse>
 {
-    [HttpGet("libraries/{UserId}/librarybooks/{Isbn13}", Name = "library-book-get")]
+    [HttpGet("libraries/{userId}/books")]
     [Consumes("application/json")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(LibraryBookResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ListLibraryBooksResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public override async Task<ActionResult<LibraryBookResponse>> HandleAsync(
-        [FromRoute] GetLibraryBookRequest request,
+    public override async Task<ActionResult<ListLibraryBooksResponse>> HandleAsync(
+        ListLibraryBooksRequest request,
         CancellationToken cancellationToken = default)
     {
         Library? library;
         try
         {
             var response = await librariesContainer.ReadItemAsync<Library>(
-                id: request.UserId,
-                partitionKey: new PartitionKey(request.UserId),
+                id: request.userId,
+                partitionKey: new PartitionKey(request.userId),
                 cancellationToken: cancellationToken);
             library = response.Resource;
         }
@@ -38,11 +38,10 @@ public class Get(Container librariesContainer) : EndpointBaseAsync
         {
             return StatusCode(500, "Unable to access database");
         }
-        var libraryBook = library.LibraryBooks.FirstOrDefault(lb => lb.Isbn13 == request.Isbn13);
-        if (libraryBook is null)
+        ListLibraryBooksResponse responseBody = new()
         {
-            return NotFound();
-        }
-        return Ok(libraryBook.ToResponse());
+            LibraryBooks = [.. library.LibraryBooks.Select(b => b.ToResponse())]
+        };
+        return Ok(responseBody);
     }
 }

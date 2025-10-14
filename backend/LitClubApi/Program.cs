@@ -38,7 +38,7 @@ Container booksContainer = await database.CreateContainerIfNotExistsAsync(
     partitionKeyPath: "/id"
 );
 
-Container LibraryContainer = await database.CreateContainerIfNotExistsAsync(
+Container librariesContainer = await database.CreateContainerIfNotExistsAsync(
     id: "libraries",
     partitionKeyPath: "/userId"
 );
