@@ -4,29 +4,31 @@ using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
-namespace LitClubApi.Endpoints.Books.DeleteBook;
+namespace LitClubApi.Endpoints.LitClubs.GetLitClub;
 
 [ApiController]
-public class Delete(Container booksContainer) : EndpointBaseAsync
-    .WithRequest<DeleteBookRequest>
-    .WithActionResult
+public class Get(Container litClubsContainer) : EndpointBaseAsync
+    .WithRequest<GetLitClubRequest>
+    .WithActionResult<LitClubResponse>
 {
-    [HttpDelete("books/{bookId}")]
+    [HttpGet("litclubs/{litClubId}", Name = "litclubs")]
     [Consumes("application/json")]
     [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(LitClubResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public override async Task<ActionResult> HandleAsync(
-        DeleteBookRequest request,
+    public override async Task<ActionResult<LitClubResponse>> HandleAsync(
+        GetLitClubRequest request,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            await booksContainer.DeleteItemAsync<Book>(
-                id: request.BookId,
-                partitionKey: new PartitionKey(request.BookId),
+            ItemResponse<LitClub> result = await litClubsContainer.ReadItemAsync<LitClub>(
+                id: request.LitClubId,
+                partitionKey: new PartitionKey(request.LitClubId),
                 cancellationToken: cancellationToken);
+
+            return Ok(result.Resource.ToResponse());
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
@@ -36,7 +38,5 @@ public class Delete(Container booksContainer) : EndpointBaseAsync
         {
             return StatusCode(500, "Unable to access database");
         }
-
-        return NoContent();
     }
 }

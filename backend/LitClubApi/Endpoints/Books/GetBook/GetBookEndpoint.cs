@@ -17,7 +17,7 @@ public class Get(Container booksContainer) : EndpointBaseAsync
     [ProducesResponseType(typeof(BookResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<BookResponse>> HandleAsync(
-            [FromRoute] GetBookRequest request,
+            GetBookRequest request,
             CancellationToken cancellationToken = default)
     {
         // Fetch the book from the container

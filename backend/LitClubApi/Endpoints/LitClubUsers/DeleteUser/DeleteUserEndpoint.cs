@@ -4,28 +4,28 @@ using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
-namespace LitClubApi.Endpoints.Books.DeleteBook;
+namespace LitClubApi.Endpoints.LitClubUsers.DeleteUser;
 
 [ApiController]
-public class Delete(Container booksContainer) : EndpointBaseAsync
-    .WithRequest<DeleteBookRequest>
+public class Delete(Container usersContainer) : EndpointBaseAsync
+    .WithRequest<DeleteUserRequest>
     .WithActionResult
 {
-    [HttpDelete("books/{bookId}")]
+    [HttpDelete("users/{userId}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult> HandleAsync(
-        DeleteBookRequest request,
+        DeleteUserRequest request,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            await booksContainer.DeleteItemAsync<Book>(
-                id: request.BookId,
-                partitionKey: new PartitionKey(request.BookId),
+            await usersContainer.DeleteItemAsync<LitClubUser>(
+                id: request.UserId,
+                partitionKey: new PartitionKey(request.UserId),
                 cancellationToken: cancellationToken);
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)

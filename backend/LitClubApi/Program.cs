@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
 // Configure the client's options to disable TSL/SSL validation before creating the client
@@ -38,6 +39,16 @@ Container booksContainer = await database.CreateContainerIfNotExistsAsync(
     partitionKeyPath: "/id"
 );
 
+Container usersContainer = await database.CreateContainerIfNotExistsAsync(
+    id: "users",
+    partitionKeyPath: "/id"
+);
+
+Container litClubsContainer = await database.CreateContainerIfNotExistsAsync(
+    id: "litclubs",
+    partitionKeyPath: "/id"
+);
+
 Container librariesContainer = await database.CreateContainerIfNotExistsAsync(
     id: "libraries",
     partitionKeyPath: "/id"
@@ -63,7 +74,30 @@ Book book = new()
     ]
 };
 
+LitClubUser litClubUser = new()
+{
+    Id = "1",
+    FirstName = "John",
+    LastName = "Green",
+    UserName = "johngreen",
+    Email = "johngreen@icloud.com",
+    PasswordHash = "johngreenpw",
+    Bio = "I'm just a Nerdfighter that loves reading and science",
+    PreferredGenres = ["Fiction"],
+};
+
+LitClub litClub = new()
+{
+    Id = "1",
+    Name = "Fans of John Green",
+    OwnerUserId = "1",
+    Description = "We love all of John Green's books. And some of Hank's too.",
+    MemberUserIds = ["1"],
+};
+
 await booksContainer.UpsertItemAsync(book, new PartitionKey(book.Id));
+await usersContainer.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
+await litClubsContainer.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
 
 Library library = new()
 {
@@ -76,6 +110,8 @@ await librariesContainer.UpsertItemAsync(library, new PartitionKey(library.UserI
 // Add service to container
 builder.Services.AddSingleton(booksContainer);
 builder.Services.AddSingleton(librariesContainer);
+builder.Services.AddSingleton(usersContainer);
+builder.Services.AddSingleton(litClubsContainer);
 
 var app = builder.Build();
 
