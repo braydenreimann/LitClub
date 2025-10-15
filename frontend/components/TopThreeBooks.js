@@ -4,6 +4,8 @@
 // react tutorial on how to make shapes: 
 // https://www.codedaily.io/tutorials/The-Shapes-of-React-Native
 
+// modifying ReadingList.js to create TopThreeBooks.js
+
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
 
@@ -12,39 +14,33 @@ import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
 export default function ReadingList() {
 
     const books = [
-    { id: 1, title: 'Book 1' },
-    { id: 2, title: 'Book 2' },
-    { id: 3, title: 'Book 3' },
-    { id: 4, title: 'Book 4' },
-    { id: 5, title: 'Book 5' },
-    { id: 6, title: 'Book 6' },
-  ];
+        { id: 1, title: 'Book 1' },
+        { id: 2, title: 'Book 2' },
+        { id: 3, title: 'Book 3' },
+    ];
 
     return (
+        <View>
+            <View>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', marginLeft: 10, marginBottom: 10 }}>
+                    Top 3 Books
+                </Text>
+            </View>
 
-        <View style={styles.scrollingWrapper}>
-            <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={true}>
+            <View style={{ flexDirection: 'row', padding: 10 }}>
                 {/* cards that scroll horizontally */}
                 {books.map((book) => (
                     <View key={book.id} style={styles.card}>
                         <Text>{book.title}</Text>
                     </View>
                 ))}
-            </ScrollView>
+            </View>
         </View>
+
     )
 };
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        overflowX: 'scroll',
-        overflowY: 'hidden',
-        whiteSpace: 'nowrap',
-        padding: 10,
-    },
-    scrollingWrapper: {
-        flex: 1,
-    },
     card: {
         width: 120,
         height: 180,
