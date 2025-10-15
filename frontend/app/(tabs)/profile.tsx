@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import StyleSheet from '../../styles/globalStyles';
+import { StyleSheet } from 'react-native';
 import Foundation from '@expo/vector-icons/Foundation'; //imported from react
 import { Platform} from 'react-native';
 import { ThemedText } from '../../components/themed-text';
@@ -8,10 +8,10 @@ import { Link } from 'expo-router';
 import { Image } from 'expo-image';
 //import ProfilePic from '@../../assets/images/userprofile_icon.png';
 import SearchBar from '../../components/SearchBar';
-import Header from '../headerWithSearch';
+import Header from '@/components/headerWithSearch';
 import { colors, fonts } from '../../theme';
-import ReadingList from '../../ReadingList'; //pull in Vidya's reading list
-import TopThreeBooks from '../../TopThreeBooks';
+import ReadingList from '@/components/ReadingList'; //pull in Vidya's reading list
+import TopThreeBooks from '@/components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
@@ -52,13 +52,6 @@ export default function ProfileScreen() {
 
 
             </View>
-
-
-
-
-
-
-
 
         </View>
     )
@@ -121,7 +114,7 @@ export const globalStyles = StyleSheet.create({
    scrollContainer: {
         overflowX: 'scroll',
         overflowY: 'hidden',
-        whiteSpace: 'nowrap',
+        //whiteSpace: 'nowrap',
         padding: 10,
     },
     scrollingWrapper: {
