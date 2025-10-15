@@ -1,18 +1,25 @@
+import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
+import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
+import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import { Link } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { Formik } from 'formik';
 import React from 'react';
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import * as yup from 'yup';
 import { useSession } from '../../auth/authContext';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
+
+
+SplashScreen.preventAutoHideAsync();
 
 const loginValidationSchema = yup.object().shape({
   email: yup
@@ -24,6 +31,15 @@ const loginValidationSchema = yup.object().shape({
 
 export default function LoginScreen() {
   const { signIn } = useSession();
+
+    const [fontsLoaded] = useFonts({
+      Fraunces_700Bold,
+      ChivoMono_500Medium,
+      NotoSansMono_400Regular,
+    });
+    React.useEffect(() => {
+      if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
 
   const handleLogin = async (values: { email: string; password: string }) => {
     const success = await signIn(values.email, values.password);

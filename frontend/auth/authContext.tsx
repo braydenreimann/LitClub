@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 
-// 1️⃣ Define the shape of your auth context
+// Defines the shape of auth context
 type AuthContextType = {
   signIn: (email?: string, password?: string) => Promise<boolean>;
   signOut: () => Promise<boolean>;
@@ -9,7 +9,7 @@ type AuthContextType = {
   isLoading: boolean;
 };
 
-// 2️⃣ Create the context with a default (empty) value
+// Creates the context with a default (empty) value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // 3️⃣ Provider component — wraps your app and holds the state
@@ -17,7 +17,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load session from storage when the app starts
+  // Loads session from storage when the app starts
   useEffect(() => {
     const loadSession = async () => {
       try {
@@ -71,7 +71,7 @@ const signOut = async (): Promise<boolean> => {
   );
 }
 
-// 4️⃣ Hook to access the session anywhere in your app
+// Hook to access the session anywhere in your app
 export function useSession() {
   const context = useContext(AuthContext);
   if (!context) {

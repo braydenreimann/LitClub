@@ -11,11 +11,11 @@ export default function index() {
 
   useEffect(() => {
     if (!isLoading) {
-      if (session) {
-        router.replace('/home');
-      } else {
+      //if (session) {
+        //router.replace('/home');
+      //} else {
         router.replace('/auth/login'); //Not logged in - going to login
-      }
+      //}
     }
   }, [isLoading, session]);
 

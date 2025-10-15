@@ -1,7 +1,6 @@
 /* Code for login page altered from 
 https://medium.com/@chaudharyalinawazz/building-a-login-screen-in-react-native-a-step-by-step-guide-f90b10aea4ec */
 /* alterations assisted by ChatGPT */
-
 import { Link, useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
