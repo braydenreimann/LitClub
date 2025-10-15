@@ -44,6 +44,16 @@ Container usersContainer = await database.CreateContainerIfNotExistsAsync(
     partitionKeyPath: "/id"
 );
 
+Container litClubsContainer = await database.CreateContainerIfNotExistsAsync(
+    id: "litclubs",
+    partitionKeyPath: "/id"
+);
+
+Container librariesContainer = await database.CreateContainerIfNotExistsAsync(
+    id: "libraries",
+    partitionKeyPath: "/id"
+);
+
 // Seed the database
 Book book = new()
 {
@@ -76,12 +86,23 @@ LitClubUser litClubUser = new()
     PreferredGenres = ["Fiction"],
 };
 
+LitClub litClub = new()
+{
+    Id = "1",
+    Name = "Fans of John Green",
+    OwnerUserId = "1",
+    Description = "We love all of John Green's books. And some of Hank's too.",
+    MemberUserIds = ["1"],
+};
+
 await booksContainer.UpsertItemAsync(book, new PartitionKey(book.Id));
 await usersContainer.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
+await litClubsContainer.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
 
 // Add service to container
 builder.Services.AddSingleton(booksContainer);
 builder.Services.AddSingleton(usersContainer);
+builder.Services.AddSingleton(litClubsContainer);
 
 var app = builder.Build();
 
