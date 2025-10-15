@@ -42,12 +42,14 @@ export default function ReadingList() {
 
 const styles = StyleSheet.create({
     card: {
-        width: 120,
-        height: 180,
+        aspectRatio: 0.65,
+        width: "30%",
         marginRight: 5,
         marginLeft: 5,
-        justifyContent: "center"
-        backgroundColor: "teal",
-        borderColor: "black",
+        justifyContent: "center",
+        backgroundColor: "#E4D7C8",
+        borderColor: "#629FAE",
+        borderWidth: 5,
+        borderRadius:12,
     },
 });
