@@ -7,90 +7,69 @@ import { Platform, StyleSheet, TextInput, View } from 'react-native';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
 import { useState } from 'react';
 import SearchBar from '@/components/SearchBar';
-import Header from '../headerWithSearch';
+import Header from '../../components/headerWithSearch';
+import ReadingList from '@/components/ReadingList';
+import { ScrollView } from 'react-native';
 
 
 export default function HomeScreen() {
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}>
       <Header />
+      <ScrollView>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title" style={{ fontFamily: 'System' }}>
+            My Bookshelf
+          </ThemedText>
+        </ThemedView>
 
-    <ParallaxScrollView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Bookshelf</ThemedText>
-      </ThemedView>
+        { /*Shelf One*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingTop: 45, paddingHorizontal: 25 }}>
+          Currently Reading
+        </ThemedText>
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
+        { /*Shelf Two*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+          Dog-Eared Books
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+        { /*Shelf Three*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+          Past Reads
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
+
+        { /*Shelf Four*/}
+        <ThemedText type="defaultSemiBold" style={{ fontFamily: 'System', fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+          My Personalized Bookshelf
         </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
+          <ReadingList />
+        </View>
+
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+    paddingHorizontal: 25,
+    paddingTop: 50,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
   },
   container: {
     flex: 1,

@@ -12,11 +12,13 @@ export default function Header() {
   return (
   // Sample data to display in the FlatList - Sourced from GeeksforGeeks
     <View style={styles.header}>
+      <Link href="/bookrecs">
        <Image
           source={require('@/assets/images/small logo.png')}
           style={styles.headerImage}
           contentFit="contain"
         />
+      </Link>
 
         <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 20 }}>
           <SearchBar />
@@ -38,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 70,
     paddingLeft: 20,
-    height: 120,
+    height: 150,
     flexDirection: 'row',
   },
   searchBar: {
