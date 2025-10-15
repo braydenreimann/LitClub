@@ -2,16 +2,19 @@
 import StyleSheet from '../../styles/globalStyles';
 import Foundation from '@expo/vector-icons/Foundation'; //imported from react
 import { Platform} from 'react-native';
-import ParallaxScrollView from '../../components/parallax-scroll-view';
 import { ThemedText } from '../../components/themed-text';
 import { ThemedView } from '../../components/themed-view';
 import { Link } from 'expo-router';
-import { View } from 'react-native';
 import { Image } from 'expo-image';
 //import ProfilePic from '@../../assets/images/userprofile_icon.png';
-import SearchBar from '@/components/SearchBar';
+import SearchBar from '../../components/SearchBar';
 import Header from '../headerWithSearch';
-import { colors, fonts } from '../theme';
+import { colors, fonts } from '../../theme';
+import ReadingList from '../../ReadingList'; //pull in Vidya's reading list
+import TopThreeBooks from '../../TopThreeBooks';
+import { View, Text, FlatList, ScrollView } from 'react-native';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+
 
 
 function EditButton() {
@@ -23,35 +26,43 @@ function EditButton() {
     );
 }
 
-type Books = { //allow the books to be displayed on the screen
-    title: string;
-    coverUrl: string;
-}
 
-type SectionProps = { //a section has a title ans list of books in that section
-    name: string;
-    list: Books[];
-}
 
-function BookSection({name, list}: SectionProps) {
+export default function ProfileScreen() {
     return (
-        <View style={styles}>
-            <Heading> {name}</Heading>
-            //implement scrollable menu like https://www.w3schools.com/howto/howto_css_menu_horizontal_scroll.asp in CSS
-                for(let i = 0; i < list.length; i++) {
-                    <View style={styles.scrollingWrapper}>
-            <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={true}>
-                {/* cards that scroll horizontally */}
-                <View style={styles.card}>
-                    <Text>{list[i].name}</Text>
-                    //add the cover image
-                </View>
-            } //exit javascript mode
+        <View>
+            <Text style={globalStyles.heading}> FirstName LastName {"\n"} </Text>
+            <EvilIcons name="user" size={24} color="black" /> {/* profile icon */ }
+            <Text style={globalStyles.subheading}> @username {"\n"} </Text>
+            <Text style={globalStyles.body}>this is my bio</Text>
+            <EditButton /> {/*be able to edit the bio */}
+
+            <View> {/*this is the part where we show the lists of the books*/}
+                <TopThreeBooks />
+                <Text style={globalStyles.subheading}>Currently Reading</Text>
+                <ReadingList /> {/* reading list for the currently reading*/}
+                <Text style={globalStyles.subheading}>Past Reads</Text>
+                <ReadingList /> {/* reading list for the Past Reads*/}
+                <Text style={globalStyles.subheading}>Saved for Later</Text>
+                <ReadingList /> {/* reading list for the Saved for Later*/}
+            </View>
+
+            <View> {/* book clubs*/}
+
+
+
+            </View>
+
+
+
+
+
+
+
+
         </View>
-    );
+    )
 }
-
-
 
 
 
@@ -80,60 +91,6 @@ function BookSection({name, list}: SectionProps) {
 
 //initial set up code borrowed from expo router template
 // https://docs.expo.dev/tutorial/create-your-first-app/
-
-
-
-export default function ProfileScreen() {
-    return (
-        // TO DO: insert header at the top, which will include the logo and search bar
-        <View>
-         <Header />
-        <ParallaxScrollView>
-            <ThemedView style={styles.container}>
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={require('@/assets/images/userprofile_icon.png')}
-                        style={styles.image}
-                    />
-                </View>
-                <heading type="title">Firstname Lastname</heading>
-                <ThemedText type="subtitle">@username</ThemedText>
-                <EditButton />   
-          
-
-
-<BookSection
-name="Your Top Three"
-list={{"Six of Crows","https://upload.wikimedia.org/wikipedia/en/1/10/Six_of_Crows_by_Leigh_Bardugo_book_cover.jpeg"}, 
-{"Atonement", "https://upload.wikimedia.org/wikipedia/en/6/6d/Atonement_%28novel%29.jpg"},
-{"The Fault in Our Stars","https://upload.wikimedia.org/wikipedia/en/a/a9/The_Fault_in_Our_Stars.jpg" }   }
-/>
-
-<BookSection
-name="Currently Reading"
-list={{"Gideon the Ninth", "https://m.media-amazon.com/images/I/81UgIZXiolL._UF1000,1000_QL80_.jpg"} 
-}
-/>
-
-<BookSection
-name="Past Reads"
-list={{}
-}
-/>
-
-<BookSection
-name="Saved for Later"
-list{{}
-}
-/>
-
-
-  </ThemedView>
-        </ParallaxScrollView>
-        </View>
-    );
-}
-
 
 
 
