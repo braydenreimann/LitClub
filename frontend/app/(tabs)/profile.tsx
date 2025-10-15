@@ -1,7 +1,7 @@
 ﻿
 import React from 'react';
 import Foundation from '@expo/vector-icons/Foundation'; 
-import { Platform} from 'react-native';
+import { Platform, Pressable} from 'react-native';
 import { ThemedText } from '../../components/themed-text';
 import { ThemedView } from '../../components/themed-view';
 import { Link } from 'expo-router';
@@ -11,7 +11,7 @@ import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
 import ReadingList from '../../components/ReadingList'; 
 import TopThreeBooks from '../../components/TopThreeBooks';
-import { View, Text, FlatList, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ScrollView, StyleSheet, Alert } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 
@@ -26,7 +26,23 @@ function EditButton() {
 
 
 
+
+
 export default function ProfileScreen() {
+    {/*for the sake of the litclubs
+       WITH BACKEND: implement this as a linked list of a users' joined book clubs */ }
+    const clubNames = [
+        "Gothic Horror Fans",
+        "Grass is Green-er: Hank and John Fanclub",
+        "Bookish Baddies" ,
+        "ENGL 404"
+    ]
+    const userClubs = Array.from({ length: 4 /*change to dynamic # book clubs*/ }, (_, i) => ({
+        id: i,
+        clubName: clubNames[i],
+    }));
+
+
     return (
         <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}>
             <Header />
@@ -47,8 +63,21 @@ export default function ProfileScreen() {
                     <ReadingList /> {/* reading list for the Saved for Later*/}
                 </View>
 
-                
-
+                {/*display the book clubs*/}
+                <Text style={globalStyles.subheading}> My LitClubs </Text>
+                <View style={globalStyles.cardGroup}>
+                  
+                    {
+                    userClubs.map((userClub) => (
+                        <Pressable
+                            key={userClub.id}
+                            style={globalStyles.litclubCard}
+                            onPress={()=>{Alert.alert('LitClub button pressed')/*TODO make the buttons go to their clubs*/ } }                        >
+                            <Text> {userClub.clubName} </Text>
+                        </Pressable>
+                    ))
+                    }
+                    </View>
                 {/* book clubs*/}
 
             </ScrollView>
@@ -83,51 +112,66 @@ export default function ProfileScreen() {
 
 
 const globalStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.cream,
-    padding: 16,
-  },
-  heading: {
-    fontFamily: fonts.heading,
-    fontSize: 32,
-    color: colors.midBlue,
-    marginBottom: 8,
-  },
-  subheading: {
-    fontFamily: fonts.subheading,
-    fontSize: 22,
-    color: colors.midBlue,
-    marginBottom: 6,
-  },
-  body: {
-    fontFamily: fonts.body,
-    fontSize: 14,
-    color: colors.darkest,
-    lineHeight: 22,
-  },
-   scrollContainer: {
+    container: {
+        flex: 1,
+        backgroundColor: colors.cream,
+        padding: 16,
+    },
+    heading: {
+        fontFamily: fonts.heading,
+        fontSize: 32,
+        color: colors.midBlue,
+        marginBottom: 8,
+    },
+    subheading: {
+        fontFamily: fonts.subheading,
+        fontSize: 22,
+        color: colors.midBlue,
+        alignContent: "center",
+        justifyContent:"center",
+        marginBottom: 6,
+    },
+    body: {
+        fontFamily: fonts.body,
+        fontSize: 14,
+        color: colors.darkest,
+        lineHeight: 22,
+    },
+    scrollContainer: {
         overflowX: 'scroll',
         overflowY: 'hidden',
         /*whiteSpace: 'nowrap',*/
         padding: 10,
-    }, 
+    },
     scrollingWrapper: {
         flex: 1,
+    },
+    cardGroup: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        padding: 5,
+        margin: 5,
     },
     card: {
         width: 120,
         height: 180,
-        marginRight: 10,
         backgroundColor: "teal",
         borderColor: "black",
     },
-    clubCard: {
+    litclubCard: {
         width: 100,
         height: 100,
-        marginRight: 6,
-        marginLeft: 6,
-        backgroundColor: "sage",
+        aspectRatio: 1,
+        backgroundColor: "#94A694",
+        borderWidth: 2,
+        borderRadius: 12,
+        marginLeft: 5,
+        marginRight: 5,
+        marginTop: 5,
+        marginBottom: 5,
+        alignItems: "center",
+        justifyContent: "center",
         borderColor:"black",
     }
 });

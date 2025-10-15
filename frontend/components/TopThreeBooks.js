@@ -44,7 +44,9 @@ const styles = StyleSheet.create({
     card: {
         width: 120,
         height: 180,
-        marginRight: 10,
+        marginRight: 5,
+        marginLeft: 5,
+        justifyContent: "center"
         backgroundColor: "teal",
         borderColor: "black",
     },
