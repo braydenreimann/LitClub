@@ -99,8 +99,17 @@ await booksContainer.UpsertItemAsync(book, new PartitionKey(book.Id));
 await usersContainer.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
 await litClubsContainer.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
 
+Library library = new()
+{
+    UserId = "Steve Bookreader",
+    LibraryBooks = []
+};
+
+await librariesContainer.UpsertItemAsync(library, new PartitionKey(library.UserId));
+
 // Add service to container
 builder.Services.AddSingleton(booksContainer);
+builder.Services.AddSingleton(librariesContainer);
 builder.Services.AddSingleton(usersContainer);
 builder.Services.AddSingleton(litClubsContainer);
 
