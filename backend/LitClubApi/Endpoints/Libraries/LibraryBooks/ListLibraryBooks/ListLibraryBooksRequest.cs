@@ -4,6 +4,6 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks.ListLibraryBooks;
 
 public sealed class ListLibraryBooksRequest
 {
-    [FromRoute(Name = "Isbn13")]
+    [FromRoute(Name = "userId")]
     public required string userId { get; init; }
 }

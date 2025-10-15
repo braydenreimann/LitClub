@@ -40,7 +40,7 @@ Container booksContainer = await database.CreateContainerIfNotExistsAsync(
 
 Container librariesContainer = await database.CreateContainerIfNotExistsAsync(
     id: "libraries",
-    partitionKeyPath: "/userId"
+    partitionKeyPath: "/id"
 );
 
 // Seed the database
@@ -70,6 +70,8 @@ Library library = new()
     UserId = "Steve Bookreader",
     LibraryBooks = []
 };
+
+await librariesContainer.UpsertItemAsync(library, new PartitionKey(library.UserId));
 
 // Add service to container
 builder.Services.AddSingleton(booksContainer);

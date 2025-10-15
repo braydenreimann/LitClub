@@ -12,7 +12,7 @@ public class Delete(Container librariesContainer) : EndpointBaseAsync
         .WithRequest<DeleteLibraryRequest>
         .WithActionResult
 {
-    [HttpDelete("libraries/{UserId}")]
+    [HttpDelete("libraries/{userId}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

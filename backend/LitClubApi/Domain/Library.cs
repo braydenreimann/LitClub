@@ -1,7 +1,10 @@
-﻿namespace LitClubApi.Domain
+﻿using Newtonsoft.Json;
+
+namespace LitClubApi.Domain
 {
     public class Library
     {
+        [JsonProperty(PropertyName = "id")]
         public required string UserId { get; set; }
         public List<LibraryBook> LibraryBooks { get; set; } = [];
     }
