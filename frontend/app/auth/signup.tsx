@@ -2,7 +2,7 @@
 https://medium.com/@chaudharyalinawazz/building-a-login-screen-in-react-native-a-step-by-step-guide-f90b10aea4ec */
 /* alterations assisted by ChatGPT */
 
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
 import {
@@ -35,6 +35,7 @@ const signupValidationSchema = yup.object().shape({
 
 export default function SignUpScreen() {
   const { signIn } = useSession();
+  const router = useRouter();
 
   const handleSignUp = async (values: {
     email: string;
@@ -42,7 +43,13 @@ export default function SignUpScreen() {
     confirmPassword: string;
   }) => {
     const success = await signIn(values.email, values.password);
-    if (!success) {
+    if (success) {
+      router.push({
+        pathname: '/auth/create_account',
+        params: {email: values.email},
+    });
+    }
+    else {
       Alert.alert('Sign-up failed', 'Please try again later.');
     }
   };
