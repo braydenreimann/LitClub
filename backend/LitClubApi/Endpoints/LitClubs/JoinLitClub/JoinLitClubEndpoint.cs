@@ -1,10 +1,8 @@
 using System.Net;
 using Ardalis.ApiEndpoints;
-using LitClubApi.Cosmos;
 using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using LitClubApi.Endpoints.LitClubs;
 
 namespace LitClubApi.Endpoints.LitClubs.JoinLitClub;
 

@@ -100,10 +100,9 @@ await usersContainer.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.I
 await litClubsContainer.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
 
 // Add service to container
-builder.Services.AddSingleton(new BooksCosmosContainer(booksContainer));
-builder.Services.AddSingleton(new UsersCosmosContainer(usersContainer));
-builder.Services.AddSingleton(new LitClubsCosmosContainer(litClubsContainer));
-builder.Services.AddSingleton(new LibrariesCosmosContainer(librariesContainer));
+builder.Services.AddSingleton(booksContainer);
+builder.Services.AddSingleton(usersContainer);
+builder.Services.AddSingleton(litClubsContainer);
 
 var app = builder.Build();
 
