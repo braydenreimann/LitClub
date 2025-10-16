@@ -29,7 +29,8 @@ function Jump2discButton() {
 export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
     return (
     <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
-        <Header />
+            <Header />
+            {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
         <ScrollView>
                 <Text style={globalStyles.heading}> Book Club Name </Text>
                 <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}

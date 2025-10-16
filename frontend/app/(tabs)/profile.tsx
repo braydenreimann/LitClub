@@ -71,19 +71,24 @@ export default function ProfileScreen() {
 
                 {/*display the book clubs*/}
                 <Text style={globalStyles.subheading}> My LitClubs </Text>
-                <View style={globalStyles.cardGroup}>
-                  
+                <View style={globalStyles.cardGroup}> {/*format the GROUP of cards correctly*/}
                     {
                         userClubs.map((userClub) => (
+                            
                             <Pressable
                                 key={userClub.id}
                                 style={globalStyles.litclubCard}
-                                onPress={() => { Alert.alert('LitClub button pressed')/*TODO make the buttons go to their clubs*/ }} >
-                                <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
-                        </Pressable>
-                    ))
+                                onPress={() => {
+                                    Alert.alert('LitClub button pressed')/*TODO make the buttons go to their clubs*/
+                                }} >
+                                <Link href="/myLitClub"> {/*nested link allows for navigation*/ } 
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
+                                </Link>
+                            </Pressable>
+                           
+                        ))
                     }
-                    </View>
+                </View>
             </ScrollView>
         </View>
     );
