@@ -28,7 +28,7 @@ export default function ReadingList() {
                 {/* cards that scroll horizontally */}
                 {books.map((book) => (
                     <Pressable key={book.id} style={styles.card}>
-                        <Link href="..\bookInfo">
+                        <Link href="..\..\app\bookInfo">
                         <Text>{book.title}</Text>
                         </Link>
                     </Pressable>
