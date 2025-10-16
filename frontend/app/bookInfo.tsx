@@ -76,21 +76,6 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
 }
 
 
-/*BREAKDOWN:
-header
-BIG header text with the book club's name
-fun banner with the club leader's username
-currently reading book
-jump to discussion button that WILL eventually do the forums
-upcoming reads scrolly section
-past reads scrolly section
-
-
-
-*/
-
-
-
 const globalStyles = StyleSheet.create({
     container: {
         flex: 1,

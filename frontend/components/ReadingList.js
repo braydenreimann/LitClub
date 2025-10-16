@@ -5,7 +5,8 @@
 // https://www.codedaily.io/tutorials/The-Shapes-of-React-Native
 
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, Pressable } from 'react-native';
+import { Link } from 'expo-router';
 
 //eventually will fetch data from backend
 
@@ -14,7 +15,7 @@ export default function ReadingList() {
     const books = [
     { id: 1, title: 'Book 1' },
     { id: 2, title: 'Book 2' },
-    { id: 3, title: 'Book 3' },
+    { id: 3, title: 'john green' },
     { id: 4, title: 'Book 4' },
     { id: 5, title: 'Book 5' },
     { id: 6, title: 'Book 6' },
@@ -26,14 +27,19 @@ export default function ReadingList() {
             <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={true}>
                 {/* cards that scroll horizontally */}
                 {books.map((book) => (
-                    <View key={book.id} style={styles.card}>
+                    <Pressable key={book.id} style={styles.card}>
+                        <Link href="..\bookInfo">
                         <Text>{book.title}</Text>
-                    </View>
+                        </Link>
+                    </Pressable>
                 ))}
             </ScrollView>
         </View>
     )
 };
+
+
+
 
 const styles = StyleSheet.create({
     scrollContainer: {
