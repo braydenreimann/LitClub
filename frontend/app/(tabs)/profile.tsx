@@ -53,9 +53,10 @@ export default function ProfileScreen() {
         "Grass is Green-er: Hank and John Fanclub",
         "Bookish Baddies" ,
         "ENGL 404",
-        "a secret fifth option"
+        "a secret fifth option",
+        "a sixth thing"
     ]
-    const userClubs = Array.from({ length: 5 /*change to dynamic # book clubs*/ }, (_, i) => ({
+    const userClubs = Array.from({ length: 6 /*change to dynamic # book clubs*/ }, (_, i) => ({
         id: i,
         clubName: clubNames[i],
     }));
