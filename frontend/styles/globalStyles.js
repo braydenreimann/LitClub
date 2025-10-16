@@ -25,4 +25,20 @@ export const globalStyles = StyleSheet.create({
     color: colors.darkest,
     lineHeight: 22,
   },
+  scrollContainer: {
+        overflowX: 'scroll',
+        overflowY: 'hidden',
+        whiteSpace: 'nowrap',
+        padding: 10,
+    },
+    scrollingWrapper: {
+        flex: 1,
+    },
+    card: {
+        width: 120,
+        height: 180,
+        marginRight: 10,
+        backgroundColor: "teal",
+        borderColor: "black",
+    },
 });
