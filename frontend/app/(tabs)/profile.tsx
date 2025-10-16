@@ -11,8 +11,9 @@ import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
 import ReadingList from '../../components/ReadingList'; 
 import TopThreeBooks from '../../components/TopThreeBooks';
-import { View, Text, FlatList, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, FlatList, ScrollView, StyleSheet, Alert,Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
+import { Fonts } from '../../constants/theme';
 
 
 
@@ -44,7 +45,7 @@ export default function ProfileScreen() {
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}>
+        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
             <Header />
             <ScrollView>
                 <Text style={globalStyles.heading}> FirstName LastName {"\n"} </Text>
@@ -68,12 +69,12 @@ export default function ProfileScreen() {
                 <View style={globalStyles.cardGroup}>
                   
                     {
-                    userClubs.map((userClub) => (
-                        <Pressable
-                            key={userClub.id}
-                            style={globalStyles.litclubCard}
-                            onPress={()=>{Alert.alert('LitClub button pressed')/*TODO make the buttons go to their clubs*/ } }                        >
-                            <Text> {userClub.clubName} </Text>
+                        userClubs.map((userClub) => (
+                            <Pressable
+                                key={userClub.id}
+                                style={globalStyles.litclubCard}
+                                onPress={() => { Alert.alert('LitClub button pressed')/*TODO make the buttons go to their clubs*/ }} >
+                                <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
                         </Pressable>
                     ))
                     }
@@ -159,12 +160,20 @@ const globalStyles = StyleSheet.create({
         backgroundColor: "teal",
         borderColor: "black",
     },
+    cardFont: {
+        fontFamily: Fonts.sans,
+        color: colors.darkest,
+        lineHeight: 22,
+        textAlign: "center",
+        textAlignVertical: "center",
+
+    },
     litclubCard: {
         width: 100,
         height: 100,
         aspectRatio: 1,
-        backgroundColor: "#94A694",
-        borderWidth: 2,
+        backgroundColor: "#94A694", //sage green
+        borderWidth: 4,
         borderRadius: 12,
         marginLeft: 5,
         marginRight: 5,
@@ -172,6 +181,8 @@ const globalStyles = StyleSheet.create({
         marginBottom: 5,
         alignItems: "center",
         justifyContent: "center",
-        borderColor:"black",
+        borderColor: "black",
+        textAlign: "center",
+        textAlignVertical:"center",
     }
 });
