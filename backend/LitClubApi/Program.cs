@@ -1,5 +1,6 @@
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
+using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
@@ -34,7 +35,6 @@ builder.Services.AddSingleton(sp =>
         }),
         ConnectionMode = ConnectionMode.Gateway
     };
-    Console.WriteLine("Hello Kathleen");
 
     return new CosmosClient(o.Endpoint, o.PrimaryKey, clientOptions);
 });
@@ -79,6 +79,25 @@ using (var scope = app.Services.CreateScope())
     var users = client.GetContainer(o.DatabaseId, o.UsersContainerId);
     var clubs = client.GetContainer(o.DatabaseId, o.LitClubsContainerId);
     var libs = client.GetContainer(o.DatabaseId, o.LibrariesContainerId);
+
+    string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
+    string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
+    string exist = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "bookdata.csv");
+
+    List<Book> booklist = CSVParserInsert.Parse(exist);
+
+    foreach (Book b in booklist)
+    {
+        try
+        {
+            await books.UpsertItemAsync(b, new PartitionKey(b.Id));
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            // Item with same id already exists, skip
+            continue;
+        }
+    }
 
     Book book = new()
     {
