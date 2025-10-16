@@ -36,9 +36,10 @@ export default function ProfileScreen() {
         "Gothic Horror Fans",
         "Grass is Green-er: Hank and John Fanclub",
         "Bookish Baddies" ,
-        "ENGL 404"
+        "ENGL 404",
+        "a secret fifth option"
     ]
-    const userClubs = Array.from({ length: 4 /*change to dynamic # book clubs*/ }, (_, i) => ({
+    const userClubs = Array.from({ length: 5 /*change to dynamic # book clubs*/ }, (_, i) => ({
         id: i,
         clubName: clubNames[i],
     }));
@@ -49,10 +50,14 @@ export default function ProfileScreen() {
             <Header />
             <ScrollView>
                 <Text style={globalStyles.heading}> FirstName LastName {"\n"} </Text>
-                <EvilIcons name="user" size={24} color="black" /> {/* profile icon */}
-                <Text style={globalStyles.subheading}> @username {"\n"} </Text>
-                <Text style={globalStyles.body}>this is my bio</Text>
-                <EditButton /> {/*be able to edit the bio */}
+                <View style={globalStyles.profileHeader}>
+                    <EvilIcons name="user" size={75} color="black" /> {/* profile icon TODO change to PFP */}
+                    <View style={globalStyles.userBio }>
+                        <Text style={globalStyles.subheading}> @username </Text>
+                        <Text style={globalStyles.body}>this is my bio</Text>
+                    </View>
+                    <EditButton /> {/*be able to edit the bio */}
+                </View>
 
                 <View> {/*this is the part where we show the lists of the books*/}
                     <TopThreeBooks />
@@ -113,6 +118,15 @@ export default function ProfileScreen() {
 
 
 const globalStyles = StyleSheet.create({
+    profileHeader: {
+        flexDirection: "row",
+        padding: 10,
+        alignItems:"center",
+    },
+    userBio: {
+        flexDirection: "column",
+        alignItems: "center",
+    },
     container: {
         flex: 1,
         backgroundColor: colors.cream,
