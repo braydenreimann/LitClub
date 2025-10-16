@@ -20,11 +20,18 @@ import { Fonts } from '../../constants/theme';
 function EditButton() {
     return (
         <Link href="/editProfilePage">
-            <Foundation name="pencil" size={24} color="black" />
+            <Foundation name="pencil" size={30} color="black" marginLeft="20" marginTop="10" />
         </Link>
     );
 }
+function SettingsButton() {
+    return (
+        <Link href="/settingsPage">
+            <EvilIcons name="gear" size={50} color="black" marginLeft="20" marginBottom="10" /> 
+        </Link>
 
+    );
+}
 
 
 
@@ -56,7 +63,10 @@ export default function ProfileScreen() {
                         <Text style={globalStyles.subheading}> @username </Text>
                         <Text style={globalStyles.body}>this is my bio</Text>
                     </View>
-                    <EditButton /> {/*be able to edit the bio */}
+                    <View style={globalStyles.userBio}>
+                        <SettingsButton />
+                        <EditButton /> {/*be able to edit the bio */}
+                    </View>
                 </View>
 
                 <View> {/*this is the part where we show the lists of the books*/}
@@ -124,11 +134,12 @@ const globalStyles = StyleSheet.create({
     profileHeader: {
         flexDirection: "row",
         padding: 10,
-        alignItems:"center",
+        alignItems: "stretch",
+        justifyContent: "space-around",
     },
     userBio: {
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "stretch",
     },
     container: {
         flex: 1,
