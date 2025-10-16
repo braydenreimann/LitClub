@@ -36,15 +36,15 @@ function BackButton() {
     );
 }
 
-export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+export default function StatsScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
     return (
         <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
             <Header />
             {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
             <ScrollView>
-                <View style={{flexDirection:'row'} } >
-                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
-                    <Text style={globalStyles.heading} > Book Club Name </Text>
+                <View style={{ flexDirection: 'row' }} >
+                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/}
+                    <Text style={globalStyles.heading} > Reading Statistics </Text>
                 </View>
                 <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
                 <View style={globalStyles.leaderBanner}>
@@ -52,7 +52,7 @@ export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a templ
                     <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
                     <Text style={globalStyles.subheading}>@username</Text>
                     <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
-            </View>
+                </View>
                 {/*currently reading section*/}
                 <View style={globalStyles.currentRead}>
                     <View style={globalStyles.sideRead}>
@@ -65,17 +65,17 @@ export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a templ
                             <Text>This is our most recent discussion!</Text>
                         </View>
                         <Jump2discButton />
-                    </View>            
+                    </View>
                 </View>
-            <View> {/*this is the part where we show the lists of the books*/}
-                <Text style={globalStyles.subheading}>Upcoming Reads</Text>
-                <ReadingList /> {/* reading list for the club's upcoming reads*/}
-                <Text style={globalStyles.subheading}>Past Reads</Text>
-                <ReadingList /> {/* reading list for the Past Reads*/}      
-            </View>        
-            
-        </ScrollView>
-    </View>
+                <View> {/*this is the part where we show the lists of the books*/}
+                    <Text style={globalStyles.subheading}>Upcoming Reads</Text>
+                    <ReadingList /> {/* reading list for the club's upcoming reads*/}
+                    <Text style={globalStyles.subheading}>Past Reads</Text>
+                    <ReadingList /> {/* reading list for the Past Reads*/}
+                </View>
+
+            </ScrollView>
+        </View>
     );
 }
 
@@ -102,16 +102,16 @@ const globalStyles = StyleSheet.create({
         padding: 16,
     },
     leaderBanner: {
-        flexDirection:"row",
+        flexDirection: "row",
         width: "100%",
         height: 40,
         backgroundColor: "#F7C76C", //easter yellow
         fontFamily: "serif",
         fontSize: 30,
-        justifyContent:"center",
+        justifyContent: "center",
         alignItems: "center",
         marginTop: 15,
-        
+
     },
     currentRead: {
         flexDirection: "row",
@@ -121,7 +121,7 @@ const globalStyles = StyleSheet.create({
     sideRead: {
         flexDirection: "column",
         width: 120,
-        marginHorizontal:20,
+        marginHorizontal: 20,
     },
     discBox: {
         backgroundColor: "#E4D7C8", //cream
@@ -136,14 +136,14 @@ const globalStyles = StyleSheet.create({
     discButton: {
         backgroundColor: "#629FAE", //teal
         borderColor: "black",
-        borderWidth:4,
+        borderWidth: 4,
         borderRadius: 12,
         alignContent: "center",
-        justifyContent:"center",
+        justifyContent: "center",
         textAlign: "center",
         margin: 5,
         height: 45,
-        width:"120%",
+        width: "120%",
 
     },
     heading: {

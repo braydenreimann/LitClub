@@ -32,6 +32,15 @@ function SettingsButton() {
 
     );
 }
+function StatsButton() {
+    return (
+        <Link href="/statsPage">
+            <Foundation name="book-bookmark" size={30} color="black" marginLeft="20" marginTop="10" />
+        </Link>
+
+    );
+}
+
 
 
 
@@ -67,6 +76,7 @@ export default function ProfileScreen() {
                         <SettingsButton />
                         <EditButton /> {/*be able to edit the bio */}
                     </View>
+                    <StatsButton />
                 </View>
 
                 <View> {/*this is the part where we show the lists of the books*/}
