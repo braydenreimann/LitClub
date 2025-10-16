@@ -32,12 +32,13 @@ export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a templ
             <Header />
             {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
         <ScrollView>
-                <Text style={globalStyles.heading}> Book Club Name </Text>
+                <Text style={globalStyles.heading} > Book Club Name </Text>
                 <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
-            <View style={globalStyles.leaderBanner}>
+                <View style={globalStyles.leaderBanner}>
+                    <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
                     <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
-                    <EvilIcons name="user" size={75} color="black" /> {/* profile icon TODO change to PFP */}
                     <Text style={globalStyles.subheading}>@username</Text>
+                    <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
             </View>
                 {/*currently reading section*/}
                 <View style={globalStyles.currentRead}>
@@ -105,9 +106,10 @@ const globalStyles = StyleSheet.create({
         backgroundColor: "#F7C76C", //easter yellow
         fontFamily: "serif",
         fontSize: 30,
-        alignContent: "center",
-        verticalAlign: "middle",
-        textAlignVertical: "center",
+        justifyContent:"center",
+        alignItems: "center",
+        marginTop: 15,
+        
     },
     currentRead: {
         flexDirection: "row",

@@ -48,7 +48,7 @@ export default function ProfileScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
             <Header />
-            <ScrollView>
+            <ScrollView> {/*TODO: add space*/ }
                 <Text style={globalStyles.heading}> FirstName LastName {"\n"} </Text>
                 <View style={globalStyles.profileHeader}>
                     <EvilIcons name="user" size={75} color="black" /> {/* profile icon TODO change to PFP */}
