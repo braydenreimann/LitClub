@@ -6,5 +6,6 @@
 /backend/LitClubApi/bin
 /backend/TestProject/bin
 /backend/TestProject/obj
+/backend/TestProject/obj/Debug
 /.vs
 /backend/LitClubApi/.vs/LitClubApi
