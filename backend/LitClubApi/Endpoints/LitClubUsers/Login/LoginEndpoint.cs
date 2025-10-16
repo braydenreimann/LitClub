@@ -1,7 +1,6 @@
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
 using LitClubApi.Infrastructure.Cosmos;
-using LitClubApi.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
@@ -68,7 +67,7 @@ public class Login(ICosmosContext cosmosContext) : EndpointBaseAsync
             return Unauthorized();
         }
 
-        bool passwordValid = PasswordHasher.VerifyPassword(request.Password, user.PasswordHash);
+        bool passwordValid = request.Password == user.PasswordHash;
 
         if (!passwordValid)
         {

@@ -1,7 +1,5 @@
-using System.Linq;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.LitClubUsers.EditUser;
-using LitClubApi.Utilities;
 
 namespace LitClubApi.Endpoints.LitClubUsers;
 
@@ -13,7 +11,7 @@ public static class UserMapper
         LastName = request.LastName,
         UserName = request.UserName,
         Email = request.Email,
-        PasswordHash = PasswordHasher.HashPassword(request.Password),
+        PasswordHash = request.Password,
         Bio = request.Bio,
         ProfilePhotoUrl = request.ProfilePhotoUrl,
         PreferredGenres = request.PreferredGenres?.ToList() ?? [],
@@ -27,7 +25,7 @@ public static class UserMapper
         if (request.Body.LastName is not null) user.LastName = request.Body.LastName;
         if (request.Body.UserName is not null) user.UserName = request.Body.UserName;
         if (request.Body.Email is not null) user.Email = request.Body.Email;
-        if (request.Body.Password is not null) user.PasswordHash = PasswordHasher.HashPassword(request.Body.Password);
+        if (request.Body.Password is not null) user.PasswordHash = request.Body.Password;
         if (request.Body.Bio is not null) user.Bio = request.Body.Bio;
         if (request.Body.ProfilePhotoUrl is not null) user.ProfilePhotoUrl = request.Body.ProfilePhotoUrl;
         if (request.Body.PreferredGenres is not null) user.PreferredGenres = request.Body.PreferredGenres.ToList();
