@@ -5,37 +5,41 @@
 // https://www.codedaily.io/tutorials/The-Shapes-of-React-Native
 
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, Pressable } from 'react-native';
+import { Link } from 'expo-router';
 
 //eventually will fetch data from backend
 
 export default function ReadingList() {
+
+    const books = [
+    { id: 1, title: 'Book 1' },
+    { id: 2, title: 'Book 2' },
+    { id: 3, title: 'john green' },
+    { id: 4, title: 'Book 4' },
+    { id: 5, title: 'Book 5' },
+    { id: 6, title: 'Book 6' },
+  ];
+
     return (
+
         <View style={styles.scrollingWrapper}>
             <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={true}>
                 {/* cards that scroll horizontally */}
-                <View style={styles.card}>
-                    <Text>Book 1</Text>
-                </View>
-                <View style={styles.card}>
-                    <Text>Book 2</Text>
-                </View>
-                <View style={styles.card}>
-                    <Text>Book 3</Text>
-                </View>
-                <View style={styles.card}>
-                    <Text>Book 4</Text>
-                </View>
-                <View style={styles.card}>
-                    <Text>Book 5</Text>
-                </View>
-                <View style={styles.card}>
-                    <Text>Book 6</Text>
-                </View>
+                {books.map((book) => (
+                    <Pressable key={book.id} style={styles.card}>
+                        <Link href="..\..\app\bookInfo">
+                        <Text>{book.title}</Text>
+                        </Link>
+                    </Pressable>
+                ))}
             </ScrollView>
         </View>
     )
 };
+
+
+
 
 const styles = StyleSheet.create({
     scrollContainer: {

@@ -15,16 +15,9 @@ import { Link, router } from 'expo-router';
 
 export default function BooksPage() {
     return (
+        
         <ScrollView style={{ flex: 1, backgroundColor: "#E4D7C8" }}>
-            <View>
-                <Link href="/home">
-                    <Pressable 
-                        onPress={() => router.back()}
-                        style= {{ paddingLeft: 20, paddingTop: 20, paddingBottom: 10 }}
-                    >
-                        <IconSymbol name="arrow.left" size={30} color="black" />
-                    </Pressable>
-                </Link>     
+            <View>  
 
                 <ThemedView style={styles.titleContainer}>
                     <ThemedText type="title" style={{ fontFamily: 'System', fontSize: 25, paddingTop: 25, paddingHorizontal: 25}}>

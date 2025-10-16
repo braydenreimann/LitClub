@@ -7,7 +7,6 @@ import { Platform, StyleSheet, TextInput, View } from 'react-native';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
 import { useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import Header from '../../components/headerWithSearch';
