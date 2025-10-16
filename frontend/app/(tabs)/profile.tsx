@@ -46,8 +46,8 @@ function StatsButton() {
 
 
 export default function ProfileScreen() {
-    {/*for the sake of the litclubs
-       WITH BACKEND: implement this as a linked list of a users' joined book clubs */ }
+    /*for the sake of the litclubs
+       WITH BACKEND: implement this as a linked list of a users' joined book clubs */
     const clubNames = [
         "Gothic Horror Fans",
         "Grass is Green-er: Hank and John Fanclub",
@@ -55,43 +55,49 @@ export default function ProfileScreen() {
         "ENGL 404",
         "a secret fifth option"
     ]
-    const userClubs = Array.from({ length: 5 /*change to dynamic # book clubs*/ }, (_, i) => ({
+    const userClubs = Array.from({ length: 5 }, (_, i) => ({
         id: i,
         clubName: clubNames[i],
     }));
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
+        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
             <Header />
-            <ScrollView> {/*TODO: add space*/ }
+            <ScrollView> 
                 <Text style={globalStyles.heading}> FirstName LastName {"\n"} </Text>
                 <View style={globalStyles.profileHeader}>
-                    <EvilIcons name="user" size={75} color="black" /> {/* profile icon TODO change to PFP */}
+                    {/* profile icon TODO change to PFP */}
+                    <EvilIcons name="user" size={75} color="black" /> 
                     <View style={globalStyles.userBio }>
                         <Text style={globalStyles.subheading}> @username </Text>
                         <Text style={globalStyles.body}>this is my bio</Text>
                     </View>
+
+                    {/*be able to edit the bio */}
                     <View style={globalStyles.userBio}>
                         <SettingsButton />
-                        <EditButton /> {/*be able to edit the bio */}
+                        <EditButton /> 
                     </View>
                     <StatsButton />
                 </View>
 
-                <View> {/*this is the part where we show the lists of the books*/}
+                {/*this is the part where we show the lists of the books*/}
+                <View> 
                     <TopThreeBooks />
                     <Text style={globalStyles.subheading}>Currently Reading</Text>
-                    <ReadingList /> {/* reading list for the currently reading*/}
+                    {/* reading list for the currently reading*/}
+                    <ReadingList /> 
                     <Text style={globalStyles.subheading}>Past Reads</Text>
-                    <ReadingList /> {/* reading list for the Past Reads*/}
+                    {/* reading list for the Past Reads*/}
+                    <ReadingList /> 
                     <Text style={globalStyles.subheading}>Saved for Later</Text>
-                    <ReadingList /> {/* reading list for the Saved for Later*/}
+                    <ReadingList /> 
                 </View>
 
                 {/*display the book clubs*/}
                 <Text style={globalStyles.subheading}> My LitClubs </Text>
-                <View style={globalStyles.cardGroup}> {/*format the GROUP of cards correctly*/}
+                <View style={globalStyles.cardGroup}> 
                     {
                         userClubs.map((userClub) => (
                             
@@ -99,9 +105,10 @@ export default function ProfileScreen() {
                                 key={userClub.id}
                                 style={globalStyles.litclubCard}
                                 onPress={() => {
-                                    Alert.alert('LitClub button pressed')/*TODO make the buttons go to their clubs*/
+                                    /*TODO make the buttons go to their clubs*/
+                                    Alert.alert('LitClub button pressed') 
                                 }} >
-                                <Link href="/myLitClub"> {/*nested link allows for navigation*/ } 
+                                <Link href="/myLitClub"> 
                                     <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
                                 </Link>
                             </Pressable>
@@ -117,7 +124,7 @@ export default function ProfileScreen() {
 
 
 
-{/* /vidya's header and search bar
+/* /vidya's header and search bar
     //profile photo left aligned
     //big text fitstname last name
     //smaller text @username
@@ -137,7 +144,7 @@ export default function ProfileScreen() {
     //your LitClubs
     //footer with the default buttons on it
 
-*/}
+*/
 
 
 const globalStyles = StyleSheet.create({
