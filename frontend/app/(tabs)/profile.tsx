@@ -43,8 +43,8 @@ function StatsButton() {
 
 
 export default function ProfileScreen() {
-    {/*for the sake of the litclubs
-       WITH BACKEND: implement this as a linked list of a users' joined book clubs */ }
+   /*for the sake of the litclubs
+       WITH BACKEND: implement this as a linked list of a users' joined book clubs */
     const clubNames = [
         "Gothic Horror Fans",
         "Grass is Green-er: Hank and John Fanclub",
@@ -80,7 +80,8 @@ export default function ProfileScreen() {
                 <View> {/*this is the part where we show the lists of the books*/}
                     <TopThreeBooks />
                     <Text style={globalStyles.subheading}>Currently Reading</Text>
-                    <ReadingList /> {/* reading list for the currently reading*/}
+                    {/* reading list for the currently reading*/}
+                    <ReadingList /> 
                     <Text style={globalStyles.subheading}>Past Reads</Text>
                     <ReadingList /> {/* reading list for the Past Reads*/}
                     <Text style={globalStyles.subheading}>Saved for Later</Text>
@@ -89,7 +90,8 @@ export default function ProfileScreen() {
 
                 {/*display the book clubs*/}
                 <Text style={globalStyles.subheading}> My LitClubs </Text>
-                <View style={globalStyles.cardGroup}> {/*format the GROUP of cards correctly*/}
+                { /*format the GROUP of cards correctly*/}
+                <View style={globalStyles.cardGroup}> 
                     {
                         userClubs.map((userClub) => (
                             
