@@ -84,8 +84,6 @@ export default function ProfileScreen() {
                     ))
                     }
                     </View>
-                {/* book clubs*/}
-
             </ScrollView>
         </View>
     );
