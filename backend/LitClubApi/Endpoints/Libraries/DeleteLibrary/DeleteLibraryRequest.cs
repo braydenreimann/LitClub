@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// using Microsoft.AspNetCore.Mvc;
 
-namespace LitClubApi.Endpoints.Libraries.DeleteLibrary;
+// namespace LitClubApi.Endpoints.Libraries.DeleteLibrary;
 
-public sealed class DeleteLibraryRequest
-{
-    [FromRoute(Name = "userId")]
-    public required string UserId { get; init; }
-}
+// public sealed class DeleteLibraryRequest
+// {
+//     [FromRoute(Name = "userId")]
+//     public required string UserId { get; init; }
+// }

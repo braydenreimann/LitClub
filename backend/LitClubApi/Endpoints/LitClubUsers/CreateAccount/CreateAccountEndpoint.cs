@@ -1,12 +1,13 @@
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.LitClubUsers.CreateAccount;
 
 [ApiController]
-public class CreateAccount(Container usersContainer) : EndpointBaseAsync
+public class CreateAccount(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<CreateAccountRequest>
     .WithActionResult<UserResponse>
 {
@@ -25,7 +26,7 @@ public class CreateAccount(Container usersContainer) : EndpointBaseAsync
             .WithParameter("@userName", request.UserName)
             .WithParameter("@Email", request.Email);
 
-        FeedIterator<LitClubUser> duplicateCheck = usersContainer.GetItemQueryIterator<LitClubUser>(
+        FeedIterator<LitClubUser> duplicateCheck = cosmosContext.Users.GetItemQueryIterator<LitClubUser>(
             queryDefinition: duplicateCheckQuery,
             requestOptions: new QueryRequestOptions
             {
@@ -52,9 +53,22 @@ public class CreateAccount(Container usersContainer) : EndpointBaseAsync
 
         try
         {
-            await usersContainer.CreateItemAsync(
+            // Add the user to the users container
+            await cosmosContext.Users.CreateItemAsync(
                 item: user,
                 partitionKey: new PartitionKey(user.Id),
+                cancellationToken: cancellationToken);
+
+            // Create a new library for the user
+            Library library = new()
+            {
+                OwnerId = user.Id,
+            };
+
+            // Add the library to the libraries container
+            await cosmosContext.Libraries.CreateItemAsync(
+                item: library,
+                partitionKey: new PartitionKey(library.OwnerId),
                 cancellationToken: cancellationToken);
         }
         catch (CosmosException)

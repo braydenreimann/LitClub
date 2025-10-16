@@ -1,7 +1,6 @@
-using System.Linq;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.LitClubUsers;
+using LitClubApi.Infrastructure.Cosmos;
 using LitClubApi.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
@@ -9,7 +8,7 @@ using Microsoft.Azure.Cosmos;
 namespace LitClubApi.Endpoints.LitClubUsers.Login;
 
 [ApiController]
-public class Login(Container usersContainer) : EndpointBaseAsync
+public class Login(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<LoginRequest>
     .WithActionResult<UserResponse>
 {
@@ -42,7 +41,7 @@ public class Login(Container usersContainer) : EndpointBaseAsync
                 .WithParameter("@identifier", request.Email);
         }
 
-        FeedIterator<LitClubUser> iterator = usersContainer.GetItemQueryIterator<LitClubUser>(
+        FeedIterator<LitClubUser> iterator = cosmosContext.Users.GetItemQueryIterator<LitClubUser>(
             queryDefinition: query,
             requestOptions: new QueryRequestOptions
             {

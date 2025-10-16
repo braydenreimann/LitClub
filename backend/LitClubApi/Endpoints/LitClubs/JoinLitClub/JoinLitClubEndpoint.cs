@@ -1,15 +1,14 @@
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.LitClubs.JoinLitClub;
 
 [ApiController]
-public class Join(
-    Container litClubsContainer,
-    Container usersContainer) : EndpointBaseAsync
+public class Join(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<JoinLitClubRequest>
     .WithActionResult<LitClubResponse>
 {
@@ -32,7 +31,7 @@ public class Join(
 
         try
         {
-            ItemResponse<LitClub> litClubResponse = await litClubsContainer.ReadItemAsync<LitClub>(
+            ItemResponse<LitClub> litClubResponse = await cosmosContext.LitClubs.ReadItemAsync<LitClub>(
                 id: request.LitClubId,
                 partitionKey: new PartitionKey(request.LitClubId),
                 cancellationToken: cancellationToken);
@@ -51,7 +50,7 @@ public class Join(
 
         try
         {
-            ItemResponse<LitClubUser> userResponse = await usersContainer.ReadItemAsync<LitClubUser>(
+            ItemResponse<LitClubUser> userResponse = await cosmosContext.Users.ReadItemAsync<LitClubUser>(
                 id: request.Body.UserId,
                 partitionKey: new PartitionKey(request.Body.UserId),
                 cancellationToken: cancellationToken);
@@ -90,7 +89,7 @@ public class Join(
         {
             try
             {
-                await usersContainer.ReplaceItemAsync(
+                await cosmosContext.Users.ReplaceItemAsync(
                     item: user,
                     id: user.Id,
                     partitionKey: new PartitionKey(user.Id),
@@ -106,7 +105,7 @@ public class Join(
         {
             try
             {
-                await litClubsContainer.ReplaceItemAsync(
+                await cosmosContext.LitClubs.ReplaceItemAsync(
                     item: litClub,
                     id: litClub.Id,
                     partitionKey: new PartitionKey(litClub.Id),

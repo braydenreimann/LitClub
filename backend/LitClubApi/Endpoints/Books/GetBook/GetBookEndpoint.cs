@@ -2,11 +2,12 @@ using Ardalis.ApiEndpoints;
 using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.GetBook;
 
 [ApiController]
-public class Get(Container booksContainer) : EndpointBaseAsync
+public class Get(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<GetBookRequest>
     .WithActionResult<BookResponse>
 {
@@ -23,7 +24,7 @@ public class Get(Container booksContainer) : EndpointBaseAsync
         // Fetch the book from the container
         try
         {
-            var read = await booksContainer.ReadItemAsync<Book>(
+            var read = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken

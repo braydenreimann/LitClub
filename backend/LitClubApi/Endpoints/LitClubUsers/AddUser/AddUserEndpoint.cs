@@ -1,14 +1,13 @@
-using System.Linq;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.LitClubUsers;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.LitClubUsers.AddUser;
 
 [ApiController]
-public class Add(Container usersContainer) : EndpointBaseAsync
+public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<AddUserRequest>
     .WithActionResult<UserResponse>
 {
@@ -27,7 +26,7 @@ public class Add(Container usersContainer) : EndpointBaseAsync
             .WithParameter("@userName", request.UserName)
             .WithParameter("@Email", request.Email);
 
-        FeedIterator<LitClubUser> duplicateCheck = usersContainer.GetItemQueryIterator<LitClubUser>(
+        FeedIterator<LitClubUser> duplicateCheck = cosmosContext.Users.GetItemQueryIterator<LitClubUser>(
             queryDefinition: duplicateCheckQuery,
             requestOptions: new QueryRequestOptions
             {
@@ -54,7 +53,7 @@ public class Add(Container usersContainer) : EndpointBaseAsync
 
         try
         {
-            await usersContainer.CreateItemAsync(
+            await cosmosContext.Users.CreateItemAsync(
                 item: user,
                 partitionKey: new PartitionKey(user.Id),
                 cancellationToken: cancellationToken);

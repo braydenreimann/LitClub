@@ -1,13 +1,14 @@
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.Editions.GetEdition;
 
 [ApiController]
-public class Get(Container booksContainer) : EndpointBaseAsync
+public class Get(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<GetEditionRequest>
     .WithActionResult<EditionResponse>
 {
@@ -25,7 +26,7 @@ public class Get(Container booksContainer) : EndpointBaseAsync
 
         try
         {
-            var response = await booksContainer.ReadItemAsync<Book>(
+            var response = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken);

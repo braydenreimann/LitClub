@@ -2,11 +2,12 @@ using Ardalis.ApiEndpoints;
 using Microsoft.Azure.Cosmos;
 using LitClubApi.Domain;
 using Microsoft.AspNetCore.Mvc;
+using LitClubApi.Infrastructure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.AddBook;
 
 [ApiController]
-public class Add(Container booksContainer) : EndpointBaseAsync
+public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<AddBookRequest>
     .WithActionResult<BookResponse>
 {
@@ -26,7 +27,7 @@ public class Add(Container booksContainer) : EndpointBaseAsync
 
         try
         {
-            var result = await booksContainer.CreateItemAsync(book, pk, cancellationToken: cancellationToken);
+            var result = await cosmosContext.Books.CreateItemAsync(book, pk, cancellationToken: cancellationToken);
         }
         catch (CosmosException)
         {

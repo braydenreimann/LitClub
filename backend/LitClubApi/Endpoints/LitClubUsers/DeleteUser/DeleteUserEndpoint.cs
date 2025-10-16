@@ -1,13 +1,14 @@
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.LitClubUsers.DeleteUser;
 
 [ApiController]
-public class Delete(Container usersContainer) : EndpointBaseAsync
+public class Delete(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<DeleteUserRequest>
     .WithActionResult
 {
@@ -23,7 +24,7 @@ public class Delete(Container usersContainer) : EndpointBaseAsync
     {
         try
         {
-            await usersContainer.DeleteItemAsync<LitClubUser>(
+            await cosmosContext.Users.DeleteItemAsync<LitClubUser>(
                 id: request.UserId,
                 partitionKey: new PartitionKey(request.UserId),
                 cancellationToken: cancellationToken);

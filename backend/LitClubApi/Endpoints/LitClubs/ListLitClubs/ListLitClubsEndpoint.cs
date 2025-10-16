@@ -1,12 +1,13 @@
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.LitClubs.ListLitClubs;
 
 [ApiController]
-public class List(Container litClubsContainer) : EndpointBaseAsync
+public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<ListLitClubsRequest>
     .WithActionResult<ListLitClubsResponse>
 {
@@ -21,7 +22,7 @@ public class List(Container litClubsContainer) : EndpointBaseAsync
     {
         int pageSize = request.ClampPageSize();
 
-        FeedIterator<LitClub> iterator = litClubsContainer.GetItemQueryIterator<LitClub>(
+        FeedIterator<LitClub> iterator = cosmosContext.LitClubs.GetItemQueryIterator<LitClub>(
             queryDefinition: new QueryDefinition("SELECT * FROM c"),
             continuationToken: request.ContinuationToken,
             requestOptions: new QueryRequestOptions

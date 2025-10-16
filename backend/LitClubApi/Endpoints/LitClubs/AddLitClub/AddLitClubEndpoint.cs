@@ -1,12 +1,13 @@
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.LitClubs.AddLitClub;
 
 [ApiController]
-public class Add(Container litClubsContainer) : EndpointBaseAsync
+public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<AddLitClubRequest>
     .WithActionResult<LitClubResponse>
 {
@@ -24,9 +25,21 @@ public class Add(Container litClubsContainer) : EndpointBaseAsync
 
         try
         {
-            await litClubsContainer.CreateItemAsync(
+            await cosmosContext.LitClubs.CreateItemAsync(
                 item: litClub,
                 partitionKey: partitionKey,
+                cancellationToken: cancellationToken);
+
+            // Create a new library for the LitClub
+            Library library = new()
+            {
+                OwnerId = litClub.Id,
+            };
+
+            // Add the library to the libraries container
+            await cosmosContext.LitClubs.CreateItemAsync(
+                item: library,
+                partitionKey: new PartitionKey(library.OwnerId),
                 cancellationToken: cancellationToken);
         }
         catch (CosmosException)
