@@ -1,17 +1,23 @@
-using System.Linq;
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.Editions.DeleteEdition;
 
-public class Delete(Container booksContainer) : EndpointBaseAsync
+[ApiController]
+public class Delete(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<DeleteEditionRequest>
     .WithActionResult
 {
     [HttpDelete("books/{bookId}/editions/{editionId}")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult> HandleAsync(
         DeleteEditionRequest request,
         CancellationToken cancellationToken = default)
@@ -20,7 +26,7 @@ public class Delete(Container booksContainer) : EndpointBaseAsync
 
         try
         {
-            var response = await booksContainer.ReadItemAsync<Book>(
+            var response = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken);
@@ -45,7 +51,7 @@ public class Delete(Container booksContainer) : EndpointBaseAsync
 
         try
         {
-            await booksContainer.ReplaceItemAsync(
+            await cosmosContext.Books.ReplaceItemAsync(
                 item: book,
                 id: book.Id,
                 partitionKey: new PartitionKey(book.Id),

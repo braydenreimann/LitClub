@@ -1,17 +1,23 @@
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.Editions;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.Editions.AddEdition;
 
-public class Add(Container booksContainer) : EndpointBaseAsync
-    .WithRequest<AddEditionRequest>
-    .WithActionResult<EditionResponse>
+[ApiController]
+public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
+.WithRequest<AddEditionRequest>
+.WithActionResult<EditionResponse>
 {
     [HttpPost("books/{bookId}/editions")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(EditionResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
         AddEditionRequest request,
         CancellationToken cancellationToken = default)
@@ -20,7 +26,7 @@ public class Add(Container booksContainer) : EndpointBaseAsync
 
         try
         {
-            var response = await booksContainer.ReadItemAsync<Book>(
+            var response = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken);
@@ -35,20 +41,22 @@ public class Add(Container booksContainer) : EndpointBaseAsync
             return StatusCode(500, "Unable to access database");
         }
 
+        var b = request.Body;
+
         Edition newEdition = new()
         {
-            Format = request.Format.ToDomain(),
-            Publisher = request.Publisher,
-            PublicationDate = request.PublicationDate,
-            PrintLength = request.PrintLength,
-            Isbn13s = [.. request.Isbn13s]
+            Format = b.Format.ToDomain(),
+            Publisher = b.Publisher,
+            PublicationDate = b.PublicationDate,
+            PrintLength = b.PrintLength,
+            Isbn13s = [.. b.Isbn13s]
         };
 
         book.Editions.Add(newEdition);
 
         try
         {
-            await booksContainer.ReplaceItemAsync(
+            await cosmosContext.Books.ReplaceItemAsync(
                 item: book,
                 id: book.Id,
                 partitionKey: new PartitionKey(book.Id),
@@ -59,7 +67,9 @@ public class Add(Container booksContainer) : EndpointBaseAsync
             return StatusCode(500, "Unable to access database");
         }
 
-        EditionResponse responseBody = newEdition.ToResponse();
-        return CreatedAtRoute("book-editions-get", new { bookId = book.Id, editionId = newEdition.Id }, responseBody);
+        return CreatedAtRoute(
+            routeName: "book-editions-get",
+            routeValues: new { bookId = book.Id, editionId = newEdition.Id },
+            value: newEdition.ToResponse());
     }
 }

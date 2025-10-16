@@ -1,5 +1,8 @@
+using LitClubApi.Configuration;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,60 +11,41 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
-// Configure the client's options to disable TSL/SSL validation before creating the client
-CosmosClientOptions options = new()
+// Bind options from configuration
+builder.Services.Configure<CosmosOptions>(
+    builder.Configuration.GetSection("Cosmos")
+);
+
+// Register a singleton CosmosClient
+builder.Services.AddSingleton(sp =>
 {
-    HttpClientFactory = () => new HttpClient(new HttpClientHandler()
+    var env = sp.GetRequiredService<IHostEnvironment>();
+    var o = sp.GetRequiredService<IOptions<CosmosOptions>>().Value;
+
+    var clientOptions = new CosmosClientOptions
     {
-        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-    }),
-    ConnectionMode = ConnectionMode.Gateway
-};
+        // Disable TSL/SSL validation for development only
+        HttpClientFactory = () => new HttpClient(new HttpClientHandler()
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        }),
+        ConnectionMode = ConnectionMode.Gateway
+    };
+    Console.WriteLine("Hello Kathleen");
 
-// Create a new instance of CosmosClient using the emulator's credentials
-using CosmosClient client = new(
-    accountEndpoint: "https://localhost:8081",
-    authKeyOrResourceToken: "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
-    clientOptions: options
-);
+    return new CosmosClient(o.Endpoint, o.PrimaryKey, clientOptions);
+});
 
-// Create a new database and container
-Database database = await client.CreateDatabaseIfNotExistsAsync(
-    id: "litclub",
-    throughput: 400
-);
-
-Container booksContainer = await database.CreateContainerIfNotExistsAsync(
-    id: "books",
-    partitionKeyPath: "/id"
-);
-
-// Create a new item
-Book book = new()
+// Registered typed context
+builder.Services.AddSingleton<ICosmosContext>(sp =>
 {
-    Id = "1",
-    Title = "The Fault in Our Stars",
-    Author = "John Green",
-    TotalChapters = 25,
-    Genre = "Young adult novel",
-    Description = "A book about two sick young lovers.",
-    Editions = [
-        new Edition {
-            Format = BookFormat.Paperback,
-            Publisher = "Penguin Books",
-            PublicationDate = DateOnly.Parse("April 8, 2014"),
-            PrintLength = 352,
-            Isbn13s = ["978-0142424179"]
-        }
-    ]
-};
-
-await booksContainer.UpsertItemAsync(book, new PartitionKey(book.Id));
-
-// Add service to container
-builder.Services.AddSingleton(booksContainer);
+    var client = sp.GetRequiredService<CosmosClient>();
+    var opts = sp.GetRequiredService<IOptions<CosmosOptions>>();
+    return new CosmosContext(client, opts);
+});
 
 var app = builder.Build();
 
@@ -71,8 +55,93 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
+// One-time initialization
+using (var scope = app.Services.CreateScope())
+{
+    var sp = scope.ServiceProvider;
+    var client = sp.GetRequiredService<CosmosClient>();
+    var o = sp.GetRequiredService<IOptions<CosmosOptions>>().Value;
+
+    // Ensure DB and containers exist
+    Database db = await client.CreateDatabaseIfNotExistsAsync(o.DatabaseId, throughput: 400);
+    await db.CreateContainerIfNotExistsAsync(o.BooksContainerId, "/id");
+    await db.CreateContainerIfNotExistsAsync(o.UsersContainerId, "/id");
+    await db.CreateContainerIfNotExistsAsync(o.LitClubsContainerId, "/id");
+    await db.CreateContainerIfNotExistsAsync(o.LibrariesContainerId, "/id");
+
+    // Optional: seed (dev-only is recommended)
+    var books = client.GetContainer(o.DatabaseId, o.BooksContainerId);
+    var users = client.GetContainer(o.DatabaseId, o.UsersContainerId);
+    var clubs = client.GetContainer(o.DatabaseId, o.LitClubsContainerId);
+    var libs = client.GetContainer(o.DatabaseId, o.LibrariesContainerId);
+
+    Book book = new()
+    {
+        Id = "1",
+        Title = "The Fault in Our Stars",
+        Author = "John Green",
+        TotalChapters = 25,
+        Genre = "Young adult novel",
+        Description = "A book about two sick young lovers.",
+        Editions = [
+            new Edition {
+                Format = BookFormat.Paperback,
+                Publisher = "Penguin Books",
+                PublicationDate = DateOnly.Parse("April 8, 2014"),
+                PrintLength = 352,
+                Isbn13s = ["978-0142424179"]
+            }
+        ]
+    };
+
+    LitClubUser litClubUser = new()
+    {
+        Id = "1",
+        FirstName = "John",
+        LastName = "Green",
+        UserName = "johngreen",
+        Email = "johngreen@icloud.com",
+        PasswordHash = "johngreenpw",
+        Bio = "I'm just a Nerdfighter that loves reading and science",
+        PreferredGenres = ["Fiction"],
+    };
+
+    LitClub litClub = new()
+    {
+        Id = "1",
+        Name = "Fans of John Green",
+        OwnerUserId = "1",
+        Description = "We love all of John Green's books. And some of Hank's too.",
+        MemberUserIds = ["1"],
+    };
+
+    Library library = new()
+    {
+        OwnerId = "1",
+        LibraryBooks =
+        [
+            new LibraryBook()
+            {
+                BookId = "1",
+                Status = ShelfStatus.currentlyReading,
+                StartedReading = DateOnly.Parse("October 11, 2025"),
+                CurrentPage = 114,
+                PercentComplete = 22,
+                OnPedastal = false
+            }
+        ]
+    };
+
+    await books.UpsertItemAsync(book, new PartitionKey(book.Id));
+    await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
+    await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
+    await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
+}
 
 app.UseAuthorization();
 

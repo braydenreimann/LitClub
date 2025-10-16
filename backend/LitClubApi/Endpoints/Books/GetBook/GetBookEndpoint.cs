@@ -1,24 +1,30 @@
-using Microsoft.Azure.Cosmos;
 using Ardalis.ApiEndpoints;
+using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.GetBook;
 
-public class Get(Container booksContainer) : EndpointBaseAsync
+[ApiController]
+public class Get(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<GetBookRequest>
     .WithActionResult<BookResponse>
 {
 
     [HttpGet("books/{bookId}", Name = "books")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(BookResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<BookResponse>> HandleAsync(
-            [FromRoute] GetBookRequest request,
+            GetBookRequest request,
             CancellationToken cancellationToken = default)
     {
         // Fetch the book from the container
         try
         {
-            var read = await booksContainer.ReadItemAsync<Book>(
+            var read = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken

@@ -1,0 +1,44 @@
+import { StyleSheet } from 'react-native';
+import { colors, fonts } from '../theme';
+
+export const globalStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.cream,
+    padding: 16,
+  },
+  heading: {
+    fontFamily: fonts.heading,
+    fontSize: 32,
+    color: colors.midBlue,
+    marginBottom: 8,
+  },
+  subheading: {
+    fontFamily: fonts.subheading,
+    fontSize: 22,
+    color: colors.midBlue,
+    marginBottom: 6,
+  },
+  body: {
+    fontFamily: fonts.body,
+    fontSize: 14,
+    color: colors.darkest,
+    lineHeight: 22,
+  },
+  scrollContainer: {
+        overflowX: 'scroll',
+        overflowY: 'hidden',
+        whiteSpace: 'nowrap',
+        padding: 10,
+    },
+    scrollingWrapper: {
+        flex: 1,
+    },
+    card: {
+        width: 120,
+        height: 180,
+        marginRight: 10,
+        backgroundColor: "teal",
+        borderColor: "black",
+    },
+});

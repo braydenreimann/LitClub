@@ -1,17 +1,23 @@
-using Microsoft.Azure.Cosmos;
 using Ardalis.ApiEndpoints;
+using Microsoft.Azure.Cosmos;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books;
 using Microsoft.AspNetCore.Mvc;
+using LitClubApi.Infrastructure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.EditBook;
 
-public class Edit(Container booksContainer) : EndpointBaseAsync
+[ApiController]
+public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<EditBookRequest>
     .WithActionResult<BookResponse>
 {
     [HttpPatch("books/{bookId}")]
-    public override async Task<ActionResult<BookResponse>> HandleAsync(EditBookRequest request,
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(BookResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public override async Task<ActionResult<BookResponse>> HandleAsync(
+        EditBookRequest request,
         CancellationToken cancellationToken = default)
     {
         Book updatedBook;
@@ -19,7 +25,7 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
         // Fetch the book from the container
         try
         {
-            var read = await booksContainer.ReadItemAsync<Book>(
+            var read = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken
@@ -31,14 +37,14 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
             return StatusCode(500, "Unable to access database");
         }
 
-        if (request.Title is not null) updatedBook.Title = request.Title;
-        if (request.Author is not null) updatedBook.Author = request.Author;
-        if (request.TotalChapters is not null) updatedBook.TotalChapters = request.TotalChapters.Value;
-        if (request.Genre is not null) updatedBook.Genre =  request.Genre;
-        if (request.Description is not null) updatedBook.Description = request.Description;
+        if (request.Body.Title is not null) updatedBook.Title = request.Body.Title;
+        if (request.Body.Author is not null) updatedBook.Author = request.Body.Author;
+        if (request.Body.TotalChapters is not null) updatedBook.TotalChapters = request.Body.TotalChapters.Value;
+        if (request.Body.Genre is not null) updatedBook.Genre = request.Body.Genre;
+        if (request.Body.Description is not null) updatedBook.Description = request.Body.Description;
         try
         {
-            await booksContainer.ReplaceItemAsync(
+            await cosmosContext.Books.ReplaceItemAsync(
                 item: updatedBook,
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),

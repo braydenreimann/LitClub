@@ -1,18 +1,23 @@
-using System.Linq;
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.Editions;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.Editions.GetEdition;
 
-public class Get(Container booksContainer) : EndpointBaseAsync
+[ApiController]
+public class Get(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<GetEditionRequest>
     .WithActionResult<EditionResponse>
 {
     [HttpGet("books/{bookId}/editions/{editionId}", Name = "book-editions-get")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(EditionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
         GetEditionRequest request,
         CancellationToken cancellationToken = default)
@@ -21,7 +26,7 @@ public class Get(Container booksContainer) : EndpointBaseAsync
 
         try
         {
-            var response = await booksContainer.ReadItemAsync<Book>(
+            var response = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken);
