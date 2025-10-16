@@ -42,9 +42,6 @@ function StatsButton() {
 }
 
 
-
-
-
 export default function ProfileScreen() {
     {/*for the sake of the litclubs
        WITH BACKEND: implement this as a linked list of a users' joined book clubs */ }
