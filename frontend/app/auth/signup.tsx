@@ -36,21 +36,11 @@ export default function SignUpScreen() {
   const { signIn } = useSession();
   const router = useRouter();
 
-  const handleSignUp = async (values: {
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) => {
-    const success = await signIn(values.email, values.password);
-    if (success) {
-      router.push({
-        pathname: '/auth/create_account',
-        params: {email: values.email},
+  const handleSignUp = async (values: { email: string; password: string; confirmPassword: string }) => {
+    router.push({
+      pathname: '/auth/create_account',
+      params: { email: values.email, password: values.password },
     });
-    }
-    else {
-      Alert.alert('Sign-up failed', 'Please try again later.');
-    }
   };
 
   return (

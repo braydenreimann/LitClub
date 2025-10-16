@@ -1,7 +1,7 @@
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { Formik } from 'formik';
 import React from 'react';
@@ -31,19 +31,22 @@ const loginValidationSchema = yup.object().shape({
 
 export default function LoginScreen() {
   const { signIn } = useSession();
+  const router = useRouter();
 
-    const [fontsLoaded] = useFonts({
-      Fraunces_700Bold,
-      ChivoMono_500Medium,
-      NotoSansMono_400Regular,
-    });
-    React.useEffect(() => {
-      if (fontsLoaded) SplashScreen.hideAsync();
-    }, [fontsLoaded]);
+  const [fontsLoaded] = useFonts({
+    Fraunces_700Bold,
+    ChivoMono_500Medium,
+    NotoSansMono_400Regular,
+  });
+  React.useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
 
   const handleLogin = async (values: { email: string; password: string }) => {
     const success = await signIn(values.email, values.password);
-    if (!success) {
+    if (success) {
+      router.push('/home');
+    } else {
       Alert.alert('Login failed', 'Invalid email or password.');
     }
   };

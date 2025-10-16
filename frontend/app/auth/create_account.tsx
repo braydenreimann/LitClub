@@ -1,15 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { useSession } from '../../auth/authContext';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
@@ -24,7 +25,8 @@ const pronounOptions = [
 
 export default function CreateAccountScreen() {
   const router = useRouter();
-  const { email } = useLocalSearchParams<{ email?: string }>();
+  const { email, password } = useLocalSearchParams<{ email?: string; password?: string }>();
+  const { register } = useSession();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -52,24 +54,29 @@ export default function CreateAccountScreen() {
       return;
     }
 
-    const userData = {
+    const payload = {
       firstName,
       lastName,
-      username,
-      email: email || '',
-      biography,
-      pronouns: selectedPronouns,
-      private: privateAccount,
-      genrePreference: null, // Placeholder for future use
+      userName: username,
+      email: String(email),
+      password: String(password),
+      bio: biography,
+      profilePhotoUrl: null,
+      preferredGenres: null,
+      privateAccount,
+      publicInteractionRestricted: false,
     };
 
     try {
-      await AsyncStorage.setItem('userProfile', JSON.stringify(userData));
-      console.log('Saved user profile:', userData);
-      router.push('/home');
+      const ok = await register(payload);
+      if (ok) {
+        router.push('/home');
+      } else {
+        Alert.alert('Error', 'Failed to create your account.');
+      }
     } catch (error) {
-      console.error('Failed to save user data:', error);
-      Alert.alert('Error', 'Failed to save your information.');
+      console.error('Register failed', error);
+      Alert.alert('Error', 'Failed to create your account.');
     }
   };
 
