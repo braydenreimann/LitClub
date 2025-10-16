@@ -35,7 +35,7 @@ export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a templ
                 <Text style={globalStyles.heading}> Book Club Name </Text>
                 <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
             <View style={globalStyles.leaderBanner}>
-                    <Text> CLUB LEADER: </Text>
+                    <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
                     <EvilIcons name="user" size={75} color="black" /> {/* profile icon TODO change to PFP */}
                     <Text style={globalStyles.subheading}>@username</Text>
             </View>
@@ -105,24 +105,42 @@ const globalStyles = StyleSheet.create({
         backgroundColor: "#F7C76C", //easter yellow
         fontFamily: "serif",
         fontSize: 30,
+        alignContent: "center",
+        verticalAlign: "middle",
+        textAlignVertical: "center",
     },
     currentRead: {
-        flexDirection:"row",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        padding: 15,
     },
     sideRead: {
-        flexDirection:"column",
+        flexDirection: "column",
+        width: 120,
+        marginHorizontal:20,
     },
     discBox: {
         backgroundColor: "#E4D7C8", //cream
         borderColor: "#193350",//second-to-darkest blue
         borderWidth: 4,
-        borderRadius:12,
+        borderRadius: 12,
+        margin: 5,
+        marginTop: 20,
+        height: 120,
+        width: "120%",
     },
     discButton: {
         backgroundColor: "#629FAE", //teal
         borderColor: "black",
         borderWidth:4,
         borderRadius: 12,
+        alignContent: "center",
+        justifyContent:"center",
+        textAlign: "center",
+        margin: 5,
+        height: 45,
+        width:"120%",
+
     },
     heading: {
         fontFamily: fonts.heading,
@@ -165,6 +183,7 @@ const globalStyles = StyleSheet.create({
         height: 180,
         backgroundColor: "teal",
         borderColor: "black",
+        margin: 15,
     },
     cardFont: {
         fontFamily: Fonts.sans,
