@@ -42,20 +42,18 @@ function StatsButton() {
 }
 
 
-
-
-
 export default function ProfileScreen() {
-    /*for the sake of the litclubs
+   /*for the sake of the litclubs
        WITH BACKEND: implement this as a linked list of a users' joined book clubs */
     const clubNames = [
         "Gothic Horror Fans",
         "Grass is Green-er: Hank and John Fanclub",
         "Bookish Baddies" ,
         "ENGL 404",
-        "a secret fifth option"
+        "a secret fifth option",
+        "a sixth thing"
     ]
-    const userClubs = Array.from({ length: 5 }, (_, i) => ({
+    const userClubs = Array.from({ length: 6 /*change to dynamic # book clubs*/ }, (_, i) => ({
         id: i,
         clubName: clubNames[i],
     }));
@@ -97,6 +95,7 @@ export default function ProfileScreen() {
 
                 {/*display the book clubs*/}
                 <Text style={globalStyles.subheading}> My LitClubs </Text>
+                { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
                     {
                         userClubs.map((userClub) => (
