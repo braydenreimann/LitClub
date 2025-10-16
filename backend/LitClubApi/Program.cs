@@ -54,6 +54,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseHttpsRedirection();
+}
 
 // One-time initialization
 using (var scope = app.Services.CreateScope())
@@ -137,8 +141,6 @@ using (var scope = app.Services.CreateScope())
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
 }
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
