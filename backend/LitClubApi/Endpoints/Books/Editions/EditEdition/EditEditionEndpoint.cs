@@ -1,18 +1,23 @@
-using System.Linq;
 using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Books.Editions;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.Editions.EditEdition;
 
-public class Edit(Container booksContainer) : EndpointBaseAsync
+[ApiController]
+public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<EditEditionRequest>
     .WithActionResult<EditionResponse>
 {
     [HttpPatch("books/{bookId}/editions/{editionId}")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(EditionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<EditionResponse>> HandleAsync(
         EditEditionRequest request,
         CancellationToken cancellationToken = default)
@@ -21,7 +26,7 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
 
         try
         {
-            var response = await booksContainer.ReadItemAsync<Book>(
+            var response = await cosmosContext.Books.ReadItemAsync<Book>(
                 id: request.BookId,
                 partitionKey: new PartitionKey(request.BookId),
                 cancellationToken: cancellationToken);
@@ -42,34 +47,34 @@ public class Edit(Container booksContainer) : EndpointBaseAsync
             return NotFound();
         }
 
-        if (request.Format.HasValue)
+        if (request.Body.Format.HasValue)
         {
-            edition.Format = request.Format.Value.ToDomain();
+            edition.Format = request.Body.Format.Value.ToDomain();
         }
 
-        if (request.Publisher is not null)
+        if (request.Body.Publisher is not null)
         {
-            edition.Publisher = request.Publisher;
+            edition.Publisher = request.Body.Publisher;
         }
 
-        if (request.PublicationDate.HasValue)
+        if (request.Body.PublicationDate.HasValue)
         {
-            edition.PublicationDate = request.PublicationDate.Value;
+            edition.PublicationDate = request.Body.PublicationDate.Value;
         }
 
-        if (request.PrintLength.HasValue)
+        if (request.Body.PrintLength.HasValue)
         {
-            edition.PrintLength = request.PrintLength;
+            edition.PrintLength = request.Body.PrintLength;
         }
 
-        if (request.Isbn13s is not null)
+        if (request.Body.Isbn13s is not null)
         {
-            edition.Isbn13s = [.. request.Isbn13s];
+            edition.Isbn13s = [.. request.Body.Isbn13s];
         }
 
         try
         {
-            await booksContainer.ReplaceItemAsync(
+            await cosmosContext.Books.ReplaceItemAsync(
                 item: book,
                 id: book.Id,
                 partitionKey: new PartitionKey(book.Id),

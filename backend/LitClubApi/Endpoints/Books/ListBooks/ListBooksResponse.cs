@@ -1,5 +1,3 @@
-using LitClubApi.Endpoints.Books;
-
 namespace LitClubApi.Endpoints.Books.ListBooks;
 
 public sealed class ListBooksResponse

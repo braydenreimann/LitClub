@@ -1,22 +1,28 @@
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Books.ListBooks;
 
-public class List(Container booksContainer) : EndpointBaseAsync
+[ApiController]
+public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<ListBooksRequest>
     .WithActionResult<ListBooksResponse>
 {
     [HttpGet("books")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(ListBooksResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<ListBooksResponse>> HandleAsync(
-        [FromQuery] ListBooksRequest request,
+        ListBooksRequest request,
         CancellationToken cancellationToken = default)
     {
         int pageSize = request.ClampPageSize();
 
-        FeedIterator<Book> iterator = booksContainer.GetItemQueryIterator<Book>(
+        FeedIterator<Book> iterator = cosmosContext.Books.GetItemQueryIterator<Book>(
             queryDefinition: new QueryDefinition("SELECT * FROM c"),
             continuationToken: request.ContinuationToken,
             requestOptions: new QueryRequestOptions

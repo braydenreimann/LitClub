@@ -1,5 +1,3 @@
-using System;
-
 namespace LitClubApi.Domain;
 
 public class Edition
