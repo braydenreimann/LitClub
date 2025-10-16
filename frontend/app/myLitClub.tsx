@@ -3,7 +3,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 import { Platform, Pressable } from 'react-native';
 import { ThemedText } from '../components/themed-text';
 import { ThemedView } from '../components/themed-view';
-import { Link } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
@@ -19,7 +19,8 @@ function Jump2discButton() {
     return (
         <Pressable
             style={globalStyles.discButton}
-            onPress={() => { Alert.alert('jumping to discussion...')/*TODO make the buttons go to their clubs*/ }} >
+            /*TODO make the buttons go to their clubs*/
+            onPress={() => { Alert.alert('jumping to discussion...') }} >
             <Text>Jump To Discussion</Text>
         </Pressable>
 
@@ -35,62 +36,67 @@ function BackButton() {
 
     );
 }
-
-export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+//PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+export default function LitClubScreen() { 
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
-            <Header />
-            {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
-            <ScrollView>
-                <View style={{flexDirection:'row'} } >
-                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
-                    <Text style={globalStyles.heading} > Book Club Name </Text>
-                </View>
-                <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
-                <View style={globalStyles.leaderBanner}>
-                    <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
-                    <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
-                    <Text style={globalStyles.subheading}>@username</Text>
-                    <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
-            </View>
-                {/*currently reading section*/}
-                <View style={globalStyles.currentRead}>
-                    <View style={globalStyles.sideRead}>
-                        {/*TODO: replace this card with the appropriate image*/}
-                        <View style={globalStyles.card}>  </View>
-                        <Text>Book Title</Text>
+        //<Stack screenOptions={{ headerShown: false }}>
+        //*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/
+        //{/*background is cream*/}
+            <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
+                <Header />
+                
+                <ScrollView>
+                    <View style={{flexDirection:'row'} } >
+                        <BackButton /> 
+                        {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
+                        <Text style={globalStyles.heading} > Book Club Name </Text>
                     </View>
-                    <View style={globalStyles.sideRead}>
-                        <View style={globalStyles.discBox}>
-                            <Text>This is our most recent discussion!</Text>
-                        </View>
-                        <Jump2discButton />
-                    </View>            
+                    <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
+                    <View style={globalStyles.leaderBanner}>
+                        <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
+                        <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
+                        <Text style={globalStyles.subheading}>@username</Text>
+                        <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
                 </View>
-            <View> {/*this is the part where we show the lists of the books*/}
-                <Text style={globalStyles.subheading}>Upcoming Reads</Text>
-                <ReadingList /> {/* reading list for the club's upcoming reads*/}
-                <Text style={globalStyles.subheading}>Past Reads</Text>
-                <ReadingList /> {/* reading list for the Past Reads*/}      
-            </View>        
-            
-        </ScrollView>
-    </View>
+                    {/*currently reading section*/}
+                    <View style={globalStyles.currentRead}>
+                        <View style={globalStyles.sideRead}>
+                            
+                            <View style={globalStyles.card}>  
+                                <Text>Book Title</Text>
+                            </View>
+                        </View>
+                        <View style={globalStyles.sideRead}>
+                            <View style={globalStyles.discBox}>
+                                <Text>This is our most recent discussion!</Text>
+                            </View>
+                            <Jump2discButton />
+                        </View>            
+                    </View>
+                <View> 
+                    <Text style={globalStyles.subheading}>Upcoming Reads</Text>
+                    {/* reading list for the club's upcoming reads*/}
+                    <ReadingList /> 
+                    <Text style={globalStyles.subheading}>Past Reads</Text>
+                    {/* reading list for the Past Reads*/}   
+                    <ReadingList />    
+                </View>        
+                
+            </ScrollView>
+        </View>
+    //</Stack>
     );
 }
 
 
 /*BREAKDOWN:
-header
-BIG header text with the book club's name
-fun banner with the club leader's username
-currently reading book
-jump to discussion button that WILL eventually do the forums
-upcoming reads scrolly section
-past reads scrolly section
-
-
-
+    header
+    BIG header text with the book club's name
+    fun banner with the club leader's username
+    currently reading book
+    jump to discussion button that WILL eventually do the forums
+    upcoming reads scrolly section
+    past reads scrolly section
 */
 
 
