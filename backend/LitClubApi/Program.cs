@@ -34,6 +34,7 @@ builder.Services.AddSingleton(sp =>
         }),
         ConnectionMode = ConnectionMode.Gateway
     };
+    Console.WriteLine("Hello Kathleen");
 
     return new CosmosClient(o.Endpoint, o.PrimaryKey, clientOptions);
 });
