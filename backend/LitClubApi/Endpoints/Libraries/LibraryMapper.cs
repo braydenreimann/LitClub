@@ -7,7 +7,7 @@ namespace LitClubApi.Endpoints.Libraries
     {
         public static LibraryResponse ToResponse(this Library library) => new()
         {
-            UserId = library.UserId,
+            OwnerId = library.OwnerId,
             LibraryBooks = [.. library.LibraryBooks.Select(librarybook => librarybook.ToResponse())]
         };
     }

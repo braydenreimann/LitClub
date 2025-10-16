@@ -1,16 +1,17 @@
 ﻿using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Libraries.LibraryBooks.DeleteLibraryBook;
 
-public class Delete(Container librariesContainer) : EndpointBaseAsync
+public class Delete(ICosmosContext cosmosContext) : EndpointBaseAsync
         .WithRequest<DeleteLibraryBookRequest>
         .WithActionResult
 {
-    [HttpDelete("libraries/{UserId}/LibraryBooks/{Isbn13}")]
+    [HttpDelete("libraries/{ownerId}/libraryBooks/{libraryBookId}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -24,9 +25,9 @@ public class Delete(Container librariesContainer) : EndpointBaseAsync
 
         try
         {
-            var response = await librariesContainer.ReadItemAsync<Library>(
-                id: request.UserId,
-                partitionKey: new PartitionKey(request.UserId),
+            var response = await cosmosContext.Libraries.ReadItemAsync<Library>(
+                id: request.OwnerId,
+                partitionKey: new PartitionKey(request.OwnerId),
                 cancellationToken: cancellationToken);
             library = response.Resource;
         }
@@ -38,7 +39,7 @@ public class Delete(Container librariesContainer) : EndpointBaseAsync
         {
             return StatusCode(500, "Unable to access database");
         }
-        var libraryBook = library.LibraryBooks.FirstOrDefault(lb => lb.Isbn13 == request.Isbn13);
+        var libraryBook = library.LibraryBooks.FirstOrDefault(lb => lb.Id == request.LibraryBookId);
         if (libraryBook is null)
         {
             return NotFound();
@@ -46,10 +47,10 @@ public class Delete(Container librariesContainer) : EndpointBaseAsync
         library.LibraryBooks.Remove(libraryBook);
         try
         {
-            await librariesContainer.ReplaceItemAsync(
+            await cosmosContext.Libraries.ReplaceItemAsync(
                 item: library,
-                id: library.UserId,
-                partitionKey: new PartitionKey(library.UserId),
+                id: library.OwnerId,
+                partitionKey: new PartitionKey(library.OwnerId),
                 cancellationToken: cancellationToken);
         }
         catch (CosmosException)

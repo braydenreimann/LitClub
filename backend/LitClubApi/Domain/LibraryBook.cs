@@ -2,7 +2,8 @@
 {
     public class LibraryBook
     {
-        public required string Isbn13 { get; set; }
+        public string Id { get; init; } = Guid.NewGuid().ToString();
+        public required string BookId { get; init; }
         public required ShelfStatus Status { get; set; }
         public DateOnly? StartedReading { get; set; }
         public DateOnly? FinishedReading { get; set; }

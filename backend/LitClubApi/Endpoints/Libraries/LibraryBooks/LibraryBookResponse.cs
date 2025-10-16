@@ -2,7 +2,7 @@
 {
     public sealed class LibraryBookResponse
     {
-        public required string Isbn13 { get; init; }
+        public required string Id { get; init; }
         public required ShelfStatusContract Status { get; init; }
         public DateOnly? StartedReading { get; init; }
         public DateOnly? FinishedReading { get; init; }

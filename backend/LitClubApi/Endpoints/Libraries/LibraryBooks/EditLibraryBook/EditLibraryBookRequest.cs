@@ -6,10 +6,10 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks.EditLibraryBook;
 
 public sealed class EditLibraryBookRequest
 {
-    [FromRoute(Name = "UserId")]
-    public required string UserId { get; init; }
-    [FromRoute(Name = "Isbn13")]
-    public required string Isbn13 { get; init; }
+    [FromRoute(Name = "ownerId")]
+    public required string OwnerId { get; init; }
+    [FromRoute(Name = "libraryBookId")]
+    public required string LibraryBookId { get; init; }
     [FromBody]
     public required EditLibraryBookBody Body { get; init; }
 }

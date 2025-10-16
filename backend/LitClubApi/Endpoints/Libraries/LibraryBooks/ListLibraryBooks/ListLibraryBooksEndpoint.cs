@@ -1,17 +1,18 @@
 ﻿using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Libraries.LibraryBooks.ListLibraryBooks;
 
 [ApiController]
-public class List(Container librariesContainer) : EndpointBaseAsync
+public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<ListLibraryBooksRequest>
     .WithActionResult<ListLibraryBooksResponse>
 {
-    [HttpGet("libraries/{userId}/books")]
+    [HttpGet("libraries/{ownerId}/libraryBooks")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ListLibraryBooksResponse), StatusCodes.Status200OK)]
@@ -24,9 +25,9 @@ public class List(Container librariesContainer) : EndpointBaseAsync
         Library? library;
         try
         {
-            var response = await librariesContainer.ReadItemAsync<Library>(
-                id: request.userId,
-                partitionKey: new PartitionKey(request.userId),
+            var response = await cosmosContext.Libraries.ReadItemAsync<Library>(
+                id: request.OwnerId,
+                partitionKey: new PartitionKey(request.OwnerId),
                 cancellationToken: cancellationToken);
             library = response.Resource;
         }

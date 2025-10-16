@@ -6,14 +6,14 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks.AddLibraryBook;
 
 public sealed class AddLibraryBookRequest
 {
-    [FromRoute(Name = "UserId")]
-    public required string UserId { get; init; }
+    [FromRoute(Name = "ownerId")]
+    public required string OwnerId { get; init; }
     [FromBody]
     public required AddLibraryBookBody Body { get; init; }
 }
 public sealed class AddLibraryBookBody
 {
-    public required string Isbn13 { get; init; }
+    public required string BookId { get; init; }
     public required ShelfStatusContract Status { get; init; }
     [JsonConverter(typeof(DateOnlyConverter))]
     public DateOnly? StartedReading { get; init; }

@@ -4,6 +4,6 @@ namespace LitClubApi.Endpoints.Libraries.GetLibrary;
 
 public class GetLibraryRequest
 {
-    [FromRoute(Name = "UserId")]
-    public required string UserId { get; init; }
+    [FromRoute(Name = "ownerId")]
+    public required string OwnerId { get; init; }
 }

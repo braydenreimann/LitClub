@@ -4,8 +4,8 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks.DeleteLibraryBook;
 
 public sealed class DeleteLibraryBookRequest
 {
-    [FromRoute(Name = "UserId")]
-    public required string UserId { get; init; }
-    [FromRoute(Name = "Isbn13")]
-    public required string Isbn13 { get; init; }
+    [FromRoute(Name = "ownerId")]
+    public required string OwnerId { get; init; }
+    [FromRoute]
+    public required string LibraryBookId { get; init; }
 }

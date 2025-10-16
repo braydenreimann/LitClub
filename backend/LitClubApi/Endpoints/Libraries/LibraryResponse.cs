@@ -4,6 +4,6 @@ namespace LitClubApi.Endpoints.Libraries;
 
 public sealed class LibraryResponse
 {
-    public required string UserId { get; init; }
+    public required string OwnerId { get; init; }
     public List<LibraryBookResponse> LibraryBooks { get; init; } = [];
 }

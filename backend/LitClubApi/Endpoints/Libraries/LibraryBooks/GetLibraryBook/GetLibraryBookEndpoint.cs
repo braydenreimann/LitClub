@@ -1,17 +1,18 @@
 ﻿using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Libraries.LibraryBooks.GetLibraryBook;
 
 [ApiController]
-public class Get(Container librariesContainer) : EndpointBaseAsync
+public class Get(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<GetLibraryBookRequest>
     .WithActionResult<LibraryBookResponse>
 {
-    [HttpGet("libraries/{UserId}/librarybooks/{Isbn13}", Name = "library-book-get")]
+    [HttpGet("libraries/{ownerId}/libraryBooks/{libraryBookId}", Name = "library-book-get")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(LibraryBookResponse), StatusCodes.Status200OK)]
@@ -24,9 +25,9 @@ public class Get(Container librariesContainer) : EndpointBaseAsync
         Library? library;
         try
         {
-            var response = await librariesContainer.ReadItemAsync<Library>(
-                id: request.UserId,
-                partitionKey: new PartitionKey(request.UserId),
+            var response = await cosmosContext.Libraries.ReadItemAsync<Library>(
+                id: request.OwnerId,
+                partitionKey: new PartitionKey(request.OwnerId),
                 cancellationToken: cancellationToken);
             library = response.Resource;
         }
@@ -38,7 +39,7 @@ public class Get(Container librariesContainer) : EndpointBaseAsync
         {
             return StatusCode(500, "Unable to access database");
         }
-        var libraryBook = library.LibraryBooks.FirstOrDefault(lb => lb.Isbn13 == request.Isbn13);
+        var libraryBook = library.LibraryBooks.FirstOrDefault(lb => lb.Id == request.LibraryBookId);
         if (libraryBook is null)
         {
             return NotFound();

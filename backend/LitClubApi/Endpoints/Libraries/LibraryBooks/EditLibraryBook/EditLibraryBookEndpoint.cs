@@ -1,32 +1,33 @@
 ﻿using System.Net;
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
+using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
 namespace LitClubApi.Endpoints.Libraries.LibraryBooks.EditLibraryBook;
 
 [ApiController]
-public class Edit(Container librariesContainer) : EndpointBaseAsync
+public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<EditLibraryBookRequest>
     .WithActionResult<LibraryBookResponse>
 {
-    [HttpPatch("libraries/{UserId}/LibraryBooks/{Isbn13}")]
+    [HttpPatch("libraries/{userId}/libraryBooks/{libraryBookId}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(LibraryBookResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<LibraryBookResponse>> HandleAsync(
-        [FromRoute] EditLibraryBookRequest request,
+        EditLibraryBookRequest request,
         CancellationToken cancellationToken = default)
     {
         Library? library;
         try
         {
-            var response = await librariesContainer.ReadItemAsync<Library>(
-                id: request.UserId,
-                partitionKey: new PartitionKey(request.UserId),
+            var response = await cosmosContext.Libraries.ReadItemAsync<Library>(
+                id: request.OwnerId,
+                partitionKey: new PartitionKey(request.OwnerId),
                 cancellationToken: cancellationToken);
             library = response.Resource;
         }
@@ -38,7 +39,7 @@ public class Edit(Container librariesContainer) : EndpointBaseAsync
         {
             return StatusCode(500, "Unable to access database");
         }
-        var libraryBook = library.LibraryBooks.FirstOrDefault(lb => lb.Isbn13 == request.Isbn13);
+        var libraryBook = library.LibraryBooks.FirstOrDefault(lb => lb.Id == request.LibraryBookId);
         if (libraryBook is null)
         {
             return NotFound();
@@ -71,10 +72,10 @@ public class Edit(Container librariesContainer) : EndpointBaseAsync
         }
         try
         {
-            await librariesContainer.ReplaceItemAsync(
+            await cosmosContext.Libraries.ReplaceItemAsync(
                 item: library,
-                id: library.UserId,
-                partitionKey: new PartitionKey(library.UserId),
+                id: library.OwnerId,
+                partitionKey: new PartitionKey(library.OwnerId),
                 cancellationToken: cancellationToken);
         }
         catch (CosmosException)
