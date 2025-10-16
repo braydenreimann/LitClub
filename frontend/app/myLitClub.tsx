@@ -15,7 +15,16 @@ import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../constants/theme';
 
 
+function Jump2discButton() {
+    return (
+        <Pressable
+            style={globalStyles.discButton}
+            onPress={() => { Alert.alert('jumping to discussion...')/*TODO make the buttons go to their clubs*/ }} >
+            <Text>Jump To Discussion</Text>
+        </Pressable>
 
+    );
+}
 
 export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
     return (
@@ -37,9 +46,10 @@ export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a templ
                         <Text>Book Title</Text>
                     </View>
                     <View style={globalStyles.sideRead}>
-                        {/*TODO: replace this card with the appropriate image*/}
-                        <View style={globalStyles.card}>  </View>
-                        <Text>Book Title</Text>
+                        <View style={globalStyles.discBox}>
+                            <Text>This is our most recent discussion!</Text>
+                        </View>
+                        <Jump2discButton />
                     </View>
 
                   
@@ -102,10 +112,16 @@ const globalStyles = StyleSheet.create({
         flexDirection:"column",
     },
     discBox: {
-        backgroundColor: colors.cream,
+        backgroundColor: "#E4D7C8", //cream
         borderColor: "#193350",//second-to-darkest blue
         borderWidth: 4,
         borderRadius:12,
+    },
+    discButton: {
+        backgroundColor: "#629FAE", //teal
+        borderColor: "black",
+        borderWidth:4,
+        borderRadius: 12,
     },
     heading: {
         fontFamily: fonts.heading,
