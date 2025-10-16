@@ -25,14 +25,27 @@ function Jump2discButton() {
 
     );
 }
+function BackButton() {
+    return (
+        <Pressable>
+            <Link href="/profile">
+                <EvilIcons name="chevron-left" size={50} color="#193350" marginLeft="20" marginBottom="10" />
+            </Link>
+        </Pressable>
+
+    );
+}
 
 export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
     return (
-    <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
+        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
             <Header />
             {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
-        <ScrollView>
-                <Text style={globalStyles.heading} > Book Club Name </Text>
+            <ScrollView>
+                <View style={{flexDirection:'row'} } >
+                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
+                    <Text style={globalStyles.heading} > Book Club Name </Text>
+                </View>
                 <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
                 <View style={globalStyles.leaderBanner}>
                     <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
@@ -57,7 +70,6 @@ export default function LitClubScreen() { //PRE_INTEGRATION: Tis will be a templ
                   
 
                 </View>
-
 
 
 
