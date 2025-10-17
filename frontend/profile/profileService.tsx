@@ -21,14 +21,14 @@ export interface User {
     followerUserIds: string[];
     blockedUserIds: string[];
     litClubIds: string[];
-    created: string; // ISO date string, e.g. "2025-10-17T00:37:46.126Z"
+    created: string; 
 }
 
 export interface Edition {
     id: string;
-    format: number; // or you can use an enum if you have one
+    format: number; 
     publisher: string;
-    publicationDate: string; // or Date if you plan to parse it
+    publicationDate: string; 
     printLength: number;
     isbn13s: string[];
 }
