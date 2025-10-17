@@ -108,7 +108,7 @@ using (var scope = app.Services.CreateScope())
         Email = "johngreen@icloud.com",
         PasswordHash = "johngreenpw",
         Bio = "I'm just a Nerdfighter that loves reading and science",
-        PreferredGenres = ["Fiction"],
+        PreferredGenres = ["Fiction", "Science-Fiction", "Romance", "Drama", "Thriller"],
     };
 
     LitClub litClub = new()

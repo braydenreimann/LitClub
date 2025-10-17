@@ -22,23 +22,25 @@ import ReadingList from '@/components/ReadingList';
 import { ScrollView } from 'react-native';
 import { globalStyles } from '@/styles/globalStyles';
 
+SplashScreen.preventAutoHideAsync();
+
 
 export default function HomeScreen() {
 
-    const [fontsLoaded] = useFonts({
-      Fraunces_700Bold,
-      ChivoMono_500Medium,
-      NotoSansMono_400Regular,
-    });
-    React.useEffect(() => {
-      if (fontsLoaded) SplashScreen.hideAsync();
-    }, [fontsLoaded]);
+  const [fontsLoaded] = useFonts({
+    Fraunces_700Bold,
+    ChivoMono_500Medium,
+    NotoSansMono_400Regular,
+  });
+  React.useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <Header />
       <ScrollView>
-        <View style={{ paddingLeft: 25, paddingTop: 45}}>
+        <View style={{ paddingLeft: 25, paddingTop: 45 }}>
           <Text style={globalStyles.heading}>
             My Bookshelf
           </Text>
