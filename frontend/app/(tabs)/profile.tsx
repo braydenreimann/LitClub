@@ -15,7 +15,6 @@ import { View, Text, FlatList, ScrollView, StyleSheet, Alert,Dimensions } from '
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../../constants/theme';
 
-import React from 'react';
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
