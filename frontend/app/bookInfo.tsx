@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Platform, Pressable } from 'react-native';
 import { ThemedText } from '../components/themed-text';
@@ -14,8 +14,27 @@ import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Fonts } from '../constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+//playing around with importing the book
+
+export interface bookImport {
+    title: string;
+    author: string;
+    totalchapters: number;
+    genre: string;
+    description?: string;
+}
+
+
+
+
+
+
+
+
+//buttons for the book info screen
 function ToCButton() {
     return (
         <Pressable
@@ -39,7 +58,7 @@ function BackButton() {
 
 export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
+        <View style={{ flex: 1, backgroundColor: colors.cream }}> {/*background is cream*/}
             <Header />
             {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
             <ScrollView>
@@ -48,28 +67,31 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                     <Text style={globalStyles.heading} > Book Information </Text>
                 </View>
 
-                <View style={globalStyles.sideSect} >
-                    <View style={globalStyles.card}>  </View>
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                </View>
+                <View style={globalStyles.currentRead}>
+                    <View style={globalStyles.sideSect} >
+                        <View style={globalStyles.card}>  </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                        </View>
+                    </View>
 
-                <View style={globalStyles.sideSect}>
-                    <Text style={globalStyles.heading}> Book Title </Text>
-                    <Text style={globalStyles.subheading}> Author </Text>
-                    <Text style={globalStyles.body}> Book Summary </Text>
-                    <ToCButton />
+                    <View style={globalStyles.sideSect}>
+                        <Text style={globalStyles.heading}> Book Title </Text>
+                        <Text style={globalStyles.subheading}> Author </Text>
+                        <Text style={globalStyles.body}> Book Summary </Text>
+                        <ToCButton />
+                    </View>
                 </View>
-               
                     <Pressable
-                        style={globalStyles.forumBox}
-                        onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs*/ }} >
+                    style={globalStyles.forumBox}
+                    onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs}*/ }} >
                         <Text>This is our most recent discussion!</Text>
                     </Pressable>
-                        
+                     
         </ScrollView>
     </View>
     );

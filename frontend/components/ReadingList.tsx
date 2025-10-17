@@ -6,7 +6,9 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter} from 'expo-router';
+import { colors, fonts } from '../theme';
+import { globalStyles } from '../styles/globalStyles';
 
 //eventually will fetch data from backend
 
@@ -15,7 +17,7 @@ export default function ReadingList() {
     const books = [
     { id: 1, title: 'Book 1' },
     { id: 2, title: 'Book 2' },
-    { id: 3, title: 'john green' },
+    { id: 3, title: 'Book 3' },
     { id: 4, title: 'Book 4' },
     { id: 5, title: 'Book 5' },
     { id: 6, title: 'Book 6' },
@@ -25,27 +27,25 @@ export default function ReadingList() {
 
         <View style={styles.scrollingWrapper}>
             <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={true}>
-                {/* cards that scroll horizontally */}
                 {books.map((book) => (
                     <Pressable key={book.id} style={styles.card}>
-                        <Link href="..\..\app\bookInfo">
-                        <Text>{book.title}</Text>
-                        </Link>
+                        <Link href="/bookInfo">
+                            <Text style={globalStyles.subheading}>{book.title}</Text>  
+                        </Link> 
                     </Pressable>
                 ))}
+
             </ScrollView>
         </View>
-    )
-};
+    );
+}
 
 
 
 
 const styles = StyleSheet.create({
     scrollContainer: {
-        overflowX: 'scroll',
-        overflowY: 'hidden',
-        whiteSpace: 'nowrap',
+        flexWrap: "wrap",
         padding: 10,
     },
     scrollingWrapper: {
@@ -55,7 +55,12 @@ const styles = StyleSheet.create({
         width: 120,
         height: 180,
         marginRight: 10,
-        backgroundColor: "teal",
-        borderColor: "black",
+        backgroundColor: colors.yellow,
+        borderColor: colors.darkest,
+        alignItems: "center",
+        alignContent:"center",
+        justifyContent: "center",
+        textAlign: "center",
+        textAlignVertical: "center",
     },
 });
