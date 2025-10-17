@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Platform, Pressable } from 'react-native';
 import { ThemedText } from '../components/themed-text';
@@ -14,8 +14,27 @@ import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Fonts } from '../constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+//playing around with importing the book
+
+export interface bookImport {
+    title: string;
+    author: string;
+    totalchapters: number;
+    genre: string;
+    description?: string;
+}
+
+
+
+
+
+
+
+
+//buttons for the book info screen
 function ToCButton() {
     return (
         <Pressable
