@@ -63,8 +63,6 @@ export default function BookReccs() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
-      {/* HEADER at the top */}
-      <Header />
 
       {/* SCROLLABLE content */}
       <ScrollView contentContainerStyle={{ padding: 16 }}>
