@@ -13,6 +13,7 @@ import TopThreeBooks from '../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../constants/theme';
+import ClubMembers from '@/components/ClubMembers';
 
 
 function Jump2discButton() {
@@ -80,6 +81,9 @@ export default function LitClubScreen() {
                     <Text style={globalStyles.subheading}>Past Reads</Text>
                     {/* reading list for the Past Reads*/}   
                     <ReadingList />    
+                    <Text style={globalStyles.subheading}>Current Members</Text>
+                    {/* TODO: INSERT CLUB MEMBERS HERE*/}
+                    <ClubMembers />
                 </View>        
                 
             </ScrollView>
