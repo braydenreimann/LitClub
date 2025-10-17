@@ -39,7 +39,7 @@ function BackButton() {
 
 export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
+        <View style={{ flex: 1, backgroundColor: colors.cream }}> {/*background is cream*/}
             <Header />
             {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
             <ScrollView>
@@ -47,7 +47,7 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                     <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
                     <Text style={globalStyles.heading} > Book Information </Text>
                 </View>
-
+                {/* 
                 <View style={globalStyles.sideSect} >
                     <View style={globalStyles.card}>  </View>
                     <FontAwesome name="star" size={24} color={colors.midBlue} />
@@ -66,10 +66,10 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                
                     <Pressable
                         style={globalStyles.forumBox}
-                        onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs*/ }} >
+                        onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs} >
                         <Text>This is our most recent discussion!</Text>
                     </Pressable>
-                        
+                 */}       
         </ScrollView>
     </View>
     );
