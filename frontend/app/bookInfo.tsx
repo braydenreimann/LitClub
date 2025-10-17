@@ -1,21 +1,18 @@
 import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
-import Foundation from '@expo/vector-icons/Foundation';
 import { Platform, Pressable } from 'react-native';
-import { ThemedText } from '../components/themed-text';
-import { ThemedView } from '../components/themed-view';
 import { Link } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
-import ReadingList from '../components/ReadingList';
-import TopThreeBooks from '../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Fonts } from '../constants/theme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import BookStatusDropdown from '@/components/BookStatusDropdown';
+import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
+import { Entypo } from '@expo/vector-icons'; // for dropdown arrow
+import { globalStyles } from '@/styles/globalStyles';
 
 //playing around with importing the book
 
@@ -38,9 +35,9 @@ export interface bookImport {
 function ToCButton() {
     return (
         <Pressable
-            style={globalStyles.ToCButton}
+            style={infoStyle.ToCButton}
             onPress={() => { Alert.alert('Displaying TOC...')/*TODO make the buttons go to their clubs*/ }} >
-            <Text>Table of Contents</Text>
+            <Text style={[globalStyles.subheading, {fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5}]}>Table of Contents</Text>
         </Pressable>
 
     );
@@ -57,6 +54,18 @@ function BackButton() {
 }
 
 export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+    const handlePrivacyChange = (newPrivacyStatus: string) => {
+        setIsPublic(newPrivacyStatus === "Public");
+        console.log("Privacy status changed to:", newPrivacyStatus);
+        // TODO: send newPrivacyStatus to Cosmos DB later
+    };
+    const handleStatusChange = (newStatus: string) => {
+        console.log("Book status changed to:", newStatus);
+        // TODO: send newStatus to Cosmos DB later
+    };
+
+   const [isPublic, setIsPublic] = useState(true);
+
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}> {/*background is cream*/}
             <Header />
@@ -67,9 +76,24 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                     <Text style={globalStyles.heading} > Book Information </Text>
                 </View>
 
-                <View style={globalStyles.currentRead}>
-                    <View style={globalStyles.sideSect} >
-                        <View style={globalStyles.card}>  </View>
+                <View style={infoStyle.currentRead}>
+                    <View style={infoStyle.sideSect} >
+
+{/* Book Container */}
+      <View style={infoStyle.bookContainer}>
+        {/* Placeholder for book image */}
+        <View style={infoStyle.bookImage}>
+          <Entypo
+            name={isPublic ? "eye" : "eye-with-line"}
+            size={24}
+            color={isPublic ? colors.midBlue : colors.midBlue}
+            style={infoStyle.eyeIcon}
+          />
+        </View>
+
+      </View>
+
+
                         <View style={{ flexDirection: "row" }}>
                             <FontAwesome name="star" size={24} color={colors.midBlue} />
                             <FontAwesome name="star" size={24} color={colors.midBlue} />
@@ -79,7 +103,7 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                         </View>
                     </View>
 
-                    <View style={globalStyles.sideSect}>
+                    <View style={infoStyle.sideSect}>
                         <Text style={globalStyles.heading}> Book Title </Text>
                         <Text style={globalStyles.subheading}> Author </Text>
                         <Text style={globalStyles.body}> Book Summary </Text>
@@ -87,23 +111,66 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                     </View>
                 </View>
                     <Pressable
-                    style={globalStyles.forumBox}
+                    style={infoStyle.forumBox}
                     onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs}*/ }} >
-                        <Text>This is our most recent discussion!</Text>
+                        <Text style={[globalStyles.body, {fontSize: 14, color: colors.midBlue}]}>This is our most recent discussion!</Text>
                     </Pressable>
-                     
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
+
+  {/* Library Status */}
+  <View style={{ flex: 1 }}>
+    <Text style={globalStyles.subheading}>Library Status</Text>
+    <View style={infoStyle.dropdownWrapper}>
+      <BookStatusDropdown onStatusChange={handleStatusChange} />
+      <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
+    </View>
+  </View>
+
+  {/* Visibility */}
+  <View style={{ flex: 1 }}>
+    <Text style={globalStyles.subheading}>Visibility</Text>
+    <View style={infoStyle.dropdownWrapper}>
+      <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
+      <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
+    </View>
+  </View>
+</View>
+
         </ScrollView>
     </View>
     );
 }
 
 
-const globalStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.cream,
-        padding: 16,
-    },
+const infoStyle = StyleSheet.create({
+
+    bookContainer: {
+    width: 150,
+    height: 220,
+    backgroundColor: colors.cream,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.midBlue,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    marginBottom: 20,
+  },
+  bookImage: {
+    width: 120,
+    height: 160,
+    backgroundColor: colors.teal,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  eyeIcon: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+  },
+
     leaderBanner: {
         flexDirection:"row",
         width: "100%",
@@ -149,26 +216,6 @@ const globalStyles = StyleSheet.create({
         width:"120%",
 
     },
-    heading: {
-        fontFamily: fonts.heading,
-        fontSize: 32,
-        color: colors.midBlue,
-        marginBottom: 8,
-    },
-    subheading: {
-        fontFamily: fonts.subheading,
-        fontSize: 22,
-        color: colors.midBlue,
-        alignContent: "center",
-        justifyContent: "center",
-        marginBottom: 6,
-    },
-    body: {
-        fontFamily: fonts.body,
-        fontSize: 14,
-        color: colors.darkest,
-        lineHeight: 22,
-    },
     scrollContainer: {
         overflowX: 'scroll',
         overflowY: 'hidden',
@@ -185,24 +232,33 @@ const globalStyles = StyleSheet.create({
         padding: 5,
         margin: 5,
     },
-    card: {
-        width: 120,
-        height: 180,
-        backgroundColor: "teal",
-        borderColor: "black",
-        margin: 15,
-    },
-    cardFont: {
-        fontFamily: Fonts.sans,
-        color: colors.darkest,
-        lineHeight: 22,
-        textAlign: "center",
-        textAlignVertical: "center",
-
-    },
     forumBox: {
         backgroundColor: colors.cream,
         borderWidth: 2,
         borderColor: colors.nextDarkest,
+    },
+
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start', // adjust spacing if needed
+        gap: 20, // space between dropdowns
+        marginVertical: 10,
+    },
+    column: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        flex: 0, // dropdowns don’t stretch
+    },
+    dropdownWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: colors.midBlue,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+    },
+    dropdownIcon: {
+        marginLeft: 5,
     },
 });

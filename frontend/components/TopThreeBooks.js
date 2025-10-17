@@ -8,6 +8,8 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { globalStyles } from '@/styles/globalStyles';
+import { fonts, colors } from '@/theme';
 
 //eventually will fetch data from backend
 
@@ -22,16 +24,18 @@ export default function ReadingList() {
     return (
         <View>
             <View>
-                <Text style={{ fontSize: 24, fontWeight: 'bold', marginLeft: 10, marginBottom: 10 }}>
-                    Top 3 Books
+                <Text style={[globalStyles.heading, { marginLeft: 10, marginBottom: 10}]}>
+                    Top Three Books
                 </Text>
             </View>
 
             <View style={{ flexDirection: 'row', padding: 10 }}>
                 {/* cards that scroll horizontally */}
                 {books.map((book) => (
-                    <View key={book.id} style={styles.card}>
-                        <Text>{book.title}</Text>
+                    <View key={book.id} style={[styles.card, {justifyContent: 'center', alignItems: 'center'}]}>
+                        <Text style={globalStyles.heading}>
+                            {book.title}
+                        </Text>
                     </View>
                 ))}
             </View>
