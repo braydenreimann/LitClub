@@ -101,8 +101,8 @@ export default function ProfileScreen() {
                     {/* profile icon TODO change to PFP */}
                     <EvilIcons name="user" size={75} color="black" /> 
                     <View style={globalStyles.userBio }>
-                        <Text style={globalStyles.subheading}> @username </Text>
-                        <Text style={globalStyles.body}>this is my bio</Text>
+                        <Text style={globalStyles.subheading}> {user ? '${user.userName}' : 'Loading...'} </Text>
+                        <Text style={globalStyles.body}>{user ? '${user.bio}' : 'Loading...'}</Text>
                     </View>
 
                     {/*be able to edit the bio */}
