@@ -38,6 +38,7 @@ export const globalStyles = StyleSheet.create({
         width: 120,
         height: 180,
         marginRight: 10,
+        borderRadius: 8,
         backgroundColor: colors.teal,
         borderColor: colors.darkest,
         fontFamily: fonts.subheading

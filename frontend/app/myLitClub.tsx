@@ -12,17 +12,25 @@ import ReadingList from '../components/ReadingList';
 import TopThreeBooks from '../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
-import { Fonts } from '../constants/theme';
 import ClubMembers from '@/components/ClubMembers';
+
+import { globalStyles } from '@/styles/globalStyles';
+import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
+import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
+import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
+import * as SplashScreen from 'expo-splash-screen';
+
 
 
 function Jump2discButton() {
     return (
         <Pressable
-            style={globalStyles.discButton}
+            style={litStyles.discButton}
             /*TODO make the buttons go to their clubs*/
             onPress={() => { Alert.alert('jumping to discussion...') }} >
-            <Text>Jump To Discussion</Text>
+            <Text style={[globalStyles.body, { textAlign: 'center', textAlignVertical: 'center' , fontSize: 12}]}>
+                Jump to Discussion
+            </Text>
         </Pressable>
 
     );
@@ -39,6 +47,15 @@ function BackButton() {
 }
 //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
 export default function LitClubScreen() { 
+    const [fontsLoaded] = useFonts({
+        Fraunces_700Bold,
+        ChivoMono_500Medium,
+        NotoSansMono_400Regular,
+    });
+    React.useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
+    
     return (
         //<Stack screenOptions={{ headerShown: false }}>
         //*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/
@@ -52,24 +69,33 @@ export default function LitClubScreen() {
                         {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
                         <Text style={globalStyles.heading} > Book Club Name </Text>
                     </View>
-                    <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
-                    <View style={globalStyles.leaderBanner}>
+                    <Text style={globalStyles.body}> 
+                        Welcome to this LitClub! Here, we're discussing everything Stephen King -- 
+                        working our way through his novels from the beginning to the end. We're happy
+                        to have you!
+                        
+                        </Text> {/*TODO: are they able to change the bio??*/}
+                    <View style={litStyles.leaderBanner}>
                         <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
                         <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
                         <Text style={globalStyles.subheading}>@username</Text>
                         <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
                 </View>
                     {/*currently reading section*/}
-                    <View style={globalStyles.currentRead}>
-                        <View style={globalStyles.sideRead}>
+                    <View style={litStyles.currentRead}>
+                        <View style={litStyles.sideRead}>
                             
                             <View style={globalStyles.card}>  
-                                <Text >Book Title</Text>
+                                <Text style={[globalStyles.heading, { textAlign: 'center', textAlignVertical: 'center' , paddingTop: 40}]}>
+                                    Book Title
+                                </Text>
                             </View>
                         </View>
-                        <View style={globalStyles.sideRead}>
-                            <View style={globalStyles.discBox}>
-                                <Text>This is our most recent discussion!</Text>
+                        <View style={litStyles.sideRead}>
+                            <View style={litStyles.discBox}>
+                                <Text style={[globalStyles.subheading, { textAlign: 'left', textAlignVertical: 'center', paddingTop: 20, paddingLeft: 5, fontSize: 18}]}>
+                                    This is our most recent discussion!
+                                </Text>
                             </View>
                             <Jump2discButton />
                         </View>            
@@ -105,18 +131,13 @@ export default function LitClubScreen() {
 
 
 
-const globalStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.cream,
-        padding: 16,
-    },
+const litStyles = StyleSheet.create({
     leaderBanner: {
         flexDirection:"row",
         width: "100%",
         height: 40,
         backgroundColor: colors.yellow,
-        fontFamily: "serif",
+        fontFamily: fonts.subheading,
         fontSize: 30,
         justifyContent:"center",
         alignItems: "center",
@@ -137,9 +158,8 @@ const globalStyles = StyleSheet.create({
         backgroundColor: colors.cream,
         borderColor: colors.nextDarkest,
         borderWidth: 4,
-        borderRadius: 12,
+        borderRadius: 20,
         margin: 5,
-        marginTop: 20,
         height: 120,
         width: "120%",
         fontFamily: fonts.body,
@@ -157,27 +177,6 @@ const globalStyles = StyleSheet.create({
         width:"120%",
         fontFamily: fonts.body,
 
-
-    },
-    heading: {
-        fontFamily: fonts.heading,
-        fontSize: 32,
-        color: colors.midBlue,
-        marginBottom: 8,
-    },
-    subheading: {
-        fontFamily: fonts.subheading,
-        fontSize: 22,
-        color: colors.midBlue,
-        alignContent: "center",
-        justifyContent: "center",
-        marginBottom: 6,
-    },
-    body: {
-        fontFamily: fonts.body,
-        fontSize: 14,
-        color: colors.darkest,
-        lineHeight: 22,
     },
     scrollContainer: {
         overflowX: 'scroll',
