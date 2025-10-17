@@ -42,7 +42,7 @@ export default function LitClubScreen() {
         //<Stack screenOptions={{ headerShown: false }}>
         //*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/
         //{/*background is cream*/}
-            <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
+            <View style={{ flex: 1, backgroundColor: colors.cream }}> 
                 <Header />
                 
                 <ScrollView>
@@ -63,7 +63,7 @@ export default function LitClubScreen() {
                         <View style={globalStyles.sideRead}>
                             
                             <View style={globalStyles.card}>  
-                                <Text>Book Title</Text>
+                                <Text >Book Title</Text>
                             </View>
                         </View>
                         <View style={globalStyles.sideRead}>
@@ -111,7 +111,7 @@ const globalStyles = StyleSheet.create({
         flexDirection:"row",
         width: "100%",
         height: 40,
-        backgroundColor: "#F7C76C", //easter yellow
+        backgroundColor: colors.yellow,
         fontFamily: "serif",
         fontSize: 30,
         justifyContent:"center",
@@ -130,18 +130,19 @@ const globalStyles = StyleSheet.create({
         marginHorizontal:20,
     },
     discBox: {
-        backgroundColor: "#E4D7C8", //cream
-        borderColor: "#193350",//second-to-darkest blue
+        backgroundColor: colors.cream,
+        borderColor: colors.nextDarkest,
         borderWidth: 4,
         borderRadius: 12,
         margin: 5,
         marginTop: 20,
         height: 120,
         width: "120%",
+        fontFamily: fonts.body,
     },
     discButton: {
-        backgroundColor: "#629FAE", //teal
-        borderColor: "black",
+        backgroundColor: colors.teal, //teal
+        borderColor: colors.darkest,
         borderWidth:4,
         borderRadius: 12,
         alignContent: "center",
@@ -150,6 +151,8 @@ const globalStyles = StyleSheet.create({
         margin: 5,
         height: 45,
         width:"120%",
+        fontFamily: fonts.body,
+
 
     },
     heading: {
@@ -189,14 +192,15 @@ const globalStyles = StyleSheet.create({
         margin: 5,
     },
     card: {
+        fontFamily: fonts.heading,
         width: 120,
         height: 180,
-        backgroundColor: "teal",
+        backgroundColor: colors.teal,
         borderColor: "black",
         margin: 15,
     },
     cardFont: {
-        fontFamily: Fonts.sans,
+        fontFamily: fonts.body,
         color: colors.darkest,
         lineHeight: 22,
         textAlign: "center",
