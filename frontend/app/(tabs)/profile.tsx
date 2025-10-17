@@ -72,6 +72,15 @@ export default function ProfileScreen() {
         id: i,
         clubLeaderships: clubLeaderships[i],
     }));
+    const archivedName = [
+        "Bookish Baddies",
+        "ENGL 404",
+        "Romantasy Rats",
+    ]
+    const archivedArr = Array.from({ length: 3 /*change to dynamic # book clubs*/ }, (_, i) => ({
+        id: i,
+        archivedName: archivedName[i],
+    }));
 
           const [fontsLoaded] = useFonts({
             Fraunces_700Bold,
@@ -177,8 +186,35 @@ export default function ProfileScreen() {
                         ))
                     }
                 </View>
+                <Text style={globalStyles.subheading}> Archived LitClubs </Text>
+                { /*format the GROUP of cards correctly*/}
+                <View style={globalStyles.cardGroup}> 
+                    {
+                        archivedArr.map((archivedName) => (
+                            
+                            <Pressable
+                                key={archivedName.id}
+                                style={[profStyles.litclubCard, { backgroundColor: colors.midBlue }]}
+                                onPress={() => {
+                                    /*TODO make the buttons go to their clubs*/
+                                    Alert.alert('LitClub button pressed') 
+                                }} >
+                                <Link href="/myLitClub"> 
+                                    <Text style={[globalStyles.cardFont, 
+                                        { textDecorationLine: 'line-through',
+
+                                         }]} adjustsFontSizeToFit={true}>
+                                        {archivedName.archivedName}
+                                    </Text>
+                                </Link>
+                            </Pressable>
+                           
+                        ))
+                    }
+                </View>
             </ScrollView>
         </View>
+        
     );
 }
 
