@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation'; 
 import { Platform, Pressable} from 'react-native';
 import { ThemedText } from '../../components/themed-text';
@@ -14,7 +14,8 @@ import TopThreeBooks from '../../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert,Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../../constants/theme';
-
+import { User, getUser } from '../../profile/profileService'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 function EditButton() {
@@ -58,12 +59,30 @@ export default function ProfileScreen() {
         clubName: clubNames[i],
     }));
 
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
+
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
 
     return (
         <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
             <Header />
             <ScrollView> 
-                <Text style={globalStyles.heading}> FirstName LastName {"\n"} </Text>
+                <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
                 <View style={globalStyles.profileHeader}>
                     {/* profile icon TODO change to PFP */}
                     <EvilIcons name="user" size={75} color="black" /> 
