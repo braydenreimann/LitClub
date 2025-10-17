@@ -1,6 +1,6 @@
 import React from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
-import { Platform, Pressable } from 'react-native';
+import { ActivityIndicator, Platform, Pressable } from 'react-native';
 import { ThemedText } from '../components/themed-text';
 import { ThemedView } from '../components/themed-view';
 import { Link, Stack } from 'expo-router';
@@ -13,6 +13,7 @@ import TopThreeBooks from '../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../constants/theme';
+import { useLitClubs } from '@/LitClubImport/LitClubContext';
 
 
 function Jump2discButton() {
@@ -30,7 +31,7 @@ function BackButton() {
     return (
         <Pressable>
             <Link href="/profile">
-                <EvilIcons name="chevron-left" size={50} color="#193350" marginLeft="20" marginBottom="10" />
+                <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}/>
             </Link>
         </Pressable>
 
@@ -38,42 +39,55 @@ function BackButton() {
 }
 //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
 export default function LitClubScreen() { 
+
+    //integration stuff:
+    const { litClubs, loading, error } = useLitClubs();
+    
+    if (loading) {
+        return <ActivityIndicator style={{ flex: 1 }} />
+    }
+
+    if (error) {
+        return <Text style={{ color: 'red', padding: 20 }}>Error: {error}</Text>;
+    }
+
+    if (!litClubs.length) {
+        return <Text style={{ padding: 20 }}>No LitClubs found.</Text>
+    }
+
+    //for now show the first one
+    const club = litClubs[0];
+
     return (
-        //<Stack screenOptions={{ headerShown: false }}>
-        //*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/
-        //{/*background is cream*/}
-            <View style={{ flex: 1, backgroundColor: colors.cream }}> 
-                <Header />
-                
-                <ScrollView>
-                    <View style={{flexDirection:'row'} } >
+            <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}> 
+                    <View style={{flexDirection:'row', paddingTop: 25 } } >
                         <BackButton /> 
-                        {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
-                        <Text style={globalStyles.heading} > Book Club Name </Text>
+                        <Text style={[globalStyles.heading, { paddingTop: 0 }]}>{club.name}</Text>
                     </View>
-                    <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
+                    {/*TODO: are they able to change the bio??*/}
+                    <Text style={[globalStyles.body, {padding: 30 }]}>{club.description}</Text> 
                     <View style={globalStyles.leaderBanner}>
-                        <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
-                        <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
-                        <Text style={globalStyles.subheading}>@username</Text>
-                        <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
-                </View>
-                    {/*currently reading section*/}
-                    <View style={globalStyles.currentRead}>
-                        <View style={globalStyles.sideRead}>
-                            
-                            <View style={globalStyles.card}>  
-                                <Text >Book Title</Text>
-                            </View>
-                        </View>
-                        <View style={globalStyles.sideRead}>
-                            <View style={globalStyles.discBox}>
-                                <Text>This is our most recent discussion!</Text>
-                            </View>
-                            <Jump2discButton />
-                        </View>            
+                        <Foundation name="crown" size={30} color="#193350" style={{ margin: 5 }} />
+                            <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
+                            <Text style={globalStyles.subheading}>@{club.ownerUserId}</Text>
+                        <Foundation name="crown" size={30} color="#193350" style={{ margin: 5 }} />
                     </View>
-                <View> 
+                        {/*currently reading section*/}
+                        <View style={globalStyles.currentRead}>
+                            <View style={globalStyles.sideRead}>
+                                
+                                <View style={globalStyles.card}>  
+                                    <Text >Book Title</Text>
+                                </View>
+                            </View>
+                            <View style={globalStyles.sideRead}>
+                                <View style={globalStyles.discBox}>
+                                    <Text>This is our most recent discussion!</Text>
+                                </View>
+                                <Jump2discButton />
+                            </View>            
+                        </View>
+                    <View> 
                     <Text style={globalStyles.subheading}>Upcoming Reads</Text>
                     {/* reading list for the club's upcoming reads*/}
                     <ReadingList /> 
@@ -82,9 +96,7 @@ export default function LitClubScreen() {
                     <ReadingList />    
                 </View>        
                 
-            </ScrollView>
-        </View>
-    //</Stack>
+        </ScrollView>
     );
 }
 
@@ -141,7 +153,7 @@ const globalStyles = StyleSheet.create({
         fontFamily: fonts.body,
     },
     discButton: {
-        backgroundColor: colors.teal, //teal
+        backgroundColor: colors.teal,
         borderColor: colors.darkest,
         borderWidth:4,
         borderRadius: 12,
@@ -178,7 +190,6 @@ const globalStyles = StyleSheet.create({
     scrollContainer: {
         overflowX: 'scroll',
         overflowY: 'hidden',
-        /*whiteSpace: 'nowrap',*/
         padding: 10,
     },
     scrollingWrapper: {

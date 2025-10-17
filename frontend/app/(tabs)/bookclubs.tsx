@@ -8,41 +8,46 @@ import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
+import { useLitClubs } from '@/LitClubImport/LitClubContext';
+
 
 export default function AllLitClubs() {
   // Example data
-  const clubNames = [
-    "Horror Fans",
-    "The Clue Crew: Mystery Lovers",
-    "Live, Laugh, Love: All Suburban Moms",
-    "Romantasy Rats",
-    "Sleuths Incorporated",
-    "Martha Stewart Cookbook Cook Throughs",
-    "Richard Siken Enjoyers",
-    "The Intersection of Sci Fi and Cool Bugs",
-    "Improv Comedy and You: every funny book ever",
-    "Actually Interesting Nonfiction",
-    "Obama's Book List",
-    "Books about Bugs",
-    "Gothic Horror Fans",
-    "Grass is Green-er: Hank and John Fanclub",
-    "Bookish Baddies",
-    "ENGL 404",
-  ];
+  const { litClubs, loading, error } = useLitClubs();
 
-  const userClubs = Array.from({ length: clubNames.length }, (_, i) => ({
-    id: i,
-    clubName: clubNames[i],
-  }));
+  const [fontsLoaded] = useFonts({
+    Fraunces_700Bold,
+    ChivoMono_500Medium,
+    NotoSansMono_400Regular,
+  });
+  React.useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
 
-      const [fontsLoaded] = useFonts({
-        Fraunces_700Bold,
-        ChivoMono_500Medium,
-        NotoSansMono_400Regular,
-      });
-      React.useEffect(() => {
-        if (fontsLoaded) SplashScreen.hideAsync();
-      }, [fontsLoaded]);
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading clubs...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
+      </View>
+    );
+  }
+
+  if (!litClubs.length) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>No Clubs Found.</Text>
+      </View>
+    );
+  }
+
 
   return (
     <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}>
@@ -56,15 +61,15 @@ export default function AllLitClubs() {
 
         {/* CARD GROUP */}
         <View style={globalStyles.cardGroup}>
-          {userClubs.map((userClub) => (
+          {litClubs.map((club) => (
             <Pressable
-              key={userClub.id}
+              key={club.id}
               style={globalStyles.litclubCard}
               onPress={() => Alert.alert('LitClub button pressed')}
             >
               <Link href="/myLitClub">
                 <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
-                  {userClub.clubName}
+                  {club.name}
                 </Text>
               </Link>
             </Pressable>

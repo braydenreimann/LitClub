@@ -19,6 +19,7 @@ import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
+import { useLitClubs } from '@/LitClubImport/LitClubContext';
 
 
 
@@ -48,29 +49,43 @@ function StatsButton() {
 
 
 export default function ProfileScreen() {
+
+    const [fontsLoaded] = useFonts({
+        Fraunces_700Bold,
+        ChivoMono_500Medium,
+        NotoSansMono_400Regular,
+    });
+    React.useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
    /*for the sake of the litclubs
        WITH BACKEND: implement this as a linked list of a users' joined book clubs */
-    const clubNames = [
-        "Gothic Horror Fans",
-        "Grass is Green-er: Hank and John Fanclub",
-        "Bookish Baddies" ,
-        "ENGL 404",
-        "a secret fifth option",
-        "a sixth thing"
-    ]
-    const userClubs = Array.from({ length: 6 /*change to dynamic # book clubs*/ }, (_, i) => ({
-        id: i,
-        clubName: clubNames[i],
-    }));
+    const { litClubs, loading, error } = useLitClubs(); 
 
-          const [fontsLoaded] = useFonts({
-            Fraunces_700Bold,
-            ChivoMono_500Medium,
-            NotoSansMono_400Regular,
-          });
-          React.useEffect(() => {
-            if (fontsLoaded) SplashScreen.hideAsync();
-          }, [fontsLoaded]);
+    if (loading) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Loading clubs...</Text>
+          </View>
+        );
+      }
+    
+      if (error) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
+          </View>
+        );
+      }
+    
+      if (!litClubs.length) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>No Clubs Found.</Text>
+          </View>
+        );
+      }
+
 
     return (
         <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
@@ -110,23 +125,19 @@ export default function ProfileScreen() {
                 <Text style={globalStyles.subheading}> My LitClubs </Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
-                    {
-                        userClubs.map((userClub) => (
-                            
-                            <Pressable
-                                key={userClub.id}
-                                style={globalStyles.litclubCard}
-                                onPress={() => {
-                                    /*TODO make the buttons go to their clubs*/
-                                    Alert.alert('LitClub button pressed') 
-                                }} >
-                                <Link href="/myLitClub"> 
-                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
-                                </Link>
-                            </Pressable>
-                           
-                        ))
-                    }
+                    {litClubs.map((club) => (
+                                <Pressable
+                                  key={club.id}
+                                  style={globalStyles.litclubCard}
+                                  onPress={() => Alert.alert('LitClub button pressed')}
+                                >
+                                  <Link href="/myLitClub">
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
+                                      {club.name}
+                                    </Text>
+                                  </Link>
+                                </Pressable>
+                              ))}
                 </View>
             </ScrollView>
         </View>

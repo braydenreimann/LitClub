@@ -1,3 +1,37 @@
+/* {
+  "users": [
+    {
+      "id": "string",
+      "firstName": "string",
+      "lastName": "string",
+      "userName": "string",
+      "email": "string",
+      "bio": "string",
+      "profilePhotoUrl": "string",
+      "preferredGenres": [
+        "string"
+      ],
+      "privateAccount": true,
+      "publicInteractionRestricted": true,
+      "followingUserIds": [
+        "string"
+      ],
+      "followerUserIds": [
+        "string"
+      ],
+      "blockedUserIds": [
+        "string"
+      ],
+      "litClubIds": [
+        "string"
+      ],
+      "created": "2025-10-17T02:51:35.809Z"
+    }
+  ],
+  "continuationToken": "string"
+} */
+
+  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';

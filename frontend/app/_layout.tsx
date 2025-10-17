@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import { SessionProvider } from '../auth/authContext';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { LitClubProvider } from '@/LitClubImport/LitClubContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -18,13 +19,15 @@ export default function RootLayout() {
 
   return (
     <SessionProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: true }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
-        {/*<StatusBar style="auto" />*/}
-      </ThemeProvider>
+      <LitClubProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack screenOptions={{ headerShown: true }}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          </Stack>
+          {/*<StatusBar style="auto" />*/}
+        </ThemeProvider>
+      </LitClubProvider>
     </SessionProvider>
   );
 }
