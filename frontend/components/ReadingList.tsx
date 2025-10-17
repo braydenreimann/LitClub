@@ -26,7 +26,7 @@ export default function ReadingList() {
     return (
 
         <View style={styles.scrollingWrapper}>
-            <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={true}>
+            <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={false}>
                 {books.map((book) => (
                     <Pressable key={book.id} style={styles.card}>
                         <Link href="/bookInfo">
