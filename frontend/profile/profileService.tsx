@@ -71,6 +71,27 @@ export async function getUser(): Promise<User | null> {
     }
 }
 
+export async function getBookFromLibraryBook(bookId: string): Promise<Book> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/books/${bookId}`);
+
+        if (!response.ok) {
+            console.warn('Failed to fetch book literal', response.status);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const book: Book = data as Book;
+
+        return book;
+
+    } catch (error) {
+        console.error('Error fetching book:', error);
+        throw error; 
+    }
+}
+
 export async function getBookshelf(userId: string, status: number): Promise<DisplayBook[] | null> {
     try {
         const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks`);
@@ -87,21 +108,31 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
             unsortedbooks = data.libraryBooks;
         }
 
-        let sortedbooks: DisplayBook[] = [];
-        let i: number = 1;
-        
-        unsortedbooks.forEach((book) => {
-            if (book.status === status) {
-                const bookToAdd: DisplayBook = { id: i, title: book.id };
-                i++;
-                sortedbooks.push(bookToAdd);
-            }
-        });
+        const filtered = unsortedbooks.filter((b)=> b.status === status);
 
-        return sortedbooks;
+        const fullBooks: (Book|null)[] = await Promise.all(
+            filtered.map(async (libBook) => {
+                try {
+                    const book = await getBookFromLibraryBook(libBook.id);
+                    return book;
+                } catch (err) {
+                    console.error(`Failed to fetch book ${libBook.id}`, err);
+                    return null; // return null for failed fetches
+                }
+            })
+        );
 
+        // Transform into DisplayBook, skipping any nulls
+        const displayBooks: DisplayBook[] = fullBooks
+            .filter((b): b is Book => b !== null) // TypeScript type guard
+            .map((b, index) => ({
+                id: index + 1,
+                title: b.title, // use the real book title now
+            }));
+
+        return displayBooks;
     } catch (error) {
-      console.error('Error fetching bookshelf:', error);
-      return null;
+        console.error('Error fetching bookshelf:', error);
+        return null;
     }
 }

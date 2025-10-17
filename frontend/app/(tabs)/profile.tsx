@@ -133,6 +133,8 @@ export default function ProfileScreen() {
                     <ReadingList status={0} /> 
                     <Text style={globalStyles.subheading}>Saved for Later</Text>
                     <ReadingList status={2} /> 
+                    <Text style={globalStyles.subheading}>Want to Read</Text>
+                    <ReadingList status={3} /> 
                 </View>
 
                 {/*display the book clubs*/}
