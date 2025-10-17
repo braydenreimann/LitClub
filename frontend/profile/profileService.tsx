@@ -24,6 +24,25 @@ export interface User {
     created: string; // ISO date string, e.g. "2025-10-17T00:37:46.126Z"
 }
 
+export interface Edition {
+    id: string;
+    format: number; // or you can use an enum if you have one
+    publisher: string;
+    publicationDate: string; // or Date if you plan to parse it
+    printLength: number;
+    isbn13s: string[];
+}
+
+export interface Book {
+    id: string;
+    title: string;
+    author: string;
+    totalChapters: number;
+    genre: string;
+    description: string;
+    editions: Edition[];
+}
+
 export interface LibraryBook {
     id: string;
     status: number;               
@@ -60,7 +79,14 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
         return [];
         }
 
-        const unsortedbooks: LibraryBook[] = await response.json();
+        let unsortedbooks: LibraryBook[] = []
+
+        const data = await response.json();
+
+        if (Array.isArray(data.libraryBooks)) {
+            unsortedbooks = data.libraryBooks;
+        }
+
         let sortedbooks: DisplayBook[] = [];
         let i: number = 1;
         

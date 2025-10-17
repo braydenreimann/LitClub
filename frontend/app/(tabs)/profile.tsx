@@ -73,6 +73,7 @@ export default function ProfileScreen() {
           React.useEffect(() => {
             if (fontsLoaded) SplashScreen.hideAsync();
           }, [fontsLoaded]);
+
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => { //chat-gpt is a quadrillion dollar idea
@@ -100,9 +101,17 @@ export default function ProfileScreen() {
                 <View style={globalStyles.profileHeader}>
                     {/* profile icon TODO change to PFP */}
                     <EvilIcons name="user" size={75} color="black" /> 
-                    <View style={globalStyles.userBio }>
-                        <Text style={globalStyles.subheading}> {user ? '${user.userName}' : 'Loading...'} </Text>
-                        <Text style={globalStyles.body}>{user ? '${user.bio}' : 'Loading...'}</Text>
+                    <View style={[globalStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
+                        <Text style={globalStyles.subheading}>
+                            {user ? `@${user.userName}` : 'Loading...'}
+                        </Text>
+
+                        <Text
+                            style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
+                            numberOfLines={0} 
+                        >
+                            {user ? user.bio : 'Loading...'}
+                        </Text>
                     </View>
 
                     {/*be able to edit the bio */}
@@ -118,12 +127,12 @@ export default function ProfileScreen() {
                     <TopThreeBooks />
                     <Text style={globalStyles.subheading}>Currently Reading</Text>
                     {/* reading list for the currently reading*/}
-                    <ReadingList /> 
+                    <ReadingList status={1} /> 
                     <Text style={globalStyles.subheading}>Past Reads</Text>
                     {/* reading list for the Past Reads*/}
-                    <ReadingList /> 
+                    <ReadingList status={0} /> 
                     <Text style={globalStyles.subheading}>Saved for Later</Text>
-                    <ReadingList /> 
+                    <ReadingList status={2} /> 
                 </View>
 
                 {/*display the book clubs*/}

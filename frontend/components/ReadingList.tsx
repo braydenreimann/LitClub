@@ -4,38 +4,76 @@
 // react tutorial on how to make shapes: 
 // https://www.codedaily.io/tutorials/The-Shapes-of-React-Native
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Pressable } from 'react-native';
 import { Link, useRouter} from 'expo-router';
 import { colors, fonts } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User, DisplayBook, getUser, getBookshelf } from '../profile/profileService';
 
 //eventually will fetch data from backend
+interface ReadingListProps {
+    status: number;
+}
+export default function ReadingList({ status }: ReadingListProps) { //AI assist with the loading functionality
+    const [user, setUser] = useState<User | null>(null);
+    const [shelf, setShelf] = useState<DisplayBook[]>([]);
+    const [loading, setLoading] = useState(true);
 
-export default function ReadingList() {
+    useEffect(() => {
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return;
+                const session: User = JSON.parse(sessionString);
+                setUser(session);
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+        loadSession();
+    }, []);
 
-    const books = [
-    { id: 1, title: 'Book 1' },
-    { id: 2, title: 'Book 2' },
-    { id: 3, title: 'Book 3' },
-    { id: 4, title: 'Book 4' },
-    { id: 5, title: 'Book 5' },
-    { id: 6, title: 'Book 6' },
-  ];
+    useEffect(() => {
+        if (!user) return;
+
+        const loadBookshelf = async () => {
+            setLoading(true);
+            try {
+                const books = await getBookshelf(user.id, status);
+                setShelf(books ?? []);
+            } catch (err) {
+                console.error('Error loading bookshelf:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadBookshelf();
+    }, [user, status]);
 
     return (
-
         <View style={styles.scrollingWrapper}>
-            <ScrollView style={styles.scrollContainer} horizontal={true} showsHorizontalScrollIndicator={true}>
-                {books.map((book) => (
-                    <Pressable key={book.id} style={styles.card}>
-                        <Link href="/bookInfo">
-                            <Text style={globalStyles.subheading}>{book.title}</Text>  
-                        </Link> 
-                    </Pressable>
-                ))}
-
-            </ScrollView>
+            {loading ? (
+                <Text style={globalStyles.body}>Loading your books...</Text>
+            ) : shelf.length === 0 ? (
+                <Text style={globalStyles.body}>No books found for this shelf.</Text>
+            ) : (
+                <ScrollView
+                    style={styles.scrollContainer}
+                    horizontal
+                    showsHorizontalScrollIndicator
+                >
+                    {shelf.map((book) => (
+                        <Pressable key={book.id} style={styles.card}>
+                            <Link href="/bookInfo">
+                                <Text style={globalStyles.subheading}>{book.title}</Text>
+                            </Link>
+                        </Pressable>
+                    ))}
+                </ScrollView>
+            )}
         </View>
     );
 }
