@@ -20,6 +20,8 @@ import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { useLitClubs } from '@/LitClubImport/LitClubContext';
+import { useLocalSearchParams } from 'expo-router';
+
 
 
 
@@ -56,25 +58,47 @@ export default function LitClubScreen() {
     React.useEffect(() => {
         if (fontsLoaded) SplashScreen.hideAsync();
     }, [fontsLoaded]);
-    
+
+    const { id } = useLocalSearchParams();
+    const { litClubs, loading, error } = useLitClubs();
+
+    const club = litClubs.find(c => c.id === id);
+
+    if (loading) {
+        return <ActivityIndicator style={{ flex: 1 }} />
+    }
+
+    if (error) {
+        return (
+            <Text style={{ color: 'red', padding: 20 }}>Error: {error}</Text>
+        );
+    }
+
+    if (!litClubs.length) {
+        return <Text style={{ padding: 20 }}>No LitClubs found.</Text>
+    }
+
+    if (!club) {
+        return <Text style={{ padding: 20 }}>Club not found.</Text>
+    }
+
     return (
             <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}> 
                     <View style={{flexDirection:'row', paddingTop: 25 } } >
                         <BackButton /> 
                         <Text style={[globalStyles.heading, { paddingTop: 0 }]}>{club.name}</Text>
                     </View>
+
                     <Text style={globalStyles.body}> 
-                        Welcome to this LitClub! Here, we're discussing everything Stephen King -- 
-                        working our way through his novels from the beginning to the end. We're happy
-                        to have you!
-                        
-                        </Text> {/*TODO: are they able to change the bio??*/}
+                        {club.description}
+                    </Text>
+
                     <View style={litStyles.leaderBanner}>
-                        <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
+                        <Foundation name="crown" size={30} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}/>
                         <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
-                        <Text style={globalStyles.subheading}>@username</Text>
-                        <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
-                </View>
+                        <Text style={globalStyles.subheading}>@{club.ownerUserId}</Text>
+                        <Foundation name="crown" size={30} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }} />
+                    </View>
                     {/*currently reading section*/}
                     <View style={litStyles.currentRead}>
                         <View style={litStyles.sideRead}>
@@ -95,12 +119,21 @@ export default function LitClubScreen() {
                         </View>            
                     </View>
                 <View> 
+
+                    {/* AI help for integrating this */}
+                    <Text style={globalStyles.subheading}>Preferred Genres</Text> 
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 20 }}>
+                        {(club.preferredGenres || []).map((genre, idx) => (
+                        <Text key={idx} style={[globalStyles.body, { marginRight: 10 }]}>#{genre}</Text>
+                        ))}
+                    </View>
+
                     <Text style={globalStyles.subheading}>Upcoming Reads</Text>
                     {/* reading list for the club's upcoming reads*/}
-                    <ReadingList /> 
+                    <ReadingList status={0} /> 
                     <Text style={globalStyles.subheading}>Past Reads</Text>
                     {/* reading list for the Past Reads*/}   
-                    <ReadingList />    
+                    <ReadingList status={0} />    
                     <Text style={globalStyles.subheading}>Current Members</Text>
                     {/* TODO: INSERT CLUB MEMBERS HERE*/}
                     <ClubMembers />

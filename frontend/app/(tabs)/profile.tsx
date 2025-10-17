@@ -53,35 +53,6 @@ function StatsButton() {
 export default function ProfileScreen() {
    /*for the sake of the litclubs
        WITH BACKEND: implement this as a linked list of a users' joined book clubs */
-    const clubNames = [
-        "Richard Siken Enjoyers",
-        "The Intersection of Sci Fi and Cool Bugs",
-        "Improv Comedy and You: every funny book ever",
-        "Gothic Horror Fans",
-        "Actually Interesting Nonfiction",
-
-    ]
-    const userClubs = Array.from({ length: 5 /*change to dynamic # book clubs*/ }, (_, i) => ({
-        id: i,
-        clubName: clubNames[i],
-    }));
-    const clubLeaderships = [
-        "Obama's Book List",
-        "Books about Bugs",
-    ]
-    const leaderArr = Array.from({ length: 2 /*change to dynamic # book clubs*/ }, (_, i) => ({
-        id: i,
-        clubLeaderships: clubLeaderships[i],
-    }));
-    const archivedName = [
-        "Bookish Baddies",
-        "ENGL 404",
-        "Romantasy Rats",
-    ]
-    const archivedArr = Array.from({ length: 3 /*change to dynamic # book clubs*/ }, (_, i) => ({
-        id: i,
-        archivedName: archivedName[i],
-    }));
 
           const [fontsLoaded] = useFonts({
             Fraunces_700Bold,
@@ -92,7 +63,34 @@ export default function ProfileScreen() {
             if (fontsLoaded) SplashScreen.hideAsync();
           }, [fontsLoaded]);
 
-    const [user, setUser] = useState<User | null>(null);
+          
+
+    const [user, setUser] = useState<User | null>(null)
+    const { litClubs, loading, error } = useLitClubs();
+
+    if (loading) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Loading clubs...</Text>
+          </View>
+        );
+      }
+    
+      if (error) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
+          </View>
+        );
+      }
+    
+      if (!litClubs.length) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>No Clubs Found.</Text>
+          </View>
+        );
+      }
 
     useEffect(() => { //chat-gpt is a quadrillion dollar idea
         // Define an async function inside useEffect
@@ -111,6 +109,11 @@ export default function ProfileScreen() {
         loadSession(); // call the async function
     }, []);
 
+    const userId = user?.id ?? '';
+    const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
+    const leaderClubs = litClubs.filter(c => c.ownerUserId === userId);
+    const archivedClubs = litClubs.filter(c => c.privateClub); // example filter
+
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}> 
             <Header />
@@ -119,7 +122,7 @@ export default function ProfileScreen() {
                 <View style={profStyles.profileHeader}>
                     {/* profile icon TODO change to PFP */}
                     <EvilIcons name="user" size={75} color="black" /> 
-                    <View style={[globalStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
+                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
                         <Text style={globalStyles.subheading}>
                             {user ? `@${user.userName}` : 'Loading...'}
                         </Text>
@@ -159,69 +162,73 @@ export default function ProfileScreen() {
                 <Text style={globalStyles.subheading}> LitClub Memberships </Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
-                    {
-                        userClubs.map((userClub) => (
+                    {loading ? (
+                        <Text>Loading clubs...</Text>
+                    ) : error ? (
+                        <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
+                    ) : userClubs.length ? (
+                        userClubs.map((club) => (
                             
                             <Pressable
-                                key={userClub.id}
+                                key={club.id}
                                 style={profStyles.litclubCard}
-                                onPress={() => {
-                                    /*TODO make the buttons go to their clubs*/
-                                    Alert.alert('LitClub button pressed') 
-                                }} >
-                                <Link href="/myLitClub"> 
-                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
+                                onPress={() => Alert.alert(`Opening ${club.name}`)} 
+                            >
+                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild > 
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
                                 </Link>
                             </Pressable>
                            
                         ))
+                    ) : ( <Text>No memberships yet.</Text> )
                     }
                 </View>
                 <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
-                    {
-                        leaderArr.map((clubLeaderships) => (
+                    {leaderClubs.length ? (
+                        leaderClubs.map((club) => (
                             
                             <Pressable
-                                key={clubLeaderships.id}
+                                key={club.id}
                                 style={profStyles.litclubCard}
-                                onPress={() => {
-                                    /*TODO make the buttons go to their clubs*/
-                                    Alert.alert('LitClub button pressed') 
-                                }} >
-                                <Link href="/myLitClub"> 
-                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {clubLeaderships.clubLeaderships} </Text>
+                                onPress={() => Alert.alert(`Opening ${club.name}`)} 
+                            >
+                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild > 
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
                                 </Link>
                             </Pressable>
                            
                         ))
+                    ) : ( <Text>You're not leading any clubs yet.</Text> )
                     }
                 </View>
                 <Text style={globalStyles.subheading}> Archived LitClubs </Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
-                    {
-                        archivedArr.map((archivedName) => (
-                            
+                    {archivedClubs.length ? (
+                        archivedClubs.map((club) => (  
                             <Pressable
-                                key={archivedName.id}
+                                key={club.id}
                                 style={[profStyles.litclubCard, { backgroundColor: colors.midBlue }]}
                                 onPress={() => {
                                     /*TODO make the buttons go to their clubs*/
-                                    Alert.alert('LitClub button pressed') 
+                                    Alert.alert(`Opening archived club ${club.name}`) 
                                 }} >
-                                <Link href="/myLitClub"> 
+                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild> 
                                     <Text style={[globalStyles.cardFont, 
                                         { textDecorationLine: 'line-through',
 
                                          }]} adjustsFontSizeToFit={true}>
-                                        {archivedName.archivedName}
+                                        {club.name}
                                     </Text>
                                 </Link>
                             </Pressable>
                            
                         ))
+                    ) : (
+                        <Text>No archived clubs.</Text>
+                    )                        
                     }
                 </View>
             </ScrollView>

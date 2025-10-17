@@ -67,7 +67,7 @@ export default function AllLitClubs() {
               style={globalStyles.litclubCard}
               onPress={() => Alert.alert('LitClub button pressed')}
             >
-              <Link href="/myLitClub">
+              <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild>
                 <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
                   {club.name}
                 </Text>

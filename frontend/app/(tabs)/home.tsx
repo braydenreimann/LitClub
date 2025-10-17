@@ -51,7 +51,7 @@ export default function HomeScreen() {
           Currently Reading
         </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList />
+          <ReadingList status = {1} />
         </View>
 
         { /*Shelf Two*/}
@@ -59,7 +59,7 @@ export default function HomeScreen() {
           Dog-Eared Books
         </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList />
+          <ReadingList status = {2}/>
         </View>
 
         { /*Shelf Three*/}
@@ -67,15 +67,15 @@ export default function HomeScreen() {
           Past Reads
         </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList />
+          <ReadingList status = {0}/>
         </View>
 
         { /*Shelf Four*/}
         <Text style={[globalStyles.subheading, { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 }]}>
-          My Personalized Bookshelf
+          Want to Read
         </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList />
+          <ReadingList status = {3} />
         </View>
 
       </ScrollView>
