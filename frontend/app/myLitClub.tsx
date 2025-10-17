@@ -86,8 +86,8 @@ export default function LitClubScreen() {
                         <View style={litStyles.sideRead}>
                             
                             <View style={globalStyles.card}>  
-                                <Text style={[globalStyles.heading, { textAlign: 'center', textAlignVertical: 'center' , paddingTop: 40}]}>
-                                    Book Title
+                                <Text style={[globalStyles.heading, { textAlign: 'center', textAlignVertical: 'center' , paddingTop: 50, fontSize: 28}]}>
+                                    Current Book
                                 </Text>
                             </View>
                         </View>
