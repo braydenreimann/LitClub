@@ -38,8 +38,9 @@ export const globalStyles = StyleSheet.create({
         width: 120,
         height: 180,
         marginRight: 10,
-        backgroundColor: "teal",
-        borderColor: "black",
+        backgroundColor: colors.teal,
+        borderColor: colors.darkest,
+        fontFamily: fonts.subheading
     },
     cardGroup: {
       flexDirection: 'row',
@@ -50,7 +51,7 @@ export const globalStyles = StyleSheet.create({
     litclubCard: {
       width: 120,
       height: 180,
-      backgroundColor: 'teal',
+      backgroundColor: colors.teal,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 8,
@@ -58,7 +59,7 @@ export const globalStyles = StyleSheet.create({
       padding: 5,
     },
     cardFont: {
-      color: 'white',
+      color: colors.cream,
       textAlign: 'center',
       fontWeight: 'bold',
       flexWrap: 'wrap',
