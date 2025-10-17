@@ -70,7 +70,7 @@ export default function CreateAccountScreen() {
     try {
       const ok = await register(payload);
       if (ok) {
-        router.push('/home');
+        router.push('/genres');
       } else {
         Alert.alert('Error', 'Failed to create your account.');
       }
