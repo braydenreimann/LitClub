@@ -13,13 +13,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import React from 'react';
 
 import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
+import { Text } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import Header from '../../components/headerWithSearch';
 import ReadingList from '@/components/ReadingList';
 import { ScrollView } from 'react-native';
+import { globalStyles } from '@/styles/globalStyles';
 
 
 export default function HomeScreen() {
@@ -34,43 +35,43 @@ export default function HomeScreen() {
     }, [fontsLoaded]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}>
+    <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <Header />
       <ScrollView>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title" style={{ fontFamily: fonts.heading }}>
+        <View style={{ paddingLeft: 25, paddingTop: 45}}>
+          <Text style={globalStyles.heading}>
             My Bookshelf
-          </ThemedText>
-        </ThemedView>
+          </Text>
+        </View>
 
         { /*Shelf One*/}
-        <ThemedText type="defaultSemiBold" style={{ fontFamily: fonts.subheading, fontSize: 25, paddingTop: 45, paddingHorizontal: 25 }}>
+        <Text style={[globalStyles.subheading, { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 }]}>
           Currently Reading
-        </ThemedText>
+        </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
           <ReadingList />
         </View>
 
         { /*Shelf Two*/}
-        <ThemedText type="defaultSemiBold" style={{ fontFamily: fonts.subheading, fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+        <Text style={[globalStyles.subheading, { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 }]}>
           Dog-Eared Books
-        </ThemedText>
+        </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
           <ReadingList />
         </View>
 
         { /*Shelf Three*/}
-        <ThemedText type="defaultSemiBold" style={{ fontFamily: fonts.subheading, fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+        <Text style={[globalStyles.subheading, { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 }]}>
           Past Reads
-        </ThemedText>
+        </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
           <ReadingList />
         </View>
 
         { /*Shelf Four*/}
-        <ThemedText type="defaultSemiBold" style={{ fontFamily: fonts.subheading, fontSize: 25, paddingHorizontal: 25, paddingTop: 45 }}>
+        <Text style={[globalStyles.subheading, { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 }]}>
           My Personalized Bookshelf
-        </ThemedText>
+        </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
           <ReadingList />
         </View>

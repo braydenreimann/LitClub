@@ -28,7 +28,7 @@ const GENRES = [
     'Fantasy', 'Romance', 'Fiction', 'Science-Fiction', 'Drama', 'Mystery', 'Non-Fiction', 'Thriller', 'Horror', 'Historical', 'Poetry', 'Biography', 'Memoir', 'Young Adult', 'True Crime', 'Science', 'Western Fiction', 'Philopshical', 'Action Fiction'
 ];
 
-export default function GenreSelection() {
+function GenreSelection() {
     const [selected, setSelected] = useState<string[]>([]);
     const router = useRouter();
 
@@ -86,6 +86,18 @@ export default function GenreSelection() {
         </ScrollView>
     )
     
+}
+
+export default function AppStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false, // hide the header
+      }}
+    >
+      <Stack.Screen name="RecommendedBooks" component={GenreSelection} />
+    </Stack.Navigator>
+  );
 }
 
 const styles = StyleSheet.create({
