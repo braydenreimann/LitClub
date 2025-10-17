@@ -1,4 +1,5 @@
 
+import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation'; 
 import { Platform, Pressable} from 'react-native';
 import { ThemedText } from '../../components/themed-text';
@@ -14,13 +15,14 @@ import { View, Text, FlatList, ScrollView, StyleSheet, Alert,Dimensions } from '
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../../constants/theme';
 
-import React from 'react';
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
+import { User, getUser } from '../../profile/profileService'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { globalStyles } from '@/styles/globalStyles';
 import { useLitClubs } from '@/LitClubImport/LitClubContext';
-
 
 
 function EditButton() {
@@ -49,59 +51,89 @@ function StatsButton() {
 
 
 export default function ProfileScreen() {
-
-    const [fontsLoaded] = useFonts({
-        Fraunces_700Bold,
-        ChivoMono_500Medium,
-        NotoSansMono_400Regular,
-    });
-    React.useEffect(() => {
-        if (fontsLoaded) SplashScreen.hideAsync();
-    }, [fontsLoaded]);
    /*for the sake of the litclubs
        WITH BACKEND: implement this as a linked list of a users' joined book clubs */
-    const { litClubs, loading, error } = useLitClubs(); 
+    const clubNames = [
+        "Richard Siken Enjoyers",
+        "The Intersection of Sci Fi and Cool Bugs",
+        "Improv Comedy and You: every funny book ever",
+        "Gothic Horror Fans",
+        "Actually Interesting Nonfiction",
 
-    if (loading) {
-        return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Loading clubs...</Text>
-          </View>
-        );
-      }
-    
-      if (error) {
-        return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
-          </View>
-        );
-      }
-    
-      if (!litClubs.length) {
-        return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>No Clubs Found.</Text>
-          </View>
-        );
-      }
+    ]
+    const userClubs = Array.from({ length: 5 /*change to dynamic # book clubs*/ }, (_, i) => ({
+        id: i,
+        clubName: clubNames[i],
+    }));
+    const clubLeaderships = [
+        "Obama's Book List",
+        "Books about Bugs",
+    ]
+    const leaderArr = Array.from({ length: 2 /*change to dynamic # book clubs*/ }, (_, i) => ({
+        id: i,
+        clubLeaderships: clubLeaderships[i],
+    }));
+    const archivedName = [
+        "Bookish Baddies",
+        "ENGL 404",
+        "Romantasy Rats",
+    ]
+    const archivedArr = Array.from({ length: 3 /*change to dynamic # book clubs*/ }, (_, i) => ({
+        id: i,
+        archivedName: archivedName[i],
+    }));
 
+          const [fontsLoaded] = useFonts({
+            Fraunces_700Bold,
+            ChivoMono_500Medium,
+            NotoSansMono_400Regular,
+          });
+          React.useEffect(() => {
+            if (fontsLoaded) SplashScreen.hideAsync();
+          }, [fontsLoaded]);
+
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
+
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
+        <View style={{ flex: 1, backgroundColor: colors.cream }}> 
             <Header />
             <ScrollView> 
-                <Text style={globalStyles.heading}> FirstName LastName {"\n"} </Text>
-                <View style={globalStyles.profileHeader}>
+                <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
+                <View style={profStyles.profileHeader}>
                     {/* profile icon TODO change to PFP */}
                     <EvilIcons name="user" size={75} color="black" /> 
-                    <View style={globalStyles.userBio }>
-                        <Text style={globalStyles.subheading}> @username </Text>
-                        <Text style={globalStyles.body}>this is my bio</Text>
+                    <View style={[globalStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
+                        <Text style={globalStyles.subheading}>
+                            {user ? `@${user.userName}` : 'Loading...'}
+                        </Text>
+
+                        <Text
+                            style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
+                            numberOfLines={0} 
+                        >
+                            {user ? user.bio : 'Loading...'}
+                        </Text>
                     </View>
 
                     {/*be able to edit the bio */}
-                    <View style={globalStyles.userBio}>
+                    <View style={profStyles.userBio}>
                         <SettingsButton />
                         <EditButton /> 
                     </View>
@@ -113,34 +145,88 @@ export default function ProfileScreen() {
                     <TopThreeBooks />
                     <Text style={globalStyles.subheading}>Currently Reading</Text>
                     {/* reading list for the currently reading*/}
-                    <ReadingList /> 
+                    <ReadingList status={1} /> 
                     <Text style={globalStyles.subheading}>Past Reads</Text>
                     {/* reading list for the Past Reads*/}
-                    <ReadingList /> 
+                    <ReadingList status={0} /> 
                     <Text style={globalStyles.subheading}>Saved for Later</Text>
-                    <ReadingList /> 
+                    <ReadingList status={2} /> 
+                    <Text style={globalStyles.subheading}>Want to Read</Text>
+                    <ReadingList status={3} /> 
                 </View>
 
                 {/*display the book clubs*/}
-                <Text style={globalStyles.subheading}> My LitClubs </Text>
+                <Text style={globalStyles.subheading}> LitClub Memberships </Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
-                    {litClubs.map((club) => (
-                                <Pressable
-                                  key={club.id}
-                                  style={globalStyles.litclubCard}
-                                  onPress={() => Alert.alert('LitClub button pressed')}
-                                >
-                                  <Link href="/myLitClub">
-                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
-                                      {club.name}
+                    {
+                        userClubs.map((userClub) => (
+                            
+                            <Pressable
+                                key={userClub.id}
+                                style={profStyles.litclubCard}
+                                onPress={() => {
+                                    /*TODO make the buttons go to their clubs*/
+                                    Alert.alert('LitClub button pressed') 
+                                }} >
+                                <Link href="/myLitClub"> 
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
+                                </Link>
+                            </Pressable>
+                           
+                        ))
+                    }
+                </View>
+                <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
+                { /*format the GROUP of cards correctly*/}
+                <View style={globalStyles.cardGroup}> 
+                    {
+                        leaderArr.map((clubLeaderships) => (
+                            
+                            <Pressable
+                                key={clubLeaderships.id}
+                                style={profStyles.litclubCard}
+                                onPress={() => {
+                                    /*TODO make the buttons go to their clubs*/
+                                    Alert.alert('LitClub button pressed') 
+                                }} >
+                                <Link href="/myLitClub"> 
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {clubLeaderships.clubLeaderships} </Text>
+                                </Link>
+                            </Pressable>
+                           
+                        ))
+                    }
+                </View>
+                <Text style={globalStyles.subheading}> Archived LitClubs </Text>
+                { /*format the GROUP of cards correctly*/}
+                <View style={globalStyles.cardGroup}> 
+                    {
+                        archivedArr.map((archivedName) => (
+                            
+                            <Pressable
+                                key={archivedName.id}
+                                style={[profStyles.litclubCard, { backgroundColor: colors.midBlue }]}
+                                onPress={() => {
+                                    /*TODO make the buttons go to their clubs*/
+                                    Alert.alert('LitClub button pressed') 
+                                }} >
+                                <Link href="/myLitClub"> 
+                                    <Text style={[globalStyles.cardFont, 
+                                        { textDecorationLine: 'line-through',
+
+                                         }]} adjustsFontSizeToFit={true}>
+                                        {archivedName.archivedName}
                                     </Text>
-                                  </Link>
-                                </Pressable>
-                              ))}
+                                </Link>
+                            </Pressable>
+                           
+                        ))
+                    }
                 </View>
             </ScrollView>
         </View>
+        
     );
 }
 
@@ -170,7 +256,7 @@ export default function ProfileScreen() {
 */
 
 
-const globalStyles = StyleSheet.create({
+const profStyles = StyleSheet.create({
     profileHeader: {
         flexDirection: "row",
         padding: 10,
@@ -181,17 +267,6 @@ const globalStyles = StyleSheet.create({
         flexDirection: "column",
         alignItems: "stretch",
     },
-    container: {
-        flex: 1,
-        backgroundColor: colors.cream,
-        padding: 16,
-    },
-    heading: {
-        fontFamily: fonts.heading,
-        fontSize: 32,
-        color: colors.midBlue,
-        marginBottom: 8,
-    },
     subheading: {
         fontFamily: fonts.subheading,
         fontSize: 22,
@@ -200,17 +275,11 @@ const globalStyles = StyleSheet.create({
         justifyContent:"center",
         marginBottom: 6,
     },
-    body: {
-        fontFamily: fonts.body,
-        fontSize: 14,
-        color: colors.darkest,
-        lineHeight: 22,
-    },
     scrollContainer: {
         overflowX: 'scroll',
         overflowY: 'hidden',
         /*whiteSpace: 'nowrap',*/
-        padding: 10,
+        padding: 20,
     },
     scrollingWrapper: {
         flex: 1,
@@ -240,16 +309,16 @@ const globalStyles = StyleSheet.create({
         width: 100,
         height: 100,
         aspectRatio: 1,
-        backgroundColor: colors.sage, //sage green
+        backgroundColor: colors.sage, 
         borderWidth: 4,
         borderRadius: 12,
-        marginLeft: 5,
+        //marginLeft: 5,
         marginRight: 5,
         marginTop: 5,
         marginBottom: 5,
         alignItems: "center",
         justifyContent: "center",
-        borderColor: colors.darkest,
+        borderColor: colors.midBlue,
         textAlign: "center",
         textAlignVertical:"center",
     }

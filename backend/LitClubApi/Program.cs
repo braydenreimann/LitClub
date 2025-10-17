@@ -1,5 +1,6 @@
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
+using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
@@ -34,7 +35,6 @@ builder.Services.AddSingleton(sp =>
         }),
         ConnectionMode = ConnectionMode.Gateway
     };
-    Console.WriteLine("Hello Kathleen");
 
     return new CosmosClient(o.Endpoint, o.PrimaryKey, clientOptions);
 });
@@ -79,6 +79,25 @@ using (var scope = app.Services.CreateScope())
     var users = client.GetContainer(o.DatabaseId, o.UsersContainerId);
     var clubs = client.GetContainer(o.DatabaseId, o.LitClubsContainerId);
     var libs = client.GetContainer(o.DatabaseId, o.LibrariesContainerId);
+
+    string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
+    string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
+    string exist = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "bookdata.csv");
+
+    List<Book> booklist = CSVParserInsert.Parse(exist);
+
+    foreach (Book b in booklist)
+    {
+        try
+        {
+            await books.UpsertItemAsync(b, new PartitionKey(b.Id));
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            // Item with same id already exists, skip
+            continue;
+        }
+    }
 
     Book book = new()
     {
@@ -136,6 +155,44 @@ using (var scope = app.Services.CreateScope())
             }
         ]
     };
+
+    int i = 0;
+    foreach (Book b in booklist)
+    {
+        ShelfStatus status = (ShelfStatus)(i % 4);
+        DateOnly? started = null;
+        DateOnly? finished = null;
+        int currentpage = 0;
+        bool pedestal = false;
+        if (i % 8 == 0)
+        {
+            pedestal = true;
+        }
+
+        if (i % 4 == 0)
+        {
+            started = DateOnly.Parse("October 4, 2023");
+            finished = DateOnly.Parse("October 10, 2023");
+        }
+        else if (i % 4 == 1 || i % 4 == 2)
+        {
+            started = DateOnly.Parse("October 11, 2023");
+            currentpage = (b.Editions[0].PrintLength ?? 0) / 2;
+
+        }
+        LibraryBook lib = new LibraryBook()
+        {
+            BookId = b.Id,
+            Status = status,
+            StartedReading = started,
+            FinishedReading = finished,
+            CurrentPage = currentpage,
+            PercentComplete = 50,
+            OnPedastal = pedestal
+        };
+        library.LibraryBooks.Add(lib);
+        i++;
+    }
 
     await books.UpsertItemAsync(book, new PartitionKey(book.Id));
     await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));

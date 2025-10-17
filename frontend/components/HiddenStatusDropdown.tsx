@@ -3,18 +3,18 @@ HOW TO USE:
 
 1. Imports:
 
-import BookStatusDropdown from "../components/BookStatusDropdown";
+import BookStatusDropdown from "../components/HiddenStatusDropdown";
 
 2. In the export default function BEFORE return() statement:
-  const handleStatusChange = (newStatus: string) => {
-    console.log("Book status changed to:", newStatus);
-    // TODO: send newStatus to Cosmos DB later
+  const handlePrivacyChange = (newPrivacyStatus: string) => {
+    console.log("Privacy status changed to:", newPrivacyStatus);
+    // TODO: send newPrivacyStatus to Cosmos DB later
   };
 
 3. IN return statement: Simply add:
 
     <View style={globalStyles.container}>
-      <BookStatusDropdown onStatusChange={handleStatusChange} />
+      <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
     </View>
 
 */
@@ -25,11 +25,8 @@ import { colors, fonts } from "../theme";
 import { globalStyles } from "../styles/globalStyles";
 
 const STATUS_OPTIONS = [
-  "Not in your library",
-  "Dog-eared for later",
-  "Currently Reading",
-  "On Hiatus",
-  "Finished",
+    "Public",
+    "Hidden"
 ];
 
 type BookStatusDropdownProps = {
@@ -38,7 +35,7 @@ type BookStatusDropdownProps = {
 };
 
 export default function BookStatusDropdown({
-  initialStatus = "Not in your library",
+  initialStatus = "Public",
   onStatusChange,
 }: BookStatusDropdownProps) {
   const [status, setStatus] = useState(initialStatus);
