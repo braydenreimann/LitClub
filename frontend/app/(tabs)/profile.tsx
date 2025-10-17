@@ -56,14 +56,21 @@ export default function ProfileScreen() {
         "Richard Siken Enjoyers",
         "The Intersection of Sci Fi and Cool Bugs",
         "Improv Comedy and You: every funny book ever",
-        "Actually Interesting Nonfiction",
-        "Obama's Book List",
-        "Books about Bugs",
         "Gothic Horror Fans",
+        "Actually Interesting Nonfiction",
+
     ]
-    const userClubs = Array.from({ length: 7 /*change to dynamic # book clubs*/ }, (_, i) => ({
+    const userClubs = Array.from({ length: 5 /*change to dynamic # book clubs*/ }, (_, i) => ({
         id: i,
         clubName: clubNames[i],
+    }));
+    const clubLeaderships = [
+        "Obama's Book List",
+        "Books about Bugs",
+    ]
+    const leaderArr = Array.from({ length: 2 /*change to dynamic # book clubs*/ }, (_, i) => ({
+        id: i,
+        clubLeaderships: clubLeaderships[i],
     }));
 
           const [fontsLoaded] = useFonts({
@@ -128,7 +135,7 @@ export default function ProfileScreen() {
                 </View>
 
                 {/*display the book clubs*/}
-                <Text style={globalStyles.subheading}> My LitClubs </Text>
+                <Text style={globalStyles.subheading}> LitClub Memberships </Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
                     {
@@ -143,6 +150,27 @@ export default function ProfileScreen() {
                                 }} >
                                 <Link href="/myLitClub"> 
                                     <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {userClub.clubName} </Text>
+                                </Link>
+                            </Pressable>
+                           
+                        ))
+                    }
+                </View>
+                <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
+                { /*format the GROUP of cards correctly*/}
+                <View style={globalStyles.cardGroup}> 
+                    {
+                        leaderArr.map((clubLeaderships) => (
+                            
+                            <Pressable
+                                key={clubLeaderships.id}
+                                style={profStyles.litclubCard}
+                                onPress={() => {
+                                    /*TODO make the buttons go to their clubs*/
+                                    Alert.alert('LitClub button pressed') 
+                                }} >
+                                <Link href="/myLitClub"> 
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >  {clubLeaderships.clubLeaderships} </Text>
                                 </Link>
                             </Pressable>
                            
@@ -203,7 +231,7 @@ const profStyles = StyleSheet.create({
         overflowX: 'scroll',
         overflowY: 'hidden',
         /*whiteSpace: 'nowrap',*/
-        padding: 10,
+        padding: 20,
     },
     scrollingWrapper: {
         flex: 1,
