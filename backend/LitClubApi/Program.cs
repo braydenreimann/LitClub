@@ -156,6 +156,44 @@ using (var scope = app.Services.CreateScope())
         ]
     };
 
+    int i = 0;
+    foreach (Book b in booklist)
+    {
+        ShelfStatus status = (ShelfStatus)(i % 4);
+        DateOnly? started = null;
+        DateOnly? finished = null;
+        int currentpage = 0;
+        bool pedestal = false;
+        if (i % 8 == 0)
+        {
+            pedestal = true;
+        }
+
+        if (i % 4 == 0)
+        {
+            started = DateOnly.Parse("October 4, 2023");
+            finished = DateOnly.Parse("October 10, 2023");
+        }
+        else if (i % 4 == 1 || i % 4 == 2)
+        {
+            started = DateOnly.Parse("October 11, 2023");
+            currentpage = (b.Editions[0].PrintLength ?? 0) / 2;
+
+        }
+        LibraryBook lib = new LibraryBook()
+        {
+            BookId = b.Id,
+            Status = status,
+            StartedReading = started,
+            FinishedReading = finished,
+            CurrentPage = currentpage,
+            PercentComplete = 50,
+            OnPedastal = pedestal
+        };
+        library.LibraryBooks.Add(lib);
+        i++;
+    }
+
     await books.UpsertItemAsync(book, new PartitionKey(book.Id));
     await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
