@@ -47,29 +47,32 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                     <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
                     <Text style={globalStyles.heading} > Book Information </Text>
                 </View>
-                {/* 
-                <View style={globalStyles.sideSect} >
-                    <View style={globalStyles.card}>  </View>
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                    <FontAwesome name="star" size={24} color={colors.midBlue} />
-                </View>
 
-                <View style={globalStyles.sideSect}>
-                    <Text style={globalStyles.heading}> Book Title </Text>
-                    <Text style={globalStyles.subheading}> Author </Text>
-                    <Text style={globalStyles.body}> Book Summary </Text>
-                    <ToCButton />
+                <View style={globalStyles.currentRead}>
+                    <View style={globalStyles.sideSect} >
+                        <View style={globalStyles.card}>  </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                            <FontAwesome name="star" size={24} color={colors.midBlue} />
+                        </View>
+                    </View>
+
+                    <View style={globalStyles.sideSect}>
+                        <Text style={globalStyles.heading}> Book Title </Text>
+                        <Text style={globalStyles.subheading}> Author </Text>
+                        <Text style={globalStyles.body}> Book Summary </Text>
+                        <ToCButton />
+                    </View>
                 </View>
-               
                     <Pressable
-                        style={globalStyles.forumBox}
-                        onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs} >
+                    style={globalStyles.forumBox}
+                    onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs}*/ }} >
                         <Text>This is our most recent discussion!</Text>
                     </Pressable>
-                 */}       
+                     
         </ScrollView>
     </View>
     );
