@@ -21,7 +21,7 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { User, getUser } from '../../profile/profileService'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { globalStyles } from '@/styles/globalStyles';
 
 
 function EditButton() {
@@ -53,14 +53,15 @@ export default function ProfileScreen() {
    /*for the sake of the litclubs
        WITH BACKEND: implement this as a linked list of a users' joined book clubs */
     const clubNames = [
+        "Richard Siken Enjoyers",
+        "The Intersection of Sci Fi and Cool Bugs",
+        "Improv Comedy and You: every funny book ever",
+        "Actually Interesting Nonfiction",
+        "Obama's Book List",
+        "Books about Bugs",
         "Gothic Horror Fans",
-        "Grass is Green-er: Hank and John Fanclub",
-        "Bookish Baddies" ,
-        "ENGL 404",
-        "a secret fifth option",
-        "a sixth thing"
     ]
-    const userClubs = Array.from({ length: 6 /*change to dynamic # book clubs*/ }, (_, i) => ({
+    const userClubs = Array.from({ length: 7 /*change to dynamic # book clubs*/ }, (_, i) => ({
         id: i,
         clubName: clubNames[i],
     }));
@@ -93,20 +94,20 @@ export default function ProfileScreen() {
     }, []);
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
+        <View style={{ flex: 1, backgroundColor: colors.cream }}> 
             <Header />
             <ScrollView> 
                 <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
-                <View style={globalStyles.profileHeader}>
+                <View style={profStyles.profileHeader}>
                     {/* profile icon TODO change to PFP */}
                     <EvilIcons name="user" size={75} color="black" /> 
-                    <View style={globalStyles.userBio }>
+                    <View style={profStyles.userBio }>
                         <Text style={globalStyles.subheading}> @username </Text>
                         <Text style={globalStyles.body}>this is my bio</Text>
                     </View>
 
                     {/*be able to edit the bio */}
-                    <View style={globalStyles.userBio}>
+                    <View style={profStyles.userBio}>
                         <SettingsButton />
                         <EditButton /> 
                     </View>
@@ -135,7 +136,7 @@ export default function ProfileScreen() {
                             
                             <Pressable
                                 key={userClub.id}
-                                style={globalStyles.litclubCard}
+                                style={profStyles.litclubCard}
                                 onPress={() => {
                                     /*TODO make the buttons go to their clubs*/
                                     Alert.alert('LitClub button pressed') 
@@ -179,7 +180,7 @@ export default function ProfileScreen() {
 */
 
 
-const globalStyles = StyleSheet.create({
+const profStyles = StyleSheet.create({
     profileHeader: {
         flexDirection: "row",
         padding: 10,
@@ -190,17 +191,6 @@ const globalStyles = StyleSheet.create({
         flexDirection: "column",
         alignItems: "stretch",
     },
-    container: {
-        flex: 1,
-        backgroundColor: colors.cream,
-        padding: 16,
-    },
-    heading: {
-        fontFamily: fonts.heading,
-        fontSize: 32,
-        color: colors.midBlue,
-        marginBottom: 8,
-    },
     subheading: {
         fontFamily: fonts.subheading,
         fontSize: 22,
@@ -208,12 +198,6 @@ const globalStyles = StyleSheet.create({
         alignContent: "center",
         justifyContent:"center",
         marginBottom: 6,
-    },
-    body: {
-        fontFamily: fonts.body,
-        fontSize: 14,
-        color: colors.darkest,
-        lineHeight: 22,
     },
     scrollContainer: {
         overflowX: 'scroll',
@@ -249,16 +233,16 @@ const globalStyles = StyleSheet.create({
         width: 100,
         height: 100,
         aspectRatio: 1,
-        backgroundColor: colors.sage, //sage green
+        backgroundColor: colors.sage, 
         borderWidth: 4,
         borderRadius: 12,
-        marginLeft: 5,
+        //marginLeft: 5,
         marginRight: 5,
         marginTop: 5,
         marginBottom: 5,
         alignItems: "center",
         justifyContent: "center",
-        borderColor: colors.darkest,
+        borderColor: colors.midBlue,
         textAlign: "center",
         textAlignVertical:"center",
     }
