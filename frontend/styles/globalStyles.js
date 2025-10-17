@@ -41,4 +41,26 @@ export const globalStyles = StyleSheet.create({
         backgroundColor: "teal",
         borderColor: "black",
     },
+    cardGroup: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10, // or margin/padding for spacing
+      marginTop: 10,
+    },
+    litclubCard: {
+      width: 120,
+      height: 180,
+      backgroundColor: 'teal',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 8,
+      marginBottom: 10,
+      padding: 5,
+    },
+    cardFont: {
+      color: 'white',
+      textAlign: 'center',
+      fontWeight: 'bold',
+      flexWrap: 'wrap',
+    }
 });

@@ -1,5 +1,4 @@
 
-import React from 'react';
 import Foundation from '@expo/vector-icons/Foundation'; 
 import { Platform, Pressable} from 'react-native';
 import { ThemedText } from '../../components/themed-text';
@@ -14,6 +13,12 @@ import TopThreeBooks from '../../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert,Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../../constants/theme';
+
+import React from 'react';
+import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
+import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
+import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
+import * as SplashScreen from 'expo-splash-screen';
 
 
 
@@ -58,6 +63,14 @@ export default function ProfileScreen() {
         clubName: clubNames[i],
     }));
 
+          const [fontsLoaded] = useFonts({
+            Fraunces_700Bold,
+            ChivoMono_500Medium,
+            NotoSansMono_400Regular,
+          });
+          React.useEffect(() => {
+            if (fontsLoaded) SplashScreen.hideAsync();
+          }, [fontsLoaded]);
 
     return (
         <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> 
@@ -201,11 +214,11 @@ const globalStyles = StyleSheet.create({
     card: {
         width: 120,
         height: 180,
-        backgroundColor: "teal",
-        borderColor: "black",
+        backgroundColor: colors.midBlue,
+        borderColor: colors.darkest,
     },
     cardFont: {
-        fontFamily: Fonts.sans,
+        fontFamily: fonts.body,
         color: colors.darkest,
         lineHeight: 22,
         textAlign: "center",
@@ -216,7 +229,7 @@ const globalStyles = StyleSheet.create({
         width: 100,
         height: 100,
         aspectRatio: 1,
-        backgroundColor: "#94A694", //sage green
+        backgroundColor: colors.sage, //sage green
         borderWidth: 4,
         borderRadius: 12,
         marginLeft: 5,
@@ -225,7 +238,7 @@ const globalStyles = StyleSheet.create({
         marginBottom: 5,
         alignItems: "center",
         justifyContent: "center",
-        borderColor: "black",
+        borderColor: colors.darkest,
         textAlign: "center",
         textAlignVertical:"center",
     }
