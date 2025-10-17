@@ -92,6 +92,50 @@ export async function getBookFromLibraryBook(bookId: string): Promise<Book> {
     }
 }
 
+export async function getTopThree(userId: string): Promise<DisplayBook[] | null> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks`);
+        if (!response.ok) {
+            console.warn('Failed to fetch bookshelf', response.status);
+            return [];
+        }
+
+        let unsortedbooks: LibraryBook[] = []
+
+        const data = await response.json();
+
+        if (Array.isArray(data.libraryBooks)) {
+            unsortedbooks = data.libraryBooks;
+        }
+        const filtered = unsortedbooks.filter((b) => b.onPedastal === true);
+
+        const fullBooks: (Book | null)[] = await Promise.all(
+            filtered.map(async (libBook) => {
+                try {
+                    const book = await getBookFromLibraryBook(libBook.id);
+                    return book;
+                } catch (err) {
+                    console.error(`Failed to fetch book ${libBook.id}`, err);
+                    return null; // return null for failed fetches
+                }
+            })
+        );
+
+        // Transform into DisplayBook, skipping any nulls
+        const displayBooks: DisplayBook[] = fullBooks
+            .filter((b): b is Book => b !== null) // TypeScript type guard
+            .map((b, index) => ({
+                id: index + 1,
+                title: b.title, // use the real book title now
+            }));
+
+        return displayBooks;
+    } catch (error) {
+        console.error('Error fetching bookshelf:', error);
+        return null;
+    }
+}
+
 export async function getBookshelf(userId: string, status: number): Promise<DisplayBook[] | null> {
     try {
         const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks`);
