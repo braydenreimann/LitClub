@@ -19,10 +19,10 @@ import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
-import { User, getUser } from '../../profile/profileService'
+import { User } from '../../interfaces/interfaces';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { globalStyles } from '@/styles/globalStyles';
-import { useLitClubs } from '@/LitClubImport/LitClubContext';
+import { globalStyles } from '../../styles/globalStyles';
+import { useLitClubs } from '../../LitClubImport/LitClubContext';
 
 
 function EditButton() {

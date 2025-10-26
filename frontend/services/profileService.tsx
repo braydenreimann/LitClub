@@ -1,62 +1,11 @@
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User, Edition, Book, LibraryBook, DisplayBook } from '../interfaces/interfaces';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
 const LAN_IP = hostFromExpo ?? '10.0.0.252';
 const API_BASE_URL = `http://${LAN_IP}:5112`;
-
-export interface User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    userName: string;
-    email: string;
-    bio: string;
-    profilePhotoUrl: string;
-    preferredGenres: string[];
-    privateAccount: boolean;
-    publicInteractionRestricted: boolean;
-    followingUserIds: string[];
-    followerUserIds: string[];
-    blockedUserIds: string[];
-    litClubIds: string[];
-    created: string; 
-}
-
-export interface Edition {
-    id: string;
-    format: number; 
-    publisher: string;
-    publicationDate: string; 
-    printLength: number;
-    isbn13s: string[];
-}
-
-export interface Book {
-    id: string;
-    title: string;
-    author: string;
-    totalChapters: number;
-    genre: string;
-    description: string;
-    editions: Edition[];
-}
-
-export interface LibraryBook {
-    id: string;
-    status: number;               
-    startedReading: string;       
-    finishedReading: string;      
-    currentPage: number;
-    percentComplete: number;
-    onPedastal: boolean;
-}
-
-export interface DisplayBook {
-    id: number;
-    title: string;
-}
 
 export async function getUser(): Promise<User | null> {
     try {

@@ -10,7 +10,8 @@ import { Link, useRouter} from 'expo-router';
 import { colors, fonts } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, DisplayBook, getUser, getBookshelf } from '../profile/profileService';
+import { User, DisplayBook } from '../interfaces/interfaces';
+import { getUser, getBookshelf } from '../services/profileService';
 
 //eventually will fetch data from backend
 interface ReadingListProps {
@@ -22,7 +23,7 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadSession = async () => {
+        const loadSession = async () => { //Load user id from session.
             try {
                 const sessionString = await AsyncStorage.getItem('session');
                 if (!sessionString) return;
@@ -35,7 +36,7 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
         loadSession();
     }, []);
 
-    useEffect(() => {
+    useEffect(() => { //load bookshelf
         if (!user) return;
 
         const loadBookshelf = async () => {
@@ -67,7 +68,11 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
                 >
                     {shelf.map((book) => (
                         <Pressable key={book.id} style={styles.card}>
-                            <Link href="/bookInfo">
+                            <Link href={{
+                                pathname: "/bookInfo",
+                                params: {id: book.id}
+                            }}
+                            >
                                 <Text style={globalStyles.subheading}>{book.title}</Text>
                             </Link>
                         </Pressable>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
-import { Platform, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { Platform, Pressable, ActivityIndicator } from 'react-native';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
@@ -14,6 +14,9 @@ import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
 import { Entypo } from '@expo/vector-icons'; // for dropdown arrow
 import { globalStyles } from '@/styles/globalStyles';
 
+import { Book } from '../interfaces/interfaces';
+import { getBook } from '../services/bookService';
+
 //playing around with importing the book
 
 export interface bookImport {
@@ -23,11 +26,6 @@ export interface bookImport {
     genre: string;
     description?: string;
 }
-
-
-
-
-
 
 
 
@@ -54,6 +52,29 @@ function BackButton() {
 }
 
 export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+
+    const { id } = useLocalSearchParams<{ id: string}>(); // When button pressed, params are sent. This function saves those params for usage. Needs to be type string.
+
+    const [book, setBook] = useState<Book | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchBook = async () => {
+            try {
+                const data = await getBook(id);
+                setBook(data);
+            } catch (err: any) {
+                console.error(err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBook();
+    }, [id]);
+
     const handlePrivacyChange = (newPrivacyStatus: string) => {
         setIsPublic(newPrivacyStatus === "Public");
         console.log("Privacy status changed to:", newPrivacyStatus);
@@ -104,9 +125,17 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                     </View>
 
                     <View style={infoStyle.sideSect}>
-                        <Text style={globalStyles.heading}> Book Title </Text>
-                        <Text style={globalStyles.subheading}> Author </Text>
-                        <Text style={globalStyles.body}> Book Summary </Text>
+                        {loading ? (
+                            <ActivityIndicator size="large" color={colors.midBlue} />
+                        ) : book ? (
+                            <>
+                                <Text style={globalStyles.heading}>{book.title}</Text>
+                                <Text style={globalStyles.subheading}>{book.author}</Text>
+                                <Text style={globalStyles.body}>{book.description}</Text>
+                            </>
+                        ) : (
+                            <Text style={globalStyles.body}>Book information not available.</Text>
+                        )}
                         <ToCButton />
                     </View>
                 </View>
