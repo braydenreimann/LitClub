@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Book, Edition } from '../interfaces/interfaces';
+import { Book, Edition, LibraryBook } from '../interfaces/interfaces';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
@@ -26,4 +26,25 @@ export async function getBook(bookId: string): Promise<Book | null> {
         console.error('Error fetching book:', error);
         throw error;
     }
+}
+
+export async function getLibraryBook(userId: string, bookId: string): Promise<LibraryBook | null> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks/${bookId}`);
+
+        if (!response.ok) {
+            console.warn('Failed to fetch book literal', response.status);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const book: LibraryBook = data as LibraryBook;
+
+        return book;
+    }catch (error) {
+        console.error('Error fetching book:', error);
+        throw error;
+    }
+
 }

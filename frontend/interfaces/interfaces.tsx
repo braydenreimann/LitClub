@@ -48,6 +48,6 @@ export interface LibraryBook {
 }
 
 export interface DisplayBook {
-    id: number;
+    id: string;
     title: string;
 }

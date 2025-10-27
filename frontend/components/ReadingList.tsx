@@ -66,7 +66,7 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
                     horizontal
                     showsHorizontalScrollIndicator
                 >
-                    {shelf.map((book) => (
+                    {shelf.map((book) => ( 
                         <Pressable key={book.id} style={styles.card}>
                             <Link href={{
                                 pathname: "/bookInfo",

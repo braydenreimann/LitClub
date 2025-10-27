@@ -119,7 +119,7 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
         const displayBooks: DisplayBook[] = fullBooks
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
-                id: index + 1,
+                id: b.id, //misnomer, actually returns index
                 title: b.title, // use the real book title now
             }));
 

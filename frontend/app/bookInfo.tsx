@@ -59,7 +59,7 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
+    useEffect(() => { //fetch book for the page
         const fetchBook = async () => {
             try {
                 const data = await getBook(id);
