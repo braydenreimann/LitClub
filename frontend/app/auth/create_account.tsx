@@ -49,8 +49,8 @@ export default function CreateAccountScreen() {
   };
 
   const handleSave = async () => {
-    if (!username || !firstName) {
-      Alert.alert('Missing information', 'Please enter at least a username and first name.');
+    if (!username || !firstName || !lastName) {
+      Alert.alert('Missing information', 'Please enter an email, first name, and last name.');
       return;
     }
 
@@ -113,7 +113,7 @@ export default function CreateAccountScreen() {
       />
 
       {/* Last name */}
-      <Text style={styles.label}>Last Name (optional)</Text>
+      <Text style={styles.label}>Last Name *</Text>
       <TextInput
         style={styles.input}
         value={lastName}
