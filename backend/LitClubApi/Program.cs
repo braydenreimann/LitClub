@@ -77,7 +77,7 @@ using (var scope = app.Services.CreateScope())
     var o = sp.GetRequiredService<IOptions<CosmosOptions>>().Value;
 
     // Ensure DB and containers exist
-    Database db = await client.CreateDatabaseIfNotExistsAsync(o.DatabaseId, throughput: 400);
+    Database db = await client.CreateDatabaseIfNotExistsAsync(o.DatabaseId, throughput: 400); //If exception thrown, delete DB Emulator Image, and repeat instructions 4.2 and 4.3 from readme in terminal. Will fix the problem
     await db.CreateContainerIfNotExistsAsync(o.BooksContainerId, "/id");
     await db.CreateContainerIfNotExistsAsync(o.UsersContainerId, "/id");
     await db.CreateContainerIfNotExistsAsync(o.LitClubsContainerId, "/id");
