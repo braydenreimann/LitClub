@@ -1,6 +1,9 @@
-// All one to one objects from backend are stored in these interfaces
+/*
+    Note: Domain models exist to represent the core business concepts of your
+    application in a clean,app-friendly shape—independent from the backend’s API shapes.
+*/
 
-export interface User {
+export type User = {
     id: string;
     firstName: string;
     lastName: string;
@@ -18,7 +21,7 @@ export interface User {
     created: string;
 }
 
-export interface Edition {
+export type Edition = {
     id: string;
     format: number;
     publisher: string;
@@ -27,7 +30,7 @@ export interface Edition {
     isbn13s: string[];
 }
 
-export interface Book {
+export type Book = {
     id: string;
     title: string;
     author: string;
@@ -37,7 +40,7 @@ export interface Book {
     editions: Edition[];
 }
 
-export interface LibraryBook {
+export type LibraryBook = {
     id: string;
     status: number;
     startedReading: string;
@@ -47,7 +50,7 @@ export interface LibraryBook {
     onPedastal: boolean;
 }
 
-export interface DisplayBook {
+export type DisplayBook = {
     id: string;
     title: string;
 }
