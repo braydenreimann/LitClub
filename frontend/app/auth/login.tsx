@@ -18,6 +18,7 @@ import { useSession } from '../../auth/authContext';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
 
+import type { LoginInput } from '@/api-mappers/auth/auth-mappers';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,8 +43,9 @@ export default function LoginScreen() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  const handleLogin = async (values: { email: string; password: string }) => {
-    const success = await signIn(values.email, values.password);
+  const handleLogin = async (values: LoginInput) => {
+    const success = await signIn(values);
+
     if (success) {
       router.push('/home');
     } else {
