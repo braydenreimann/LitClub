@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Edition, Book, LibraryBook, DisplayBook } from '../interfaces/interfaces';
+import { User, Edition, Book, LibraryBook, DisplayBook } from '../domain/models';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
@@ -37,7 +37,7 @@ export async function getBookFromLibraryBook(bookId: string): Promise<Book> {
 
     } catch (error) {
         console.error('Error fetching book:', error);
-        throw error; 
+        throw error;
     }
 }
 
@@ -88,9 +88,9 @@ export async function getTopThree(userId: string): Promise<DisplayBook[] | null>
 export async function getBookshelf(userId: string, status: number): Promise<DisplayBook[] | null> {
     try {
         const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks`);
-        if(!response.ok) {
-                console.warn('Failed to fetch bookshelf', response.status);
-        return [];
+        if (!response.ok) {
+            console.warn('Failed to fetch bookshelf', response.status);
+            return [];
         }
 
         let unsortedbooks: LibraryBook[] = []
@@ -101,9 +101,9 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
             unsortedbooks = data.libraryBooks;
         }
 
-        const filtered = unsortedbooks.filter((b)=> b.status === status);
+        const filtered = unsortedbooks.filter((b) => b.status === status);
 
-        const fullBooks: (Book|null)[] = await Promise.all(
+        const fullBooks: (Book | null)[] = await Promise.all(
             filtered.map(async (libBook) => {
                 try {
                     const book = await getBookFromLibraryBook(libBook.id);

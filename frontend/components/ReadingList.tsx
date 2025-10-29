@@ -6,12 +6,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Pressable } from 'react-native';
-import { Link, useRouter} from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { colors, fonts } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, DisplayBook } from '../interfaces/interfaces';
-import { getUser, getBookshelf } from '../services/profileService';
+import { User, DisplayBook } from '../domain/models';
+import { getUser, getBookshelf } from '../services/usersService';
 
 //eventually will fetch data from backend
 interface ReadingListProps {
@@ -66,11 +66,11 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
                     horizontal
                     showsHorizontalScrollIndicator
                 >
-                    {shelf.map((book) => ( 
+                    {shelf.map((book) => (
                         <Pressable key={book.id} style={styles.card}>
                             <Link href={{
                                 pathname: "/bookInfo",
-                                params: {id: book.id}
+                                params: { id: book.id }
                             }}
                             >
                                 <Text style={globalStyles.subheading}>{book.title}</Text>
@@ -100,9 +100,9 @@ const styles = StyleSheet.create({
         marginRight: 10,
         backgroundColor: colors.yellow,
         borderColor: colors.darkest,
-        borderRadius:12,
+        borderRadius: 12,
         alignItems: "center",
-        alignContent:"center",
+        alignContent: "center",
         justifyContent: "center",
         textAlign: "center",
         textAlignVertical: "center",

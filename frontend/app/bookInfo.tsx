@@ -14,8 +14,8 @@ import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
 import { Entypo } from '@expo/vector-icons'; // for dropdown arrow
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book } from '../interfaces/interfaces';
-import { getBook } from '../services/bookService';
+import { Book } from '../domain/models';
+import { getBook } from '../services/booksService';
 
 //playing around with importing the book
 
@@ -35,7 +35,7 @@ function ToCButton() {
         <Pressable
             style={infoStyle.ToCButton}
             onPress={() => { Alert.alert('Displaying TOC...')/*TODO make the buttons go to their clubs*/ }} >
-            <Text style={[globalStyles.subheading, {fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5}]}>Table of Contents</Text>
+            <Text style={[globalStyles.subheading, { fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5 }]}>Table of Contents</Text>
         </Pressable>
 
     );
@@ -53,7 +53,7 @@ function BackButton() {
 
 export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
 
-    const { id } = useLocalSearchParams<{ id: string}>(); // When button pressed, params are sent. This function saves those params for usage. Needs to be type string.
+    const { id } = useLocalSearchParams<{ id: string }>(); // When button pressed, params are sent. This function saves those params for usage. Needs to be type string.
 
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
@@ -85,34 +85,34 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
         // TODO: send newStatus to Cosmos DB later
     };
 
-   const [isPublic, setIsPublic] = useState(true);
+    const [isPublic, setIsPublic] = useState(true);
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}> {/*background is cream*/}
             <Header />
             {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
             <ScrollView>
-                <View style={{flexDirection:'row'} } >
-                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
+                <View style={{ flexDirection: 'row' }} >
+                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/}
                     <Text style={globalStyles.heading} > Book Information </Text>
                 </View>
 
                 <View style={infoStyle.currentRead}>
                     <View style={infoStyle.sideSect} >
 
-{/* Book Container */}
-      <View style={infoStyle.bookContainer}>
-        {/* Placeholder for book image */}
-        <View style={infoStyle.bookImage}>
-          <Entypo
-            name={isPublic ? "eye" : "eye-with-line"}
-            size={24}
-            color={isPublic ? colors.midBlue : colors.midBlue}
-            style={infoStyle.eyeIcon}
-          />
-        </View>
+                        {/* Book Container */}
+                        <View style={infoStyle.bookContainer}>
+                            {/* Placeholder for book image */}
+                            <View style={infoStyle.bookImage}>
+                                <Entypo
+                                    name={isPublic ? "eye" : "eye-with-line"}
+                                    size={24}
+                                    color={isPublic ? colors.midBlue : colors.midBlue}
+                                    style={infoStyle.eyeIcon}
+                                />
+                            </View>
 
-      </View>
+                        </View>
 
 
                         <View style={{ flexDirection: "row" }}>
@@ -139,34 +139,34 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                         <ToCButton />
                     </View>
                 </View>
-                    <Pressable
+                <Pressable
                     style={infoStyle.forumBox}
                     onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs}*/ }} >
-                        <Text style={[globalStyles.body, {fontSize: 14, color: colors.midBlue}]}>This is our most recent discussion!</Text>
-                    </Pressable>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
+                    <Text style={[globalStyles.body, { fontSize: 14, color: colors.midBlue }]}>This is our most recent discussion!</Text>
+                </Pressable>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
 
-  {/* Library Status */}
-  <View style={{ flex: 1 }}>
-    <Text style={globalStyles.subheading}>Library Status</Text>
-    <View style={infoStyle.dropdownWrapper}>
-      <BookStatusDropdown onStatusChange={handleStatusChange} />
-      <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
-    </View>
-  </View>
+                    {/* Library Status */}
+                    <View style={{ flex: 1 }}>
+                        <Text style={globalStyles.subheading}>Library Status</Text>
+                        <View style={infoStyle.dropdownWrapper}>
+                            <BookStatusDropdown onStatusChange={handleStatusChange} />
+                            <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
+                        </View>
+                    </View>
 
-  {/* Visibility */}
-  <View style={{ flex: 1 }}>
-    <Text style={globalStyles.subheading}>Visibility</Text>
-    <View style={infoStyle.dropdownWrapper}>
-      <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
-      <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
-    </View>
-  </View>
-</View>
+                    {/* Visibility */}
+                    <View style={{ flex: 1 }}>
+                        <Text style={globalStyles.subheading}>Visibility</Text>
+                        <View style={infoStyle.dropdownWrapper}>
+                            <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
+                            <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
+                        </View>
+                    </View>
+                </View>
 
-        </ScrollView>
-    </View>
+            </ScrollView>
+        </View>
     );
 }
 
@@ -174,43 +174,43 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
 const infoStyle = StyleSheet.create({
 
     bookContainer: {
-    width: 150,
-    height: 220,
-    backgroundColor: colors.cream,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.midBlue,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-    marginBottom: 20,
-  },
-  bookImage: {
-    width: 120,
-    height: 160,
-    backgroundColor: colors.teal,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-  },
-  eyeIcon: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-  },
+        width: 150,
+        height: 220,
+        backgroundColor: colors.cream,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: colors.midBlue,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        marginBottom: 20,
+    },
+    bookImage: {
+        width: 120,
+        height: 160,
+        backgroundColor: colors.teal,
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+    },
+    eyeIcon: {
+        position: "absolute",
+        top: 8,
+        right: 8,
+    },
 
     leaderBanner: {
-        flexDirection:"row",
+        flexDirection: "row",
         width: "100%",
         height: 40,
         backgroundColor: colors.yellow, //easter yellow
         fontFamily: "serif",
         fontSize: 30,
-        justifyContent:"center",
+        justifyContent: "center",
         alignItems: "center",
         marginTop: 15,
-        
+
     },
     currentRead: {
         flexDirection: "row",
@@ -220,7 +220,7 @@ const infoStyle = StyleSheet.create({
     sideSect: {
         flexDirection: "column",
         width: 120,
-        marginHorizontal:20,
+        marginHorizontal: 20,
     },
     discBox: {
         backgroundColor: "#E4D7C8", //cream
@@ -235,14 +235,14 @@ const infoStyle = StyleSheet.create({
     ToCButton: {
         backgroundColor: colors.teal,
         borderColor: "black",
-        borderWidth:4,
+        borderWidth: 4,
         borderRadius: 12,
         alignContent: "center",
-        justifyContent:"center",
+        justifyContent: "center",
         textAlign: "center",
         margin: 5,
         height: 45,
-        width:"120%",
+        width: "120%",
 
     },
     scrollContainer: {

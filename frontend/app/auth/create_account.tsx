@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useSession } from '../../auth/authContext';
@@ -14,6 +13,8 @@ import {
 } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
+
+import type { CreateAccountInput } from '@/api-mappers/auth/auth-mappers';
 
 const pronounOptions = [
   'he', 'him', 'his',
@@ -54,7 +55,7 @@ export default function CreateAccountScreen() {
       return;
     }
 
-    const payload = {
+    const input: CreateAccountInput = {
       firstName,
       lastName,
       userName: username,
@@ -68,7 +69,7 @@ export default function CreateAccountScreen() {
     };
 
     try {
-      const ok = await register(payload);
+      const ok = await register(input);
       if (ok) {
         router.push('/genres');
       } else {
