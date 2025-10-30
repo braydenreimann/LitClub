@@ -1,6 +1,6 @@
 /*
     Note: Domain models exist to represent the core business concepts of your
-    application in a clean,app-friendly shape—independent from the backend’s API shapes.
+    application, cleanly and indpendent from the backend shapes.
 */
 
 export type User = {
@@ -53,4 +53,14 @@ export type LibraryBook = {
 export type DisplayBook = {
     id: string;
     title: string;
+}
+
+export type LitClub = {
+    id: string,
+    name: string,
+    ownerUserId: string,
+    description: string,
+    preferredGenres: string[],
+    privateClub: boolean,
+    memberUserIds: string[]
 }
