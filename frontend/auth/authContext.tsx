@@ -65,6 +65,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
       const body = toCreateAccountRequest(input);
       const { data, error } = await client.POST("/users/register", { body });
 
+      // This error handling should be improved, but is sufficient for demo
       if (error) {
         if (error.status === 409) {
           console.warn('Username or email already exists.');
