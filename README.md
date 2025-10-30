@@ -43,14 +43,16 @@ git clone git@github.com:braydenreimann/LitClub.git
 
 ---
 
-### 3. Run the Expo App
+### 3. Run the Expo App*
 1. Navigate to the frontend:
    ```bash
    cd LitClub/frontend
    ```
-2. Install dependencies:
+2. Install dependencies:*
    ```bash
    npm install
+   npm i openapi-fetch*
+   npm i -D openapi-typescript typescript*
    ```
 3. Start the app:
    ```bash
