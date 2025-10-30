@@ -51,8 +51,8 @@ git clone git@github.com:braydenreimann/LitClub.git
 2. Install dependencies:*
    ```bash
    npm install
-   npm i openapi-fetch*
-   npm i -D openapi-typescript typescript*
+   npm i openapi-fetch
+   npm i -D openapi-typescript typescript
    ```
 3. Start the app:
    ```bash
