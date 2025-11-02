@@ -3,8 +3,13 @@ using LitClubApi.Domain;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
+using Azure.Storage.Blobs; //dotnet add package Azure.Storage.Blobs in LitClubApi project folder
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Net.Sockets;
+using System.Reflection.Metadata;
+using System.Security.Policy;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +61,30 @@ builder.Services.AddSingleton<ICosmosContext>(sp =>
     return new CosmosContext(client, opts);
 });
 
+//Blob is a seperate Azure service from Cosmos DB, therefore we need a seperate emulator for local use. That emulator is Azurite
+//docker pull mcr.mircosoft.com/azure-storage/azurite
+//docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 --name azurite mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --blobPort 10000
+
+//bind blob options from configuration
+builder.Services.Configure<BlobOptions>(
+    builder.Configuration.GetSection("Blob")
+);
+
+//register singleton BlobServiceClient
+builder.Services.AddSingleton(sp =>
+{
+    var o = sp.GetRequiredService<IOptions<BlobOptions>>().Value;
+    return new BlobServiceClient(o.ConnectionString);
+});
+
+//register typed BlobContainerClient
+builder.Services.AddSingleton(sp =>
+{
+    var blobService = sp.GetRequiredService<BlobServiceClient>();
+    var opts = sp.GetRequiredService<IOptions<BlobOptions>>().Value;
+    return blobService.GetBlobContainerClient(opts.ContainerName);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -82,6 +111,10 @@ using (var scope = app.Services.CreateScope())
     await db.CreateContainerIfNotExistsAsync(o.UsersContainerId, "/id");
     await db.CreateContainerIfNotExistsAsync(o.LitClubsContainerId, "/id");
     await db.CreateContainerIfNotExistsAsync(o.LibrariesContainerId, "/id");
+
+    //Blob container setup
+    var blobContainer = sp.GetRequiredService<BlobContainerClient>();
+    await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
 
     // Optional: seed (dev-only is recommended)
     var books = client.GetContainer(o.DatabaseId, o.BooksContainerId);

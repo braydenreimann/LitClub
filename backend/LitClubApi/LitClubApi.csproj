@@ -8,9 +8,15 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.ApiEndpoints" Version="4.1.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.54.0-preview.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Endpoints\Blobs\GetImage\" />
+    <Folder Include="Endpoints\Blobs\UploadImage\" />
   </ItemGroup>
 
 </Project>
