@@ -7,23 +7,24 @@ namespace LitClubApi.Endpoints.Books.AddBook
     public class CSVParserInsert
     {
         public static List<Book> Parse(string csvpath) //Returns List of Books from CSV 
-        {   
-             //Check for file existence
-            
+        {
+            //Check for file existence
+
             if (!File.Exists(csvpath))
             {
                 Console.WriteLine("Error: File does not exist... Are you using the correct path?");
-                return new List<Book> { };
+                return [];
             }
 
             // Reads all lines from CSV
             // *NOT GOOD for massive csv, but will work fine with our smaller files
             string[] lines = File.ReadAllLines(csvpath);
 
-            List<Book>? booklist = new List<Book> { };
+            List<Book>? booklist = [];
 
             //start at i=1 to skip header
-            for (int i = 1; i < lines.Length; i++) {
+            for (int i = 1; i < lines.Length; i++)
+            {
                 string line = lines[i];
                 if (string.IsNullOrWhiteSpace(line)) { continue; } //skip empty lines
                 line = line.Replace("\t", "");
@@ -31,7 +32,7 @@ namespace LitClubApi.Endpoints.Books.AddBook
 
                 string[] col = line.Split(',');
 
-                if (col.Length != 9) //Check for correct number of columns
+                if (col.Length != 10) //Check for correct number of columns
                 {
                     Console.WriteLine("Error: Invalid number of fields for " + col[0] + ". This book will not be inserted, continuting csv parse");
                     continue;
@@ -70,10 +71,10 @@ namespace LitClubApi.Endpoints.Books.AddBook
                     Author = col[1],
                     TotalChapters = int.Parse(col[7]),
                     Genre = col[8],
-                    Editions = new List<Edition> { edition }
-                    // Description not currently represented in csv, subject to change
+                    Editions = [edition],
+                    CoverImagePath = col[9]
                 };
-             
+
                 booklist.Add(book);
 
             }
