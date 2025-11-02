@@ -1092,6 +1092,7 @@ export interface components {
             totalChapters: number;
             genre: string | null;
             description?: string | null;
+            coverImageUrl?: string | null;
         };
         AddEditionBody: {
             format: components["schemas"]["EditionFormatContract"];
@@ -1144,6 +1145,7 @@ export interface components {
             totalChapters: number;
             genre: string | null;
             description?: string | null;
+            coverImageUrl?: string | null;
             editions?: components["schemas"]["EditionResponse"][] | null;
         };
         CreateAccountRequest: {
@@ -1165,6 +1167,7 @@ export interface components {
             totalChapters?: number | null;
             genre?: string | null;
             description?: string | null;
+            coverImageUrl?: string | null;
         };
         EditEditionBody: {
             format?: components["schemas"]["EditionFormatContract"];

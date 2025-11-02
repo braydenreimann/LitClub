@@ -1,4 +1,4 @@
-{
+﻿{
   "openapi": "3.0.1",
   "info": {
     "title": "LitClub API",
@@ -1260,6 +1260,10 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1469,6 +1473,10 @@
             "type": "string",
             "nullable": true
           },
+          "coverImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
           "editions": {
             "type": "array",
             "items": {
@@ -1554,6 +1562,10 @@
             "nullable": true
           },
           "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverImageUrl": {
             "type": "string",
             "nullable": true
           }
