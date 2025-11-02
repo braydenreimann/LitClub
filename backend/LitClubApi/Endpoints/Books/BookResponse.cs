@@ -10,5 +10,6 @@ public sealed class BookResponse
     public required int TotalChapters { get; init; }
     public required string Genre { get; init; } 
     public string? Description { get; init; }
+    public string? CoverImageUrl { get; init; }
     public List<EditionResponse> Editions { get; init; } = [];
 }

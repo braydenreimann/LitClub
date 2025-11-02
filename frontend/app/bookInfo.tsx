@@ -57,6 +57,8 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
 
     const { id } = useLocalSearchParams<{ id: string }>(); // When button pressed, params are sent. This function saves those params for usage. Needs to be type string.
 
+    const [isExpanded, setIsExpanded] = useState(false); //determines expansion of truncated text
+
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -129,7 +131,20 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                             <>
                                 <Text style={globalStyles.heading}>{book.title}</Text>
                                 <Text style={globalStyles.subheading}>{book.author}</Text>
-                                <Text style={globalStyles.body}>{book.description}</Text>
+                                <Text style={globalStyles.body}>
+                                    {isExpanded || book.description.length <= 50  // If description is short or already expanded, simply display book description
+                                        ? book.description
+                                        : `${book.description.slice(0, 50)}...`}
+                                </Text>
+
+                                {book.description.length > 50 && ( // If length greater than 50, shows pressable button for expanding or contracting text
+                                    <Pressable onPress={() => setIsExpanded(prev => !prev)}> 
+                                        <Text style={{ color: colors.midBlue, marginTop: 4 }}>
+                                            {isExpanded ? "Show less" : "Show more"}
+                                        </Text>
+                                    </Pressable>
+                                )}
+                                
                             </>
                         ) : (
                             <Text style={globalStyles.body}>Book information not available.</Text>
