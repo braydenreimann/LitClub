@@ -72,7 +72,7 @@ namespace LitClubApi.Endpoints.Books.AddBook
                     TotalChapters = int.Parse(col[7]),
                     Genre = col[8],
                     Editions = [edition],
-                    CoverImagePath = col[9]
+                    CoverImageUrl = col[9]
                 };
 
                 booklist.Add(book);

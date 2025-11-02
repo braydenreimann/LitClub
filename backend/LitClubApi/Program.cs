@@ -11,6 +11,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Security.Policy;
@@ -120,7 +121,7 @@ using (var scope = app.Services.CreateScope())
     //Blob container setup
     var blobContainer = sp.GetRequiredService<BlobContainerClient>();
     await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
-                                                                       // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
+                                                  // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
 
     // Optional: seed (dev-only is recommended)
     var books = client.GetContainer(o.DatabaseId, o.BooksContainerId);
@@ -147,9 +148,9 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "TFIOS.png");
+    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", "the-fault-in-our-stars.jpg");
 
-    string blobName = "TFIOS.png";
+    string blobName = "the-fault-in-our-stars.jpg";
     var blobClient = blobContainer.GetBlobClient(blobName);
 
     using (var stream = File.OpenRead(coverPath))
@@ -174,8 +175,7 @@ using (var scope = app.Services.CreateScope())
                 PrintLength = 352,
                 Isbn13s = ["978-0142424179"]
             }
-        ],
-        CoverImagePath = "the-fault-in-our-stars.jpg"
+        ]
     };
 
     LitClubUser litClubUser = new()
@@ -281,15 +281,6 @@ if (updateSpec)
 
     Console.WriteLine($"OpenAPI schema successfully written to: {outputPath}");
 }
-
-
-var coversPath = Path.Combine(app.Environment.ContentRootPath, "bookdata", "BookCovers");
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(coversPath),
-    RequestPath = "/covers"
-});
 
 app.UseAuthorization();
 
