@@ -39,6 +39,7 @@ export type Book = {
     description: string;
     coverImageUrl: string;
     editions: Edition[];
+    coverImagePath: string;
 }
 
 export type LibraryBook = {

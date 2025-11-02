@@ -16,6 +16,8 @@ import { globalStyles } from '@/styles/globalStyles';
 
 import { Book } from '../domain/models';
 import { getBook } from '../services/booksService';
+import { getBookCoverUri } from '@/services/bookCoversService';
+
 
 //playing around with importing the book
 
@@ -105,14 +107,10 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                         {/* Book Container */}
                         <View style={infoStyle.bookContainer}>
                             {/* Placeholder for book image */}
-                            <View style={infoStyle.bookImage}>
-                                <Entypo
-                                    name={isPublic ? "eye" : "eye-with-line"}
-                                    size={24}
-                                    color={isPublic ? colors.midBlue : colors.midBlue}
-                                    style={infoStyle.eyeIcon}
-                                />
-                            </View>
+                            <Image
+                                source={{ uri: getBookCoverUri(book?.coverImagePath) }}
+                                style={infoStyle.bookImage}
+                            />
 
                         </View>
 
