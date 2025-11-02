@@ -37,6 +37,7 @@ export type Book = {
     totalChapters: number;
     genre: string;
     description: string;
+    coverImageUrl: string;
     editions: Edition[];
 }
 
@@ -53,6 +54,7 @@ export type LibraryBook = {
 export type DisplayBook = {
     id: string;
     title: string;
+    coverImageUrl: string;
 }
 
 export type LitClub = {

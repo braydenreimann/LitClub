@@ -10,6 +10,8 @@ using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Security.Policy;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using LitClubApi.Endpoints.Blobs;
+using Azure.Storage.Blobs.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -114,7 +116,8 @@ using (var scope = app.Services.CreateScope())
 
     //Blob container setup
     var blobContainer = sp.GetRequiredService<BlobContainerClient>();
-    await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
+    await blobContainer.CreateIfNotExistsAsync(PublicAccessType.Blob); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
+                                                                       // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
 
     // Optional: seed (dev-only is recommended)
     var books = client.GetContainer(o.DatabaseId, o.BooksContainerId);
@@ -141,6 +144,16 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "TFIOS.png");
+
+    string blobName = "TFIOS.png";
+    var blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
     Book book = new()
     {
         Id = "1",
@@ -149,6 +162,7 @@ using (var scope = app.Services.CreateScope())
         TotalChapters = 25,
         Genre = "Young adult novel",
         Description = "A book about two sick young lovers.",
+        CoverImageUrl = blobClient.Uri.ToString(),
         Editions = [
             new Edition {
                 Format = BookFormat.Paperback,
@@ -245,5 +259,6 @@ using (var scope = app.Services.CreateScope())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapUploadImageEndpoint();
 
 app.Run();

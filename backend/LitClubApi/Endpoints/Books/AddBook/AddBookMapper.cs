@@ -10,6 +10,7 @@ public static class AddBookMapper
         Author = request.Author,
         TotalChapters = request.TotalChapters,
         Genre = request.Genre,
-        Description = request.Description
+        Description = request.Description,
+        CoverImageUrl = request.CoverImageUrl
     };
 }

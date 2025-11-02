@@ -11,5 +11,6 @@ public class Book
     public required int TotalChapters { get; set; }
     public required string Genre { get; set; }
     public string? Description { get; set; }
+    public string? CoverImageUrl { get; set; }
     public List<Edition> Editions { get; set; } = [];
 }

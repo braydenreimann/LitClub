@@ -74,8 +74,9 @@ export async function getTopThree(userId: string): Promise<DisplayBook[] | null>
         const displayBooks: DisplayBook[] = fullBooks
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
-                id: index + 1,
-                title: b.title, // use the real book title now
+                id: b.id,
+                title: b.title,
+                coverImageUrl: b.coverImageUrl// use the real book title now
             }));
 
         return displayBooks;
@@ -120,7 +121,8 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
                 id: b.id, //misnomer, actually returns index
-                title: b.title, // use the real book title now
+                title: b.title,
+                coverImageUrl: b.coverImageUrl// use the real book title now
             }));
 
         return displayBooks;
