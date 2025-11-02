@@ -62,9 +62,9 @@ Follow the on-screen instructions to open the app in Expo Go.
 
 ---
 
-## 4. Set Up the Cosmos DB Emulator (for the API Backend)
+## 4. Set Up the Cosmos DB Emulator and Azurite Emulator (for the API Backend)
 
-This emulator lets you run the LitClub API locally without connecting to Azure.
+These emulators let you run the LitClub API locally without connecting to Azure.
 
 ### 1. Install Docker
 
@@ -105,8 +105,23 @@ Open [http://localhost:1234](http://localhost:1234) to view the interactive data
 Any time you remove the `cosmos-emulator` container from Docker, you will have to run this command again to initialize the container.
 
 ---
+### 4. Pull the Azurite Emulator Image
+Before running the command below, make sure you have the Docker Desktop application open.
 
-### 4. Configure the LitClub API Client
+```bash
+docker pull mcr.mircosoft.com/azure-storage/azurite
+```
+
+
+### 5. Run the Azurite Emulator
+
+```bash
+docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 --name azurite mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --blobPort 10000
+```
+
+Opening this emulator should give an error, as the address is not a formatted URL with an SAS token.
+
+### 6. Configure the LitClub API Client
 Navigate to the backend (`LitClub/backend/LitClubApi`). In `Program.cs`, confirm this setup:
 
 ```csharp
@@ -130,7 +145,7 @@ using CosmosClient client = new(
 
 ---
 
-### 6. Emulator Management
+### 7. Emulator Management
 ```bash
 docker stop cosmos-emulator
 docker start cosmos-emulator
@@ -145,7 +160,7 @@ When you're done for the day, or don't need the backend anymore, you should stop
 
 ---
 
-### 7. Run the API
+### 8. Run the API
 1. Navigate to the backend:
    ```bash
    cd LitClub/backend/LitClubApi
