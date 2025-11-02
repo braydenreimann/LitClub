@@ -1,17 +1,18 @@
+using Azure.Storage.Blobs; //dotnet add package Azure.Storage.Blobs in LitClubApi project folder
+using Azure.Storage.Blobs.Models;
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
+using LitClubApi.Endpoints.Blobs;
+using LitClubApi.Endpoints.Blobs.GenerateSas;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
-using Azure.Storage.Blobs; //dotnet add package Azure.Storage.Blobs in LitClubApi project folder
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Security.Policy;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using LitClubApi.Endpoints.Blobs;
-using Azure.Storage.Blobs.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -116,7 +117,7 @@ using (var scope = app.Services.CreateScope())
 
     //Blob container setup
     var blobContainer = sp.GetRequiredService<BlobContainerClient>();
-    await blobContainer.CreateIfNotExistsAsync(PublicAccessType.Blob); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
+    await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
                                                                        // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
 
     // Optional: seed (dev-only is recommended)
@@ -260,5 +261,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapUploadImageEndpoint();
+app.MapGenerateSasEndpoint();
 
 app.Run();
