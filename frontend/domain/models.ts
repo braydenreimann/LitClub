@@ -38,6 +38,7 @@ export type Book = {
     genre: string;
     description: string;
     editions: Edition[];
+    coverImagePath: string;
 }
 
 export type LibraryBook = {

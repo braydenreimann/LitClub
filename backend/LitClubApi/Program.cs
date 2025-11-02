@@ -3,8 +3,11 @@ using LitClubApi.Domain;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -124,7 +127,8 @@ using (var scope = app.Services.CreateScope())
                 PrintLength = 352,
                 Isbn13s = ["978-0142424179"]
             }
-        ]
+        ],
+        CoverImagePath = "the-fault-in-our-stars.jpg"
     };
 
     LitClubUser litClubUser = new()
@@ -208,6 +212,37 @@ using (var scope = app.Services.CreateScope())
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
 }
+
+var updateSpec = args.Contains("--updateSpec");
+
+// Generate a new OpenAPI spec document
+if (updateSpec)
+{
+    Console.WriteLine("Generating a new OpenAPI schema...");
+
+    using var scope = app.Services.CreateScope();
+    var provider = scope.ServiceProvider.GetRequiredService<ISwaggerProvider>();
+    var doc = provider.GetSwagger("v1");
+
+    var schemaDir = Path.Combine(app.Environment.ContentRootPath, "schema");
+    Directory.CreateDirectory(schemaDir);
+    var outputPath = Path.Combine(schemaDir, "openapi.v1.json");
+
+    // Serialize as OpenAPI 3.0 JSON
+    var json = doc.Serialize(Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0, Microsoft.OpenApi.OpenApiFormat.Json);
+    await File.WriteAllTextAsync(outputPath, json, System.Text.Encoding.UTF8);
+
+    Console.WriteLine($"OpenAPI schema successfully written to: {outputPath}");
+}
+
+
+var coversPath = Path.Combine(app.Environment.ContentRootPath, "bookdata", "BookCovers");
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(coversPath),
+    RequestPath = "/covers"
+});
 
 app.UseAuthorization();
 
