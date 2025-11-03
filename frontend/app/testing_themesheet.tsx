@@ -10,6 +10,8 @@ import Subheading from '../components/Subheading';
 import { globalStyles } from '../styles/globalStyles';
 import { colors } from '../theme';
 
+export default function testing_themesheet() {
+}
 
 // SplashScreen.preventAutoHideAsync();
 

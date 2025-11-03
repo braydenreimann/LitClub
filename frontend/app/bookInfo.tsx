@@ -102,14 +102,11 @@ export default function BookInfoScreen() {
         console.log("Book status changed to:", newStatus);
         // TODO: Implement function
     };
-
-   const [isPublic, setIsPublic] = useState(true);
     
    
     {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
     {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
     return (
-        <View style={{ flex: 1, backgroundColor: colors.cream }}>
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
@@ -304,8 +301,6 @@ const infoStyle = StyleSheet.create({
     },
     rowContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-start',
-        gap: 20,
         justifyContent: 'flex-start',
         gap: 20,
         marginVertical: 10,
