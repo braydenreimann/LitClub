@@ -159,34 +159,14 @@ export default function ProfileScreen() {
                 </View>
 
                 {/*display the book clubs*/}
-                <Text style={globalStyles.subheading}> LitClub Memberships </Text>
+                <Text style={globalStyles.subheading}>My LitClubs</Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
                     {loading ? (
                         <Text>Loading clubs...</Text>
                     ) : error ? (
                         <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
-                    ) : userClubs.length ? (
-                        userClubs.map((club) => (
-                            
-                            <Pressable
-                                key={club.id}
-                                style={profStyles.litclubCard}
-                                onPress={() => Alert.alert(`Opening ${club.name}`)} 
-                            >
-                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild > 
-                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
-                                </Link>
-                            </Pressable>
-                           
-                        ))
-                    ) : ( <Text>No memberships yet.</Text> )
-                    }
-                </View>
-                <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
-                { /*format the GROUP of cards correctly*/}
-                <View style={globalStyles.cardGroup}> 
-                    {leaderClubs.length ? (
+                    ) : leaderClubs.length ? (
                         leaderClubs.map((club) => (
                             
                             <Pressable
@@ -200,10 +180,30 @@ export default function ProfileScreen() {
                             </Pressable>
                            
                         ))
-                    ) : ( <Text>You're not leading any clubs yet.</Text> )
+                    ) : ( <Text>No owned LitClubs yet.</Text> )
                     }
                 </View>
-                <Text style={globalStyles.subheading}> Archived LitClubs </Text>
+                <Text style={globalStyles.subheading}>Active LitClubs</Text>
+                { /*format the GROUP of cards correctly*/}
+                <View style={globalStyles.cardGroup}> 
+                    {userClubs.length ? (
+                        userClubs.map((club) => (
+                            
+                            <Pressable
+                                key={club.id}
+                                style={profStyles.litclubCard}
+                                onPress={() => Alert.alert(`Opening ${club.name}`)} 
+                            >
+                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild > 
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
+                                </Link>
+                            </Pressable>
+                           
+                        ))
+                    ) : ( <Text>No active LitClubs.</Text> )
+                    }
+                </View>
+                <Text style={globalStyles.subheading}>Archived LitClubs</Text>
                 { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}> 
                     {archivedClubs.length ? (
@@ -227,10 +227,12 @@ export default function ProfileScreen() {
                            
                         ))
                     ) : (
-                        <Text>No archived clubs.</Text>
+                        <Text>No archived LitClubs.</Text>
                     )                        
                     }
                 </View>
+
+                <View style = {{paddingBottom:20}}></View>
             </ScrollView>
         </View>
         

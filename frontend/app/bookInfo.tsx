@@ -65,14 +65,16 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
     };
 
    const [isPublic, setIsPublic] = useState(true);
-
+    
+   
+    {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
+    {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
     return (
-        <View style={{ flex: 1, backgroundColor: colors.cream }}> {/*background is cream*/}
+        <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
-            {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
             <ScrollView>
                 <View style={{flexDirection:'row'} } >
-                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
+                    <BackButton /> 
                     <Text style={globalStyles.heading} > Book Information </Text>
                 </View>
 
@@ -240,8 +242,8 @@ const infoStyle = StyleSheet.create({
 
     rowContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-start', // adjust spacing if needed
-        gap: 20, // space between dropdowns
+        justifyContent: 'flex-start',
+        gap: 20,
         marginVertical: 10,
     },
     column: {
