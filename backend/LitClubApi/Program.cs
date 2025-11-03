@@ -1,9 +1,21 @@
+using Azure.Storage.Blobs; //dotnet add package Azure.Storage.Blobs in LitClubApi project folder
+using Azure.Storage.Blobs.Models;
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
+using LitClubApi.Endpoints.Blobs;
+using LitClubApi.Endpoints.Blobs.GenerateSas;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
+using System.Net.Sockets;
+using System.Reflection.Metadata;
+using System.Security.Policy;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +25,15 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "LitClub API",
+        Version = "v1",
+        Description = "OpenAPI schema for LitClub"
+    });
+});
 
 // Bind options from configuration
 builder.Services.Configure<CosmosOptions>(
@@ -47,6 +67,30 @@ builder.Services.AddSingleton<ICosmosContext>(sp =>
     return new CosmosContext(client, opts);
 });
 
+//Blob is a seperate Azure service from Cosmos DB, therefore we need a seperate emulator for local use. That emulator is Azurite
+//docker pull mcr.mircosoft.com/azure-storage/azurite
+//docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 --name azurite mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --blobPort 10000
+
+//bind blob options from configuration
+builder.Services.Configure<BlobOptions>(
+    builder.Configuration.GetSection("Blob")
+);
+
+//register singleton BlobServiceClient
+builder.Services.AddSingleton(sp =>
+{
+    var o = sp.GetRequiredService<IOptions<BlobOptions>>().Value;
+    return new BlobServiceClient(o.ConnectionString);
+});
+
+//register typed BlobContainerClient
+builder.Services.AddSingleton(sp =>
+{
+    var blobService = sp.GetRequiredService<BlobServiceClient>();
+    var opts = sp.GetRequiredService<IOptions<BlobOptions>>().Value;
+    return blobService.GetBlobContainerClient(opts.ContainerName);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -68,11 +112,16 @@ using (var scope = app.Services.CreateScope())
     var o = sp.GetRequiredService<IOptions<CosmosOptions>>().Value;
 
     // Ensure DB and containers exist
-    Database db = await client.CreateDatabaseIfNotExistsAsync(o.DatabaseId, throughput: 400);
+    Database db = await client.CreateDatabaseIfNotExistsAsync(o.DatabaseId, throughput: 400); //If exception thrown, delete DB Emulator Image, and repeat instructions 4.2 and 4.3 from readme in terminal. Will fix the problem
     await db.CreateContainerIfNotExistsAsync(o.BooksContainerId, "/id");
     await db.CreateContainerIfNotExistsAsync(o.UsersContainerId, "/id");
     await db.CreateContainerIfNotExistsAsync(o.LitClubsContainerId, "/id");
     await db.CreateContainerIfNotExistsAsync(o.LibrariesContainerId, "/id");
+
+    //Blob container setup
+    var blobContainer = sp.GetRequiredService<BlobContainerClient>();
+    await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
+                                                  // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
 
     // Optional: seed (dev-only is recommended)
     var books = client.GetContainer(o.DatabaseId, o.BooksContainerId);
@@ -99,6 +148,16 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", "the-fault-in-our-stars.jpg");
+
+    string blobName = "the-fault-in-our-stars.jpg";
+    var blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
     Book book = new()
     {
         Id = "1",
@@ -107,6 +166,7 @@ using (var scope = app.Services.CreateScope())
         TotalChapters = 25,
         Genre = "Young adult novel",
         Description = "A book about two sick young lovers.",
+        CoverImageUrl = blobClient.Uri.ToString(),
         Editions = [
             new Edition {
                 Format = BookFormat.Paperback,
@@ -200,8 +260,32 @@ using (var scope = app.Services.CreateScope())
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
 }
 
+var updateSpec = args.Contains("--updateSpec");
+
+// Generate a new OpenAPI spec document
+if (updateSpec)
+{
+    Console.WriteLine("Generating a new OpenAPI schema...");
+
+    using var scope = app.Services.CreateScope();
+    var provider = scope.ServiceProvider.GetRequiredService<ISwaggerProvider>();
+    var doc = provider.GetSwagger("v1");
+
+    var schemaDir = Path.Combine(app.Environment.ContentRootPath, "schema");
+    Directory.CreateDirectory(schemaDir);
+    var outputPath = Path.Combine(schemaDir, "openapi.v1.json");
+
+    // Serialize as OpenAPI 3.0 JSON
+    var json = doc.Serialize(Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0, Microsoft.OpenApi.OpenApiFormat.Json);
+    await File.WriteAllTextAsync(outputPath, json, System.Text.Encoding.UTF8);
+
+    Console.WriteLine($"OpenAPI schema successfully written to: {outputPath}");
+}
+
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapUploadImageEndpoint();
+app.MapGenerateSasEndpoint();
 
 app.Run();

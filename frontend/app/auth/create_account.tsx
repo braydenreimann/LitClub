@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useSession } from '../../auth/authContext';
@@ -14,6 +13,8 @@ import {
 } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
+
+import type { CreateAccountInput } from '@/api-mappers/auth/auth-mappers';
 
 const pronounOptions = [
   'he', 'him', 'his',
@@ -49,12 +50,12 @@ export default function CreateAccountScreen() {
   };
 
   const handleSave = async () => {
-    if (!username || !firstName) {
-      Alert.alert('Missing information', 'Please enter at least a username and first name.');
+    if (!username || !firstName || !lastName) {
+      Alert.alert('Missing information', 'Please enter an email, first name, and last name.');
       return;
     }
 
-    const payload = {
+    const input: CreateAccountInput = {
       firstName,
       lastName,
       userName: username,
@@ -68,7 +69,7 @@ export default function CreateAccountScreen() {
     };
 
     try {
-      const ok = await register(payload);
+      const ok = await register(input);
       if (ok) {
         router.push('/genres');
       } else {
@@ -113,7 +114,7 @@ export default function CreateAccountScreen() {
       />
 
       {/* Last name */}
-      <Text style={styles.label}>Last Name (optional)</Text>
+      <Text style={styles.label}>Last Name *</Text>
       <TextInput
         style={styles.input}
         value={lastName}

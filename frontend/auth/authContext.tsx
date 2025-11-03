@@ -1,65 +1,19 @@
-/* {
-  "users": [
-    {
-      "id": "string",
-      "firstName": "string",
-      "lastName": "string",
-      "userName": "string",
-      "email": "string",
-      "bio": "string",
-      "profilePhotoUrl": "string",
-      "preferredGenres": [
-        "string"
-      ],
-      "privateAccount": true,
-      "publicInteractionRestricted": true,
-      "followingUserIds": [
-        "string"
-      ],
-      "followerUserIds": [
-        "string"
-      ],
-      "blockedUserIds": [
-        "string"
-      ],
-      "litClubIds": [
-        "string"
-      ],
-      "created": "2025-10-17T02:51:35.809Z"
-    }
-  ],
-  "continuationToken": "string"
-} */
-
-  
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import { client } from 'client';
 
-export interface CreateAccountPayload {
-  firstName: string;
-  lastName?: string;
-  userName: string;
-  email: string;
-  password: string;
-  bio?: string;
-  profilePhotoUrl?: string | null;
-  preferredGenres?: string[] | null;
-  privateAccount: boolean;
-  publicInteractionRestricted: boolean;
-}
-
-// Try to infer the Metro host (works with Expo Go LAN)
-const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
-// Fallback to your LAN IP if not available
-const LAN_IP = hostFromExpo ?? '10.0.0.252';
-const API_BASE_URL = `http://${LAN_IP}:5112`;
+import {
+  toLoginRequest,
+  toCreateAccountRequest,
+  type LoginInput,
+  type CreateAccountInput
+} from '../api-mappers/auth/auth-mappers';
 
 // ---- Context types
 type AuthContextType = {
-  signIn: (email?: string, password?: string) => Promise<boolean>;
+  signIn: (input: LoginInput) => Promise<boolean>;
   signOut: () => Promise<boolean>;
-  register: (payload: CreateAccountPayload) => Promise<boolean>;
+  register: (payload: CreateAccountInput) => Promise<boolean>;
   session: string | null;
   isLoading: boolean;
 };
@@ -85,53 +39,45 @@ export function SessionProvider({ children }: PropsWithChildren) {
     loadSession();
   }, []);
 
-  const signIn = async (email?: string, password?: string): Promise<boolean> => {
+  const signIn = async (input: LoginInput): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // include userName: null to force the email branch
-        body: JSON.stringify({ userName: null, email, password }),
-      });
+      const body = toLoginRequest(input);
+      const { data, error } = await client.POST("/users/login", { body });
 
-      if (!response.ok) {
-        const msg = await response.text().catch(() => '');
-        console.warn('Login failed', response.status, msg);
+      if (error) {
+        console.warn(`Login failed. ${error.detail}`);
         return false;
       }
 
-      const data = await response.json();
-      const sessionData = JSON.stringify(data); // demo: store entire user
+      const sessionData = JSON.stringify(data);
       setSession(sessionData);
       await AsyncStorage.setItem('session', sessionData);
+
       return true;
-    } catch (err) {
-      console.error('Sign-in failed', err);
+    } catch (e) {
+      console.error('Sign-in failed unexpectedly', e);
       return false;
     }
   };
 
-  const register = async (payload: CreateAccountPayload): Promise<boolean> => {
+  const register = async (input: CreateAccountInput): Promise<boolean> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/users/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const body = toCreateAccountRequest(input);
+      const { data, error } = await client.POST("/users/register", { body });
 
-      if (res.status === 409) {
-        console.warn('Username or email already exists.');
-        return false;
-      }
-      if (!res.ok) {
-        const msg = await res.text().catch(() => '');
-        console.warn('Register failed', res.status, msg);
+      // This error handling should be improved, but is sufficient for demo
+      if (error) {
+        if (error.status === 409) {
+          console.warn('Username or email already exists.');
+          return false;
+        }
+
+        console.warn(`Login failed. ${error.detail}`);
         return false;
       }
 
-      const data = await res.json();
       const serialized = JSON.stringify(data);
-      setSession(serialized); // auto-login for demo
+      setSession(serialized);
       await AsyncStorage.setItem('session', serialized);
       return true;
     } catch (err) {

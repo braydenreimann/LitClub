@@ -1,62 +1,11 @@
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User, Edition, Book, LibraryBook, DisplayBook } from '../domain/models';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
 const LAN_IP = hostFromExpo ?? '10.0.0.252';
 const API_BASE_URL = `http://${LAN_IP}:5112`;
-
-export interface User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    userName: string;
-    email: string;
-    bio: string;
-    profilePhotoUrl: string;
-    preferredGenres: string[];
-    privateAccount: boolean;
-    publicInteractionRestricted: boolean;
-    followingUserIds: string[];
-    followerUserIds: string[];
-    blockedUserIds: string[];
-    litClubIds: string[];
-    created: string; 
-}
-
-export interface Edition {
-    id: string;
-    format: number; 
-    publisher: string;
-    publicationDate: string; 
-    printLength: number;
-    isbn13s: string[];
-}
-
-export interface Book {
-    id: string;
-    title: string;
-    author: string;
-    totalChapters: number;
-    genre: string;
-    description: string;
-    editions: Edition[];
-}
-
-export interface LibraryBook {
-    id: string;
-    status: number;               
-    startedReading: string;       
-    finishedReading: string;      
-    currentPage: number;
-    percentComplete: number;
-    onPedastal: boolean;
-}
-
-export interface DisplayBook {
-    id: number;
-    title: string;
-}
 
 export async function getUser(): Promise<User | null> {
     try {
@@ -88,7 +37,7 @@ export async function getBookFromLibraryBook(bookId: string): Promise<Book> {
 
     } catch (error) {
         console.error('Error fetching book:', error);
-        throw error; 
+        throw error;
     }
 }
 
@@ -125,8 +74,9 @@ export async function getTopThree(userId: string): Promise<DisplayBook[] | null>
         const displayBooks: DisplayBook[] = fullBooks
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
-                id: index + 1,
-                title: b.title, // use the real book title now
+                id: b.id,
+                title: b.title,
+                coverImageUrl: b.coverImageUrl// use the real book title now
             }));
 
         return displayBooks;
@@ -139,9 +89,9 @@ export async function getTopThree(userId: string): Promise<DisplayBook[] | null>
 export async function getBookshelf(userId: string, status: number): Promise<DisplayBook[] | null> {
     try {
         const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks`);
-        if(!response.ok) {
-                console.warn('Failed to fetch bookshelf', response.status);
-        return [];
+        if (!response.ok) {
+            console.warn('Failed to fetch bookshelf', response.status);
+            return [];
         }
 
         let unsortedbooks: LibraryBook[] = []
@@ -152,9 +102,9 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
             unsortedbooks = data.libraryBooks;
         }
 
-        const filtered = unsortedbooks.filter((b)=> b.status === status);
+        const filtered = unsortedbooks.filter((b) => b.status === status);
 
-        const fullBooks: (Book|null)[] = await Promise.all(
+        const fullBooks: (Book | null)[] = await Promise.all(
             filtered.map(async (libBook) => {
                 try {
                     const book = await getBookFromLibraryBook(libBook.id);
@@ -170,8 +120,9 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
         const displayBooks: DisplayBook[] = fullBooks
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
-                id: index + 1,
-                title: b.title, // use the real book title now
+                id: b.id, //misnomer, actually returns index
+                title: b.title,
+                coverImageUrl: b.coverImageUrl// use the real book title now
             }));
 
         return displayBooks;

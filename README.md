@@ -8,7 +8,7 @@ Visit [nodejs.org](https://nodejs.org/en/download) and follow the installation i
 #### 2. Install Git
 Download and install Git from [git-scm.com/downloads](https://git-scm.com/downloads). Follow the installation wizard for your OS.
 
-#### 3. Install .NET 8 LTS *
+#### 3. Install .NET 8 LTS
 LitClub’s backend is built on **.NET 8 (Long-Term Support)**.
 
 Download and install it from the official Microsoft website:  
@@ -20,10 +20,10 @@ dotnet --version
 ```
 You should see a version beginning with `8.` (e.g., `8.0.303`).
 
-#### 4. Install VS Code and C# Extensions *
+#### 4. Install VS Code and C# Extensions
 Download **VS Code** from [code.visualstudio.com](https://code.visualstudio.com/) and follow the setup instructions for your operating system.
 
-##### Recommended Extensions *
+##### Recommended Extensions
 Once VS Code is installed, open it and install the following extensions:
 1. **C# Dev Kit** (Microsoft)  
    Provides a full-featured C# development environment.
@@ -43,14 +43,16 @@ git clone git@github.com:braydenreimann/LitClub.git
 
 ---
 
-### 3. Run the Expo App
+### 3. Run the Expo App*
 1. Navigate to the frontend:
    ```bash
    cd LitClub/frontend
    ```
-2. Install dependencies:
+2. Install dependencies:*
    ```bash
    npm install
+   npm i openapi-fetch
+   npm i -D openapi-typescript typescript
    ```
 3. Start the app:
    ```bash
@@ -60,11 +62,11 @@ Follow the on-screen instructions to open the app in Expo Go.
 
 ---
 
-## 4. Set Up the Cosmos DB Emulator (for the API Backend) *
+## 4. Set Up the Cosmos DB Emulator and Azurite Emulator (for the API Backend)
 
-This emulator lets you run the LitClub API locally without connecting to Azure.
+These emulators let you run the LitClub API locally without connecting to Azure.
 
-### 1. Install Docker *
+### 1. Install Docker
 
 #### macOS
 1. Install **Docker Desktop for Mac** from [Docker’s site](https://www.docker.com/products/docker-desktop/).
@@ -85,7 +87,7 @@ This emulator lets you run the LitClub API locally without connecting to Azure.
 
 ---
 
-### 2. Pull the Cosmos DB Emulator Image *
+### 2. Pull the Cosmos DB Emulator Image
 Before running the command below, make sure you have the Docker Desktop application open.
 
 ```bash
@@ -93,7 +95,7 @@ docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
 ```
 ---
 
-### 3. Run the Cosmos DB Emulator *
+### 3. Run the Cosmos DB Emulator
 ```bash
 docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmos-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview --protocol https
 ```
@@ -103,8 +105,23 @@ Open [http://localhost:1234](http://localhost:1234) to view the interactive data
 Any time you remove the `cosmos-emulator` container from Docker, you will have to run this command again to initialize the container.
 
 ---
+### 4. Pull the Azurite Emulator Image
+Before running the command below, make sure you have the Docker Desktop application open.
 
-### 4. Configure the LitClub API Client *
+```bash
+docker pull mcr.mircosoft.com/azure-storage/azurite
+```
+
+
+### 5. Run the Azurite Emulator
+
+```bash
+docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 --name azurite mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --blobPort 10000
+```
+
+Opening this emulator should give an error, as the address is not a formatted URL with an SAS token.
+
+### 6. Configure the LitClub API Client
 Navigate to the backend (`LitClub/backend/LitClubApi`). In `Program.cs`, confirm this setup:
 
 ```csharp
@@ -128,7 +145,7 @@ using CosmosClient client = new(
 
 ---
 
-### 6. Emulator Management
+### 7. Emulator Management
 ```bash
 docker stop cosmos-emulator
 docker start cosmos-emulator
@@ -143,7 +160,7 @@ When you're done for the day, or don't need the backend anymore, you should stop
 
 ---
 
-### 7. Run the API
+### 8. Run the API
 1. Navigate to the backend:
    ```bash
    cd LitClub/backend/LitClubApi

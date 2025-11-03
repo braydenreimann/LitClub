@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
-import { Platform, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { Platform, Pressable, ActivityIndicator } from 'react-native';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
@@ -14,6 +14,11 @@ import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
 import { Entypo } from '@expo/vector-icons'; // for dropdown arrow
 import { globalStyles } from '@/styles/globalStyles';
 
+import { Book } from '../domain/models';
+import { getBook } from '../services/booksService';
+import { getBookCoverUri } from '@/services/bookCoversService';
+
+
 //playing around with importing the book
 
 export interface bookImport {
@@ -26,18 +31,13 @@ export interface bookImport {
 
 
 
-
-
-
-
-
 //buttons for the book info screen
 function ToCButton() {
     return (
         <Pressable
             style={infoStyle.ToCButton}
             onPress={() => { Alert.alert('Displaying TOC...')/*TODO make the buttons go to their clubs*/ }} >
-            <Text style={[globalStyles.subheading, {fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5}]}>Table of Contents</Text>
+            <Text style={[globalStyles.subheading, { fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5 }]}>Table of Contents</Text>
         </Pressable>
 
     );
@@ -54,6 +54,31 @@ function BackButton() {
 }
 
 export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+
+    const { id } = useLocalSearchParams<{ id: string }>(); // When button pressed, params are sent. This function saves those params for usage. Needs to be type string.
+
+    const [isExpanded, setIsExpanded] = useState(false); //determines expansion of truncated text
+
+    const [book, setBook] = useState<Book | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => { //fetch book for the page
+        const fetchBook = async () => {
+            try {
+                const data = await getBook(id);
+                setBook(data);
+            } catch (err: any) {
+                console.error(err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBook();
+    }, [id]);
+
     const handlePrivacyChange = (newPrivacyStatus: string) => {
         setIsPublic(newPrivacyStatus === "Public");
         console.log("Privacy status changed to:", newPrivacyStatus);
@@ -81,19 +106,15 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                 <View style={infoStyle.currentRead}>
                     <View style={infoStyle.sideSect} >
 
-{/* Book Container */}
-      <View style={infoStyle.bookContainer}>
-        {/* Placeholder for book image */}
-        <View style={infoStyle.bookImage}>
-          <Entypo
-            name={isPublic ? "eye" : "eye-with-line"}
-            size={24}
-            color={isPublic ? colors.midBlue : colors.midBlue}
-            style={infoStyle.eyeIcon}
-          />
-        </View>
+                        {/* Book Container */}
+                        <View style={infoStyle.bookContainer}>
+                            {/* Placeholder for book image */}
+                            <Image
+                                source={{ uri: getBookCoverUri(book?.coverImagePath) }}
+                                style={infoStyle.bookImage}
+                            />
 
-      </View>
+                        </View>
 
 
                         <View style={{ flexDirection: "row" }}>
@@ -106,40 +127,61 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                     </View>
 
                     <View style={infoStyle.sideSect}>
-                        <Text style={globalStyles.heading}> Book Title </Text>
-                        <Text style={globalStyles.subheading}> Author </Text>
-                        <Text style={globalStyles.body}> Book Summary </Text>
+                        {loading ? (
+                            <ActivityIndicator size="large" color={colors.midBlue} />
+                        ) : book ? (
+                            <>
+                                <Text style={globalStyles.heading}>{book.title}</Text>
+                                <Text style={globalStyles.subheading}>{book.author}</Text>
+                                <Text style={globalStyles.body}>
+                                    {isExpanded || book.description.length <= 50  // If description is short or already expanded, simply display book description
+                                        ? book.description
+                                        : `${book.description.slice(0, 50)}...`}
+                                </Text>
+
+                                {book.description.length > 50 && ( // If length greater than 50, shows pressable button for expanding or contracting text
+                                    <Pressable onPress={() => setIsExpanded(prev => !prev)}> 
+                                        <Text style={{ color: colors.midBlue, marginTop: 4 }}>
+                                            {isExpanded ? "Show less" : "Show more"}
+                                        </Text>
+                                    </Pressable>
+                                )}
+                                
+                            </>
+                        ) : (
+                            <Text style={globalStyles.body}>Book information not available.</Text>
+                        )}
                         <ToCButton />
                     </View>
                 </View>
-                    <Pressable
+                <Pressable
                     style={infoStyle.forumBox}
                     onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs}*/ }} >
-                        <Text style={[globalStyles.body, {fontSize: 14, color: colors.midBlue}]}>This is our most recent discussion!</Text>
-                    </Pressable>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
+                    <Text style={[globalStyles.body, { fontSize: 14, color: colors.midBlue }]}>This is our most recent discussion!</Text>
+                </Pressable>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
 
-  {/* Library Status */}
-  <View style={{ flex: 1 }}>
-    <Text style={globalStyles.subheading}>Library Status</Text>
-    <View style={infoStyle.dropdownWrapper}>
-      <BookStatusDropdown onStatusChange={handleStatusChange} />
-      <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
-    </View>
-  </View>
+                    {/* Library Status */}
+                    <View style={{ flex: 1 }}>
+                        <Text style={globalStyles.subheading}>Library Status</Text>
+                        <View style={infoStyle.dropdownWrapper}>
+                            <BookStatusDropdown onStatusChange={handleStatusChange} />
+                            <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
+                        </View>
+                    </View>
 
-  {/* Visibility */}
-  <View style={{ flex: 1 }}>
-    <Text style={globalStyles.subheading}>Visibility</Text>
-    <View style={infoStyle.dropdownWrapper}>
-      <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
-      <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
-    </View>
-  </View>
-</View>
+                    {/* Visibility */}
+                    <View style={{ flex: 1 }}>
+                        <Text style={globalStyles.subheading}>Visibility</Text>
+                        <View style={infoStyle.dropdownWrapper}>
+                            <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
+                            <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
+                        </View>
+                    </View>
+                </View>
 
-        </ScrollView>
-    </View>
+            </ScrollView>
+        </View>
     );
 }
 
@@ -147,43 +189,43 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
 const infoStyle = StyleSheet.create({
 
     bookContainer: {
-    width: 150,
-    height: 220,
-    backgroundColor: colors.cream,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.midBlue,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-    marginBottom: 20,
-  },
-  bookImage: {
-    width: 120,
-    height: 160,
-    backgroundColor: colors.teal,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-  },
-  eyeIcon: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-  },
+        width: 150,
+        height: 220,
+        backgroundColor: colors.cream,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: colors.midBlue,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        marginBottom: 20,
+    },
+    bookImage: {
+        width: 120,
+        height: 160,
+        backgroundColor: colors.teal,
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+    },
+    eyeIcon: {
+        position: "absolute",
+        top: 8,
+        right: 8,
+    },
 
     leaderBanner: {
-        flexDirection:"row",
+        flexDirection: "row",
         width: "100%",
         height: 40,
         backgroundColor: colors.yellow, //easter yellow
         fontFamily: "serif",
         fontSize: 30,
-        justifyContent:"center",
+        justifyContent: "center",
         alignItems: "center",
         marginTop: 15,
-        
+
     },
     currentRead: {
         flexDirection: "row",
@@ -193,7 +235,7 @@ const infoStyle = StyleSheet.create({
     sideSect: {
         flexDirection: "column",
         width: 120,
-        marginHorizontal:20,
+        marginHorizontal: 20,
     },
     discBox: {
         backgroundColor: "#E4D7C8", //cream
@@ -208,14 +250,14 @@ const infoStyle = StyleSheet.create({
     ToCButton: {
         backgroundColor: colors.teal,
         borderColor: "black",
-        borderWidth:4,
+        borderWidth: 4,
         borderRadius: 12,
         alignContent: "center",
-        justifyContent:"center",
+        justifyContent: "center",
         textAlign: "center",
         margin: 5,
         height: 45,
-        width:"120%",
+        width: "120%",
 
     },
     scrollContainer: {

@@ -42,6 +42,7 @@ public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
         if (request.Body.TotalChapters is not null) updatedBook.TotalChapters = request.Body.TotalChapters.Value;
         if (request.Body.Genre is not null) updatedBook.Genre = request.Body.Genre;
         if (request.Body.Description is not null) updatedBook.Description = request.Body.Description;
+        if (request.Body.CoverImageUrl is not null) updatedBook.CoverImageUrl = request.Body.CoverImageUrl;
         try
         {
             await cosmosContext.Books.ReplaceItemAsync(

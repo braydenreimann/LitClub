@@ -10,7 +10,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { globalStyles } from '@/styles/globalStyles';
 import { fonts, colors } from '@/theme';
-import { User, DisplayBook, getTopThree } from '../profile/profileService';
+import { User, DisplayBook } from '../domain/models';
+import { getTopThree } from '../services/usersService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //eventually will fetch data from backend
