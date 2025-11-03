@@ -68,7 +68,6 @@ export default function BookInfoScreen() {
                 const data = await getBook(id);
                 setBook(data);
             } catch (err: any) {
-                console.error(err);
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -81,10 +80,8 @@ export default function BookInfoScreen() {
         let alive = true;
 
         (async () => {
-            console.error(book?.coverImageUrl);
             const uri = await getBookCoverUri(book?.coverImageUrl);
             if (alive) setCoverUri(uri || "");
-            //console.error(uri);
         })();
 
         return () => { alive = false; };
