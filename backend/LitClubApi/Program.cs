@@ -146,6 +146,17 @@ using (var scope = app.Services.CreateScope())
             // Item with same id already exists, skip
             continue;
         }
+
+        string coverPathLoop = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", $"{b.CoverImageUrl}");
+
+        string blobNameLoop = $"{b.CoverImageUrl}";
+        var blobClientLoop = blobContainer.GetBlobClient(blobNameLoop);
+
+        using (var stream = File.OpenRead(coverPathLoop))
+        {
+            await blobClientLoop.UploadAsync(stream, overwrite: true);
+        }
+
     }
 
     string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", "the-fault-in-our-stars.jpg");
