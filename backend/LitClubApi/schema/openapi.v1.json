@@ -1126,6 +1126,45 @@
         }
       }
     },
+    "/generate-sas/{blobName}": {
+      "get": {
+        "tags": [
+          "Get"
+        ],
+        "parameters": [
+          {
+            "name": "blobName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SasResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/litclubs/{litClubId}/members": {
       "post": {
         "tags": [
@@ -2067,6 +2106,19 @@
           }
         },
         "additionalProperties": { }
+      },
+      "SasResponse": {
+        "required": [
+          "sasUri"
+        ],
+        "type": "object",
+        "properties": {
+          "sasUri": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ShelfStatusContract": {
         "enum": [

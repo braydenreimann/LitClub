@@ -1,6 +1,4 @@
 ﻿using LitClubApi.Domain;
-using System;
-using System.IO;
 
 namespace LitClubApi.Endpoints.Books.AddBook
 {
