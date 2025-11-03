@@ -1,4 +1,8 @@
 ﻿using LitClubApi.Domain;
+using Microsoft.Azure.Cosmos;
+using System;
+using System.IO;
+using System.Runtime.ConstrainedExecution;
 
 namespace LitClubApi.Endpoints.Books.AddBook
 {
