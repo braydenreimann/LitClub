@@ -109,7 +109,7 @@ Any time you remove the `cosmos-emulator` container from Docker, you will have t
 ### 4. Run the Azurite Emulator
 
 ```bash
-docker run -p 10000:10000 mcr.microsoft.com/azure-storage/azurite \
+docker run -p 10000:10000 mcr.microsoft.com/azure-storage/azurite
     azurite-blob --blobHost 0.0.0.0 --blobPort 10000
 ```
 
