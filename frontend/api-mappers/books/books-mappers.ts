@@ -23,7 +23,7 @@ export function toDomainBook(dto: BookResponse): Book {
         totalChapters: dto.totalChapters,
         genre: dto.genre!,
         description: dto.description ?? "",
+        coverImageUrl: dto.coverImageUrl!,
         editions: (dto.editions ?? []).map(toDomainEdition),
-        coverImagePath: dto.coverImagePath!
     }
 }
