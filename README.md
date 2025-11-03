@@ -106,16 +106,14 @@ Any time you remove the `cosmos-emulator` container from Docker, you will have t
 
 ---
 
-### 5. Run the Azurite Emulator
+### 4. Run the Azurite Emulator
 
 ```bash
 docker run -p 10000:10000 mcr.microsoft.com/azure-storage/azurite \
     azurite-blob --blobHost 0.0.0.0 --blobPort 10000
 ```
 
-Opening this emulator should give an error, as the address is not a formatted URL with an SAS token.
-
-### 6. Configure the LitClub API Client
+### 5. Configure the LitClub API Client
 Navigate to the backend (`LitClub/backend/LitClubApi`). In `Program.cs`, confirm this setup:
 
 ```csharp
