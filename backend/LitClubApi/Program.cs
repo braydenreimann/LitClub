@@ -146,6 +146,17 @@ using (var scope = app.Services.CreateScope())
             // Item with same id already exists, skip
             continue;
         }
+
+        string coverPathLoop = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", $"{b.CoverImageUrl}");
+
+        string blobNameLoop = $"{b.CoverImageUrl}";
+        var blobClientLoop = blobContainer.GetBlobClient(blobNameLoop);
+
+        using (var stream = File.OpenRead(coverPathLoop))
+        {
+            await blobClientLoop.UploadAsync(stream, overwrite: true);
+        }
+
     }
 
     string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", "the-fault-in-our-stars.jpg");
@@ -166,7 +177,7 @@ using (var scope = app.Services.CreateScope())
         TotalChapters = 25,
         Genre = "Young adult novel",
         Description = "A book about two sick young lovers.",
-        CoverImageUrl = blobClient.Uri.ToString(),
+        CoverImageUrl = "the-fault-in-our-stars.jpg",
         Editions = [
             new Edition {
                 Format = BookFormat.Paperback,
@@ -286,6 +297,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapUploadImageEndpoint();
-app.MapGenerateSasEndpoint();
 
 app.Run();

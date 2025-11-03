@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import React, { useEffect, useState, type PropsWithChildren } from 'react';
 import { Platform, Pressable, ActivityIndicator } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
@@ -11,37 +11,36 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import BookStatusDropdown from '@/components/BookStatusDropdown';
 import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
-import { Entypo } from '@expo/vector-icons'; // for dropdown arrow
+import { Entypo } from '@expo/vector-icons';
 import { globalStyles } from '@/styles/globalStyles';
 
 import { Book } from '../domain/models';
 import { getBook } from '../services/booksService';
-import { getBookCoverUri } from '@/services/bookCoversService';
+import { getBookCoverUri } from '@/services/imagesService';
 
-
-//playing around with importing the book
-
+// playing around with importing the book
 export interface bookImport {
     title: string;
     author: string;
     totalchapters: number;
     genre: string;
     description?: string;
+    coverImageUrl?: string;
 }
 
-
-
-//buttons for the book info screen
+// buttons for the book info screen
 function ToCButton() {
     return (
         <Pressable
             style={infoStyle.ToCButton}
-            onPress={() => { Alert.alert('Displaying TOC...')/*TODO make the buttons go to their clubs*/ }} >
-            <Text style={[globalStyles.subheading, { fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5 }]}>Table of Contents</Text>
+            onPress={() => { Alert.alert('Displaying TOC...') }}>
+            <Text style={[globalStyles.subheading, { fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5 }]}>
+                Table of Contents
+            </Text>
         </Pressable>
-
     );
 }
+
 function BackButton() {
     return (
         <Pressable>
@@ -49,22 +48,22 @@ function BackButton() {
                 <EvilIcons name="chevron-left" size={50} color="#193350" marginLeft="20" marginBottom="10" />
             </Link>
         </Pressable>
-
     );
 }
 
-export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+export default function BookInfoScreen() {
+    const { id } = useLocalSearchParams<{ id: string }>();
 
-    const { id } = useLocalSearchParams<{ id: string }>(); // When button pressed, params are sent. This function saves those params for usage. Needs to be type string.
-
-    const [isExpanded, setIsExpanded] = useState(false); //determines expansion of truncated text
-
+    const [isExpanded, setIsExpanded] = useState(false);
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => { //fetch book for the page
+    const [coverUri, setCoverUri] = useState<string>("");
+
+    useEffect(() => {
         const fetchBook = async () => {
+            setLoading(true);
             try {
                 const data = await getBook(id);
                 setBook(data);
@@ -75,18 +74,33 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                 setLoading(false);
             }
         };
-
         fetchBook();
     }, [id]);
+
+    useEffect(() => {
+        let alive = true;
+
+        (async () => {
+            console.error(book?.coverImageUrl);
+            const uri = await getBookCoverUri(book?.coverImageUrl);
+            if (alive) setCoverUri(uri || "");
+            //console.error(uri);
+        })();
+
+        return () => { alive = false; };
+    }, [book?.coverImageUrl]);
+
+    const [isPublic, setIsPublic] = useState(true);
 
     const handlePrivacyChange = (newPrivacyStatus: string) => {
         setIsPublic(newPrivacyStatus === "Public");
         console.log("Privacy status changed to:", newPrivacyStatus);
-        // TODO: send newPrivacyStatus to Cosmos DB later
+        // TODO: Implement function
     };
+
     const handleStatusChange = (newStatus: string) => {
         console.log("Book status changed to:", newStatus);
-        // TODO: send newStatus to Cosmos DB later
+        // TODO: Implement function
     };
 
    const [isPublic, setIsPublic] = useState(true);
@@ -96,6 +110,7 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
     {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
+        <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
                 <View style={{flexDirection:'row'} } >
@@ -104,18 +119,21 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                 </View>
 
                 <View style={infoStyle.currentRead}>
-                    <View style={infoStyle.sideSect} >
+                    <View style={infoStyle.sideSect}>
 
                         {/* Book Container */}
                         <View style={infoStyle.bookContainer}>
-                            {/* Placeholder for book image */}
                             <Image
-                                source={{ uri: getBookCoverUri(book?.coverImagePath) }}
+                                source={
+                                    coverUri
+                                        ? { uri: coverUri }
+                                        : require('../assets/images/turkstra.jpg')
+                                }
                                 style={infoStyle.bookImage}
+                                contentFit="cover"
+                                transition={150}
                             />
-
                         </View>
-
 
                         <View style={{ flexDirection: "row" }}>
                             <FontAwesome name="star" size={24} color={colors.midBlue} />
@@ -133,20 +151,26 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                             <>
                                 <Text style={globalStyles.heading}>{book.title}</Text>
                                 <Text style={globalStyles.subheading}>{book.author}</Text>
-                                <Text style={globalStyles.body}>
-                                    {isExpanded || book.description.length <= 50  // If description is short or already expanded, simply display book description
-                                        ? book.description
-                                        : `${book.description.slice(0, 50)}...`}
-                                </Text>
 
-                                {book.description.length > 50 && ( // If length greater than 50, shows pressable button for expanding or contracting text
-                                    <Pressable onPress={() => setIsExpanded(prev => !prev)}> 
-                                        <Text style={{ color: colors.midBlue, marginTop: 4 }}>
-                                            {isExpanded ? "Show less" : "Show more"}
-                                        </Text>
-                                    </Pressable>
-                                )}
-                                
+                                {(() => {
+                                    const desc = book.description ?? "";
+                                    const isLong = desc.length > 50;
+                                    return (
+                                        <>
+                                            <Text style={globalStyles.body}>
+                                                {isExpanded || !isLong ? desc : `${desc.slice(0, 50)}...`}
+                                            </Text>
+                                            {isLong && (
+                                                <Pressable onPress={() => setIsExpanded(prev => !prev)}>
+                                                    <Text style={{ color: colors.midBlue, marginTop: 4 }}>
+                                                        {isExpanded ? "Show less" : "Show more"}
+                                                    </Text>
+                                                </Pressable>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+
                             </>
                         ) : (
                             <Text style={globalStyles.body}>Book information not available.</Text>
@@ -154,13 +178,16 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
                         <ToCButton />
                     </View>
                 </View>
+
                 <Pressable
                     style={infoStyle.forumBox}
-                    onPress={() => { Alert.alert('Forums to be implemented later...')/*TODO make the buttons go to their clubs}*/ }} >
-                    <Text style={[globalStyles.body, { fontSize: 14, color: colors.midBlue }]}>This is our most recent discussion!</Text>
+                    onPress={() => { Alert.alert('Forums to be implemented later...') }} >
+                    <Text style={[globalStyles.body, { fontSize: 14, color: colors.midBlue }]}>
+                        This is our most recent discussion!
+                    </Text>
                 </Pressable>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
 
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
                     {/* Library Status */}
                     <View style={{ flex: 1 }}>
                         <Text style={globalStyles.subheading}>Library Status</Text>
@@ -185,9 +212,7 @@ export default function BookInfoScreen() { //PRE_INTEGRATION: Tis will be a temp
     );
 }
 
-
 const infoStyle = StyleSheet.create({
-
     bookContainer: {
         width: 150,
         height: 220,
@@ -214,18 +239,16 @@ const infoStyle = StyleSheet.create({
         top: 8,
         right: 8,
     },
-
     leaderBanner: {
         flexDirection: "row",
         width: "100%",
         height: 40,
-        backgroundColor: colors.yellow, //easter yellow
+        backgroundColor: colors.yellow,
         fontFamily: "serif",
         fontSize: 30,
         justifyContent: "center",
         alignItems: "center",
         marginTop: 15,
-
     },
     currentRead: {
         flexDirection: "row",
@@ -238,8 +261,8 @@ const infoStyle = StyleSheet.create({
         marginHorizontal: 20,
     },
     discBox: {
-        backgroundColor: "#E4D7C8", //cream
-        borderColor: "#193350",//second-to-darkest blue
+        backgroundColor: "#E4D7C8",
+        borderColor: "#193350",
         borderWidth: 4,
         borderRadius: 12,
         margin: 5,
@@ -258,12 +281,10 @@ const infoStyle = StyleSheet.create({
         margin: 5,
         height: 45,
         width: "120%",
-
     },
     scrollContainer: {
         overflowX: 'scroll',
         overflowY: 'hidden',
-        /*whiteSpace: 'nowrap',*/
         padding: 10,
     },
     scrollingWrapper: {
@@ -281,9 +302,10 @@ const infoStyle = StyleSheet.create({
         borderWidth: 2,
         borderColor: colors.nextDarkest,
     },
-
     rowContainer: {
         flexDirection: 'row',
+        justifyContent: 'flex-start',
+        gap: 20,
         justifyContent: 'flex-start',
         gap: 20,
         marginVertical: 10,
@@ -291,7 +313,7 @@ const infoStyle = StyleSheet.create({
     column: {
         flexDirection: 'column',
         alignItems: 'flex-start',
-        flex: 0, // dropdowns don’t stretch
+        flex: 0,
     },
     dropdownWrapper: {
         flexDirection: 'row',
