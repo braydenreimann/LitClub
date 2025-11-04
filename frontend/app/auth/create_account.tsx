@@ -94,7 +94,7 @@ export default function CreateAccountScreen() {
       />
 
       {/* Username */}
-      <Text style={styles.label}>Username *</Text>
+      <Text style={styles.label}>Username * (hiiiiii)</Text>
       <TextInput
         style={styles.input}
         value={username}
