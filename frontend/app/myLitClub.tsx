@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { ActivityIndicator, Platform, Pressable } from 'react-native';
 import { ThemedText } from '../components/themed-text';
 import { ThemedView } from '../components/themed-view';
-import { Link, Stack } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
@@ -21,9 +21,15 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { useLitClubs } from '@/LitClubImport/LitClubContext';
 import { useLocalSearchParams } from 'expo-router';
+import Constants from 'expo-constants';
+import { User } from '@/domain/models';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-
+const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
+const LAN_IP = hostFromExpo ?? '10.0.0.252'
+const API_BASE_URL = `http://${LAN_IP}:5112`
+const apiUrl = `${API_BASE_URL}/litclubs`;
 
 function Jump2discButton() {
     return (
@@ -60,7 +66,28 @@ export default function LitClubScreen() {
     }, [fontsLoaded]);
 
     const { id } = useLocalSearchParams();
-    const { litClubs, loading, error } = useLitClubs();
+    const router = useRouter();
+    const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
+
+    const [actionLoading, setActionLoading] = useState(false);
+    const [user, setUser] = useState<{ id: string } | null>(null);
+
+    useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
+
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
 
     const club = litClubs.find(c => c.id === id);
 
@@ -80,6 +107,77 @@ export default function LitClubScreen() {
 
     if (!club) {
         return <Text style={{ padding: 20 }}>Club not found.</Text>
+    }
+
+    const currentUserId = user?.id ?? ''; //pull from async storage session
+    const isOwner = club.ownerUserId === currentUserId;
+
+    //leave a club if you dont own the club
+    async function handleLeaveClub() {
+        Alert.alert(
+            "Leave Club",
+            "Are you sure you want to leave this club?",
+            [
+                {text: "Cancel", style: "cancel"},
+                {text: "Leave", style: "destructive", onPress: async () => {
+                        if (!club) {
+                            Alert.alert('Club not found.');
+                            return;
+                        }
+                        try {
+                            setActionLoading(true);
+                            const res = await fetch(`http://{LAN_IP}:5112/litclubs/${club.id}/leave`, {
+                                method: 'POST',
+                            });
+                            if (!res.ok) {
+                                Alert.alert('Failed to leave club.');
+                            } else {
+                                await fetchLitClubs(); // Refresh club list after leaving
+                                router.replace('/bookclubs'); // Navigate back after leaving
+                            }
+                        } catch (error) {
+                            Alert.alert('Error leaving club:', (error as Error).message);
+                        } finally {
+                            setActionLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
+    }
+    
+    //delete club if you own the club
+    async function handleDeleteClub() {
+        Alert.alert(
+            "Delete Club",
+            "Are you sure you want to delete this club? It will delete for all users in this club.",
+            [
+                {text: "Cancel", style: "cancel"},
+                {text: "Delete", style: "destructive", onPress: async () => {
+                        if (!club) {
+                            Alert.alert('Club not found.');
+                            return;
+                        }
+                        try {
+                            setActionLoading(true);
+                            const res = await fetch(`http://${LAN_IP}:5112/litclubs/${club.id}`, {
+                                method: 'DELETE',
+                            });
+                            if (!res.ok) {
+                                Alert.alert('Failed to delete club.');
+                            } else {
+                                await fetchLitClubs(); // Refresh club list after leaving
+                                router.replace('/bookclubs'); // Navigate back after leaving
+                            }
+                        } catch (error) {
+                            Alert.alert('Error deleting club:', (error as Error).message);
+                        } finally {
+                            setActionLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
     }
 
     return (
@@ -137,7 +235,22 @@ export default function LitClubScreen() {
                     <Text style={globalStyles.subheading}>Current Members</Text>
                     {/* TODO: INSERT CLUB MEMBERS HERE*/}
                     <ClubMembers />
-                </View>        
+                </View> 
+
+                <Pressable
+                    disabled={actionLoading}
+                    onPress={isOwner ? handleDeleteClub : handleLeaveClub}
+                    style={[litStyles.actionButton, { backgroundColor: colors.midBlue}]}
+                >
+                    <Text style={[globalStyles.body, { color: 'white', textAlign: 'center', textAlignVertical: 'center' }]}>
+                        {actionLoading 
+                            ? "Processing..."
+                            : isOwner 
+                                ? "Delete Club" 
+                                : "Leave Club"
+                        }
+                    </Text>
+                </Pressable>    
                 
         </ScrollView>
     );
@@ -232,6 +345,13 @@ const litStyles = StyleSheet.create({
         lineHeight: 22,
         textAlign: "center",
         textAlignVertical: "center",
+
+    },
+    actionButton: {
+        marginVertical: 40,
+        marginHorizontal: 30,
+        padding: 15,
+        borderRadius: 12,
 
     },
 });

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation'; 
-import { Platform, Pressable, TextInput} from 'react-native';
+import { InteractionManager, Platform, Pressable, TextInput} from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link, useRouter } from 'expo-router';
@@ -45,7 +45,8 @@ export default function CreateLitClub() {
         }, [fontsLoaded]);
 
     const router = useRouter();
-    const { fetchLitClubs } = useLitClubs();
+    const { addLitClub, fetchLitClubs } = useLitClubs();
+    const { session } = useSession();
     const [user, setUser] = useState<User | null>(null);
 
     // club form inputs
@@ -87,7 +88,7 @@ export default function CreateLitClub() {
             ownerUserId: user.id,
             description: description.trim(),
             preferredGenres: preferredGenres ? preferredGenres.split(',').map(genre => genre.trim()) : [],
-            isPrivate: privateClub,
+            privateClub,
             memberUserIds: [user.id],
             libraryId: '',
         };
@@ -101,14 +102,18 @@ export default function CreateLitClub() {
                 },
                 body: JSON.stringify(payload),
             });
-            
+
             if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error('Failed to create club', { cause: errorData });
+                const errorText = await response.text();
+                throw new Error(`Server Error (${response.status}): ${errorText}`);
             }
+
+            const createdClub = await response.json();
+            addLitClub(createdClub);
+            //await fetchLitClubs(); //refresh list
+            
             Alert.alert('Success', `${name} club created successfully!`);
-            await fetchLitClubs(); // Refresh the list of clubs
-            router.back(); // Navigate back to the previous screen
+            router.push('/bookclubs');
         } catch (error: any) {
             console.error('Error creating club:', error);
             Alert.alert('Error', `Failed to create club: ${error.message}`);
@@ -120,8 +125,9 @@ export default function CreateLitClub() {
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream, }}>
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={[globalStyles.heading, {paddingBottom: 50}]}>Create a New Lit Club</Text>
+                <Text style={[globalStyles.heading, {paddingBottom: 50, paddingTop: 80}]}>Create a New Lit Club</Text>
 
+                {/* Club Name */}
                 <Text style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest }]}>Enter the Name of Your LitClub</Text>
                 <TextInput
                     style={styles.input}
@@ -131,6 +137,7 @@ export default function CreateLitClub() {
                     onChangeText={setName}
                 />
 
+                {/* Description */}
                 <Text style={[globalStyles.subheading, { paddingTop: 30, fontSize: 18, color: colors.darkest }]}>Tell Us About Your LitClub</Text>
                 <TextInput
                     style={[styles.input, styles.textArea]}
@@ -142,6 +149,7 @@ export default function CreateLitClub() {
                     onChangeText={setDescription}
                 />
 
+                {/* Genres */}
                 <Text style={[globalStyles.subheading, { paddingTop: 30, fontSize: 18, color: colors.darkest }]}>Preferred Genres (Comma Separated)</Text>
                 <TextInput
                     style={styles.input}
@@ -151,6 +159,7 @@ export default function CreateLitClub() {
                     onChangeText={setPreferredGenres}
                 />
 
+                {/* Privacy toggle */}
                 <Pressable
                     style={[styles.toggleButton, privateClub && styles.toggleButtonActive, { marginTop: 30 }]}
                     onPress={() => setPrivateClub(!privateClub)}
@@ -160,6 +169,7 @@ export default function CreateLitClub() {
                     </Text>
                 </Pressable>
                 
+                {/* Create Button */}
                 <Pressable
                     style={[styles.createButton, loading && { opacity: 0.6 }, { marginTop: 20 }]}
                     onPress={handleCreateClub}
@@ -230,3 +240,7 @@ const styles = StyleSheet.create({
     },
 });
     
+function setShouldNavigate(arg0: boolean) {
+    throw new Error('Function not implemented.');
+}
+

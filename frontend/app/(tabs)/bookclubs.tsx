@@ -1,35 +1,54 @@
-import { View, ScrollView, Text, Pressable, Alert } from 'react-native';
+import { View, ScrollView, Text, Pressable, Alert, useColorScheme } from 'react-native';
 import Header from '../../components/headerWithSearch';
 import { globalStyles } from '@/styles/globalStyles';
-import { Link } from 'expo-router';
+import { Link, useFocusEffect } from 'expo-router';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { useLitClubs } from '@/LitClubImport/LitClubContext';
-import { User } from '@/profile/profileService';
 import { colors } from '@/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User } from '@/domain/models';
 
 
 export default function AllLitClubs() {
   // Example data
-  
-
   const [fontsLoaded] = useFonts({
     Fraunces_700Bold,
     ChivoMono_500Medium,
     NotoSansMono_400Regular,
   });
-  React.useEffect(() => {
+
+  const [user, setUser] = useState<User | null>(null)
+  const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchLitClubs();
+    }, [fetchLitClubs])
+  )
+
+  useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
+  useEffect(() => { //from profile.tsx
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
 
-  const [user, setUser] = useState<User | null>(null)
-  const { litClubs, loading, error } = useLitClubs();
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+        loadSession();
+  }, []);
 
   if (loading) {
     return (
@@ -38,7 +57,6 @@ export default function AllLitClubs() {
       </View>
     );
   }
-
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -54,21 +72,6 @@ export default function AllLitClubs() {
       </View>
     );
   }
-
-  useEffect(() => { //from profile.tsx
-        const loadSession = async () => {
-            try {
-                const sessionString = await AsyncStorage.getItem('session');
-                if (!sessionString) return; // no session stored
-
-                const session: User = JSON.parse(sessionString);
-                setUser(session); // update state
-            } catch (error) {
-                console.error('Error loading session:', error);
-            }
-        };
-        loadSession();
-    }, []);
   
   const userId = user?.id ?? '';
   const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
@@ -107,11 +110,7 @@ export default function AllLitClubs() {
         <Text style={globalStyles.heading}>My LitClubs</Text>
 
         <View style={globalStyles.cardGroup}> 
-          {loading ? (
-            <Text>Loading clubs...</Text>
-          ) : error ? (
-            <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
-          ) : leaderClubs.length ? (
+          {leaderClubs.length ? (
             leaderClubs.map((club) => (
                                     
             <Pressable

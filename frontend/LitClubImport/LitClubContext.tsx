@@ -22,7 +22,7 @@
 */
 
 import Constants from 'expo-constants';
-import React, { createContext, Key, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import React, { createContext, Key, useCallback, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 const LAN_IP = hostFromExpo ?? '10.0.0.252'
@@ -45,6 +45,7 @@ export interface LitClub {
 interface LitClubContextType {
   litClubs: LitClub[];
   fetchLitClubs: () => Promise<void>; //manually refetch from API
+  addLitClub: (newClub: LitClub) => void;
   loading: boolean; //true while fetching data
   error: string | null; 
 }
@@ -54,6 +55,7 @@ interface LitClubContextType {
 const LitClubContext = createContext<LitClubContextType>({
   litClubs: [],
   fetchLitClubs: async () => {},
+  addLitClub: () => {},
   loading: false,
   error: null,
 });
@@ -71,7 +73,7 @@ export const LitClubProvider: React.FC<React.PropsWithChildren> = ({ children })
   
 
   // function to fetch litclubs from backend
-  const fetchLitClubs = async () => {
+  const fetchLitClubs = useCallback(async () => {
     setLoading(true); //loading spinner
     setError(null); //clear prev errors
 
@@ -101,16 +103,22 @@ export const LitClubProvider: React.FC<React.PropsWithChildren> = ({ children })
         //stop loading obviously
         setLoading(false);
     }
-  };
+  }, []);
+
+  // function to add a new LitClub to the state
+  const addLitClub = useCallback((newClub: LitClub) => {
+    setLitClubs(prevClubs => [...prevClubs, newClub]);
+  }, []);
 
   //fetch lit clubs when this provider first mounts
   useEffect(() => {
     fetchLitClubs();
   }, []);
 
+
   // React Context Provider allows wrapping code so anything inside can see or use the data given
   return (
-    <LitClubContext.Provider value={{ litClubs, fetchLitClubs, loading, error }}>
+    <LitClubContext.Provider value={{ litClubs, fetchLitClubs, addLitClub, loading, error }}>
       {children}
     </LitClubContext.Provider>
   );
