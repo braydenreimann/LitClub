@@ -94,7 +94,8 @@ export default function CreateAccountScreen() {
       />
 
       {/* Username */}
-      <Text style={styles.label}>Username * (hiiiiii)</Text>
+      <Text style={styles.label}>Username *</Text>
+      <Text style={[styles.label, {marginTop: 0, fontSize: 12, color: colors.nextDarkest}]}>Choose wisely - this can't be changed later!</Text>
       <TextInput
         style={styles.input}
         value={username}
