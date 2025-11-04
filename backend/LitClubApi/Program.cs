@@ -6,12 +6,14 @@ using LitClubApi.Endpoints.Blobs;
 using LitClubApi.Endpoints.Blobs.GenerateSas;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Security.Policy;
@@ -123,11 +125,41 @@ using (var scope = app.Services.CreateScope())
     await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
                                                   // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
 
+    // Threads container
+    await db.CreateContainerIfNotExistsAsync(new ContainerProperties
+    {
+        Id = "threads",
+        PartitionKeyPath = "/threadId",
+        IndexingPolicy = new IndexingPolicy
+        {
+            Automatic = true,
+            IndexingMode = IndexingMode.Consistent,
+            IncludedPaths =
+        {
+            new IncludedPath { Path = "/*" }
+        },
+            ExcludedPaths =
+        {
+            new ExcludedPath { Path = "/\"Body\"/?" } // optional
+        },
+            CompositeIndexes =
+        {
+            new Collection<CompositePath>
+            {
+                new() { Path = "/threadId", Order = CompositePathSortOrder.Ascending },
+                new() { Path = "/Score",    Order = CompositePathSortOrder.Descending },
+                new() { Path = "/Created",  Order = CompositePathSortOrder.Ascending }
+            }
+        }
+        }
+    });
+
     // Optional: seed (dev-only is recommended)
     var books = client.GetContainer(o.DatabaseId, o.BooksContainerId);
     var users = client.GetContainer(o.DatabaseId, o.UsersContainerId);
     var clubs = client.GetContainer(o.DatabaseId, o.LitClubsContainerId);
     var libs = client.GetContainer(o.DatabaseId, o.LibrariesContainerId);
+    var threads = client.GetContainer(o.DatabaseId, o.ThreadsContainerId);
 
     string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
     string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
@@ -225,6 +257,31 @@ using (var scope = app.Services.CreateScope())
                 OnPedastal = false
             }
         ]
+    };
+
+    Author author = new()
+    {
+        AuthorId = "1",
+        Username = "johngreen",
+    };
+
+    LitClubApi.Endpoints.Threads.AddThread.ThreadDocument thread = new()
+    {
+        Id = "1",
+        ThreadId = "1",
+        Author = author,
+        Title = "Chapter 1 Thread",
+        Body = "This is the thread for Chapter 1 of The Fault in Our Stars",
+        BookId = "1",
+        ChapterNumber = 1
+    };
+
+    Comment comment = new()
+    {
+        ThreadId = thread.Id,
+        Author = author,
+        Body = "This is a great comment on a thread!",
+        ParentCommentId = null,
     };
 
     int i = 0;
