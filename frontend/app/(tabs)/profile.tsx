@@ -23,19 +23,20 @@ import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
 import { useLitClubs } from '../../LitClubImport/LitClubContext';
+import BodyText from '@/components/BodyText';
 
 
 function EditButton() {
     return (
         <Link href="/editProfilePage">
-            <Foundation name="pencil" size={30} color="black" marginLeft="20" marginTop="10" />
+            <Foundation name="pencil" size={20} color={colors.darkest} />
         </Link>
     );
 }
 function SettingsButton() {
     return (
         <Link href="/settingsPage">
-            <EvilIcons name="gear" size={50} color="black" marginLeft="20" marginBottom="10" />
+            <EvilIcons name="gear" size={30} color={colors.darkest} />
         </Link>
 
     );
@@ -43,7 +44,7 @@ function SettingsButton() {
 function StatsButton() {
     return (
         <Link href="/statsPage">
-            <Foundation name="book-bookmark" size={30} color="black" marginLeft="20" marginTop="10" />
+            <Foundation name="book-bookmark" size={30} color={colors.darkest} />
         </Link>
 
     );
@@ -118,10 +119,24 @@ export default function ProfileScreen() {
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
-                <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
+            <View style={profStyles.nameRow}>
+                <Text style={[globalStyles.heading, {paddingTop: 15}]}>
+                    {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
+                    {"\n"}
+                    <Text style={globalStyles.body}>{'she/he/they'}</Text>
+                </Text>
+
+                {/* Buttons next to the name */}
+                <View style={profStyles.iconRow}>
+                    <SettingsButton />
+                    <StatsButton />
+                    <EditButton />
+                </View>
+            </View>
+                
                 <View style={profStyles.profileHeader}>
                     {/* profile icon TODO change to PFP */}
-                    <EvilIcons name="user" size={75} color="black" />
+                    <EvilIcons name="user" size={75} color={colors.darkest} />
                     <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
                         <Text style={globalStyles.subheading}>
                             {user ? `@${user.userName}` : 'Loading...'}
@@ -136,11 +151,7 @@ export default function ProfileScreen() {
                     </View>
 
                     {/*be able to edit the bio */}
-                    <View style={profStyles.userBio}>
-                        <SettingsButton />
-                        <EditButton />
-                    </View>
-                    <StatsButton />
+
                 </View>
 
                 {/*this is the part where we show the lists of the books*/}
@@ -228,7 +239,7 @@ export default function ProfileScreen() {
 
                         ))
                     ) : (
-                        <Text>No archived clubs.</Text>
+                        <Text style={[globalStyles.body, {paddingLeft: 15}]}>No archived clubs.</Text>
                     )
                     }
                 </View>
@@ -329,5 +340,18 @@ const profStyles = StyleSheet.create({
         borderColor: colors.midBlue,
         textAlign: "center",
         textAlignVertical: "center",
-    }
+    },
+    nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingTop: 15,
+    },
+    iconRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10, 
+    },
+
 });
