@@ -1,4 +1,3 @@
-using System.Linq;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.Books.Editions;
 
