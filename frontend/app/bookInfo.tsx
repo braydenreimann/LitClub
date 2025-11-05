@@ -173,7 +173,7 @@ export default function BookInfoScreen() {
 
                 <Pressable
                     onPress={() => {
-                        router.push("/threads/6c7bcb26-d62b-43ea-9160-93ba52e1d287");
+                        router.push("/threads/35e18343-1b6e-4c5c-bb3a-c84ac0da6414");
                     }} >
                     <Text>This is some text.</Text>
                 </Pressable>
