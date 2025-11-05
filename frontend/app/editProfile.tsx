@@ -18,8 +18,13 @@ import { editUser } from '../services/usersService';
 import { components } from '../schema/openapi-types'; 
 import { Modal, Pressable } from 'react-native';
 
-
+import { useSession } from '@/auth/authContext';
+import { type LoginInput } from '@/api-mappers/auth/auth-mappers';
 import { EditUserInput } from '../api-mappers/users/users-mappers'; 
+import { verifyPassword } from '@/services/authService';
+import { bool, boolean } from 'yup';
+
+const { signIn } = useSession();
 
 const pronounOptions = [
   'he', 'him', 'his',
@@ -164,14 +169,15 @@ const handleChangePasswordPress = () => {
 const handleVerifyCurrentPassword = async () => {
   if (!user) return;
 
-  // Example: user.password is stored locally for this demo
-  // In production, you might want to call backend to verify current password
-  const passwordCorrect = currentPasswordInput === user.password;
+  const input: LoginInput = {
+    email: user.email,
+    password: currentPasswordInput,
+  };
 
-  if (passwordCorrect) {
+  const success = await signIn(input);
+
+  if (success) {
     setShowCurrentPasswordModal(false);
-    setNewPassword('');
-    setConfirmNewPassword('');
     setShowNewPasswordModal(true);
   } else {
     Alert.alert('Incorrect Password', 'The password you entered is incorrect.');
