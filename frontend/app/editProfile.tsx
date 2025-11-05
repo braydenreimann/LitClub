@@ -16,6 +16,8 @@ import { colors, fonts } from '../theme';
 import { User } from '../domain/models';
 import { editUser } from '../services/usersService'; 
 import { components } from '../schema/openapi-types'; 
+import { Modal, Pressable } from 'react-native';
+
 
 import { EditUserInput } from '../api-mappers/users/users-mappers'; 
 
@@ -39,6 +41,14 @@ export default function EditProfileScreen() {
   const [biography, setBiography] = useState('');
   const [privateAccount, setPrivateAccount] = useState(false);
   const [selectedPronouns, setSelectedPronouns] = useState<string[]>([]);
+
+  const [showCurrentPasswordModal, setShowCurrentPasswordModal] = useState(false);
+  const [showNewPasswordModal, setShowNewPasswordModal] = useState(false);
+
+  const [currentPasswordInput, setCurrentPasswordInput] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
 
   // Load user data on mount
   useEffect(() => {
@@ -136,29 +146,6 @@ export default function EditProfileScreen() {
       console.error('Unexpected error saving user:', err);
       Alert.alert('Error', 'Failed to save your changes.');
     }
-
-{/*
-    const updatedUser = {
-      ...user,
-      firstName,
-      lastName,
-      bio: biography,
-      privateAccount,
-      pronouns: selectedPronouns,
-    };
-
-    try {
-      // TODO: Replace this with an actual API call to update your backend database
-      // e.g., await updateUserProfile(updatedUser);
-
-      await AsyncStorage.setItem('session', JSON.stringify(updatedUser));
-
-      Alert.alert('Success', 'Your changes have been saved.');
-      router.push('/profile'); // go back to profile page
-    } catch (error) {
-      console.error('Error saving user:', error);
-      Alert.alert('Error', 'Failed to save your changes.');
-    }*/}
   };
 
   const handleDiscard = () => {
@@ -167,6 +154,61 @@ export default function EditProfileScreen() {
       { text: 'Discard', style: 'destructive', onPress: () => router.back() },
     ]);
   };
+
+const handleChangePasswordPress = () => {
+  setCurrentPasswordInput('');
+  setShowCurrentPasswordModal(true);
+};
+
+// Step 1: verify current password
+const handleVerifyCurrentPassword = async () => {
+  if (!user) return;
+
+  // Example: user.password is stored locally for this demo
+  // In production, you might want to call backend to verify current password
+  const passwordCorrect = currentPasswordInput === user.password;
+
+  if (passwordCorrect) {
+    setShowCurrentPasswordModal(false);
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setShowNewPasswordModal(true);
+  } else {
+    Alert.alert('Incorrect Password', 'The password you entered is incorrect.');
+  }
+};
+
+// Step 2: save new password
+const handleSaveNewPassword = async () => {
+  if (!user) return;
+
+  if (!newPassword || !confirmNewPassword) {
+    Alert.alert('Missing Fields', 'Please enter your new password twice.');
+    return;
+  }
+  if (newPassword !== confirmNewPassword) {
+    Alert.alert('Mismatch', 'Passwords do not match.');
+    return;
+  }
+
+  setPasswordChangeLoading(true);
+
+  const input: EditUserInput = {
+    userId: user.id,
+    password: newPassword,
+  };
+
+  const { success, error } = await editUser(input);
+  setPasswordChangeLoading(false);
+  setShowNewPasswordModal(false);
+
+  if (success) {
+    Alert.alert('Success', 'Your password has been updated.');
+  } else {
+    console.error('Error updating password:', error);
+    Alert.alert('Error', 'Failed to update password. Try again.');
+  }
+};
 
   return (
     <ScrollView
@@ -250,12 +292,63 @@ export default function EditProfileScreen() {
           thumbColor={colors.cream}
         />
       </View>
-      <TouchableOpacity
-        style={[styles.button, styles.passwordButton]}
-          onPress={() => router.push('/changePassword')}
-        >
-          <Text style={styles.buttonText}>Change Password</Text>
-      </TouchableOpacity>
+{/* Change Password Button */}
+<TouchableOpacity style={[styles.button, styles.passwordButton]} onPress={handleChangePasswordPress}>
+  <Text style={styles.buttonText}>Change Password</Text>
+</TouchableOpacity>
+
+{/* Modal 1: Current Password */}
+<Modal visible={showCurrentPasswordModal} transparent animationType="slide">
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.label}>Enter Current Password</Text>
+      <TextInput
+        style={styles.input}
+        value={currentPasswordInput}
+        onChangeText={setCurrentPasswordInput}
+        secureTextEntry
+      />
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={[styles.button, styles.discardButton]} onPress={() => setShowCurrentPasswordModal(false)}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleVerifyCurrentPassword}>
+          <Text style={styles.buttonText}>{passwordChangeLoading ? 'Checking...' : 'Next'}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
+{/* Modal 2: New Password */}
+<Modal visible={showNewPasswordModal} transparent animationType="slide">
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.label}>Enter New Password</Text>
+      <TextInput
+        style={styles.input}
+        value={newPassword}
+        onChangeText={setNewPassword}
+        secureTextEntry
+      />
+      <Text style={styles.label}>Confirm New Password</Text>
+      <TextInput
+        style={styles.input}
+        value={confirmNewPassword}
+        onChangeText={setConfirmNewPassword}
+        secureTextEntry
+      />
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={[styles.button, styles.discardButton]} onPress={() => setShowNewPasswordModal(false)}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveNewPassword}>
+          <Text style={styles.buttonText}>{passwordChangeLoading ? 'Saving...' : 'Save'}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
 
       {/* Buttons */}
       <View style={styles.buttonRow}>
@@ -355,5 +448,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.subheading,
     color: colors.cream,
     fontSize: 18,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: colors.cream,
+    borderRadius: 12,
+    padding: 20,
   },
 });

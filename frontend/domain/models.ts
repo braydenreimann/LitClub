@@ -19,6 +19,7 @@ export type User = {
     blockedUserIds: string[];
     litClubIds: string[];
     created: string;
+    password: string; //Sofia put this here
 }
 
 export type Edition = {

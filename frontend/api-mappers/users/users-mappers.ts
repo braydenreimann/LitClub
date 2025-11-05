@@ -30,3 +30,8 @@ export function toEditUserBody(input: EditUserInput): EditUserBody {
     publicInteractionRestricted: input.publicInteractionRestricted ?? null,
   };
 }
+
+export type PasswordChangeInput = {
+  currentPassword: string;
+  newPassword: string;
+};
