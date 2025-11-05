@@ -1,6 +1,6 @@
 // components/threads/CommentItem.tsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, StyleSheet, ActivityIndicator, LayoutChangeEvent } from "react-native";
 import { colors } from "@/theme";
 import type { CommentResponse, Author } from "@/domain/models/thread-types";
 import { addReply, voteComment } from "@/services/commentsService";
@@ -16,6 +16,7 @@ type Props = {
     currentUserId: string;
     showHiddenComments?: boolean;
     onHiddenBelowZeroChange?: (commentId: string, hidden: boolean) => void;
+    scrollParentTo?: (y: number) => void; // ⬅️ NEW
 };
 
 export default function CommentItem({
@@ -25,12 +26,12 @@ export default function CommentItem({
     currentUserId,
     showHiddenComments = false,
     onHiddenBelowZeroChange,
+    scrollParentTo,
 }: Props) {
     const [expanded, setExpanded] = useState(false);
     const [showReplyBox, setShowReplyBox] = useState(false);
     const [showHiddenReplies, setShowHiddenReplies] = useState(false);
 
-    // local top-level state (score + user's vote)
     const [localScore, setLocalScore] = useState(comment.score);
     const [localUserVote, setLocalUserVote] = useState<-1 | 0 | 1>((comment.userVote ?? 0) as -1 | 0 | 1);
 
@@ -74,7 +75,6 @@ export default function CommentItem({
         await ensureLoaded();
     }, [expanded, ensureLoaded]);
 
-    // top-level vote change
     const onChangeTopLevelVote = useCallback(
         async (nextVote: -1 | 0 | 1) => {
             const prev = localUserVote;
@@ -94,10 +94,9 @@ export default function CommentItem({
         [threadId, comment.id, currentUserId, localUserVote]
     );
 
-    // reply vote change
     const onChangeReplyVote = useCallback(
         async (replyId: string, nextVote: -1 | 0 | 1) => {
-            applyVote(replyId, nextVote); // optimistic
+            applyVote(replyId, nextVote);
             try {
                 const res = await voteComment(threadId, replyId, currentUserId, nextVote);
                 applyVote(replyId, res.userVote as -1 | 0 | 1);
@@ -144,19 +143,24 @@ export default function CommentItem({
         [expanded, threadId, currentAuthor, comment.id, optimisticAdd, confirmReplace, rollbackRemove]
     );
 
+    // measure our top Y to allow scrolling into view on input focus
+    const topYRef = useRef(0);
+    const onLayout = useCallback((e: LayoutChangeEvent) => {
+        topYRef.current = e.nativeEvent.layout.y;
+    }, []);
+
     // hide top-level if score < 0 and hidden-not-shown
     if (comment.isDeleted) return null;
     if (!showHiddenComments && localScore < 0) return null;
 
     return (
-        <View style={styles.wrap}>
+        <View style={styles.wrap} onLayout={onLayout}>
             <View style={styles.headerRow}>
                 <Text style={styles.username}>{comment.author.username}</Text>
             </View>
 
             <Text style={styles.body}>{comment.body}</Text>
 
-            {/* Horizontal meta/actions row with VoteButtons first */}
             <View style={styles.actionsRow}>
                 <VoteButtons
                     currentVote={localUserVote}
@@ -169,6 +173,8 @@ export default function CommentItem({
                         setShowReplyBox((s) => !s);
                         if (!expanded) setExpanded(true);
                         ensureLoaded();
+                        // scroll into view when opening the composer
+                        scrollParentTo?.(topYRef.current);
                     }}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
@@ -184,8 +190,13 @@ export default function CommentItem({
                 )}
             </View>
 
-            {showReplyBox && <ReplyComposer onSubmit={submitReply} />}
-
+            {showReplyBox && (
+                <ReplyComposer
+                    onSubmit={submitReply}
+                    onFocus={() => scrollParentTo?.(topYRef.current)}
+                    refocusAfterSubmit={false}   // ⬅️ prevent re-opening keyboard
+                />
+            )}
             {expanded && (
                 <View style={styles.replies}>
                     {loading && replies.length === 0 ? (
@@ -230,7 +241,7 @@ export default function CommentItem({
 const styles = StyleSheet.create({
     wrap: { paddingVertical: 10, borderBottomWidth: 1, borderColor: "#e6e2da" },
     headerRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
-    username: { fontWeight: "500", color: colors.midBlue },
+    username: { fontWeight: "700", color: colors.midBlue },
     body: { color: colors.darkest, marginTop: 2 },
     actionsRow: { marginTop: 8, flexDirection: "row", alignItems: "center", gap: 16, flexWrap: "wrap" },
     action: { color: colors.midBlue, fontSize: 12, fontWeight: "600" },

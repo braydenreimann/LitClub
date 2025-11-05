@@ -1,3 +1,4 @@
+// components/threads/ReplyComposer.tsx
 import React, { useCallback, useRef, useState } from "react";
 import { View, TextInput, Pressable, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { colors } from "@/theme";
@@ -5,10 +6,9 @@ import { colors } from "@/theme";
 type Props = {
     placeholder?: string;
     onSubmit: (text: string) => Promise<void> | void;
-    /** Called only after a successful submit */
     onSubmitted?: () => void;
-    /** Keep focus after submit (default: true) */
     refocusAfterSubmit?: boolean;
+    onFocus?: () => void; // ⬅️ NEW
 };
 
 export default function ReplyComposer({
@@ -16,6 +16,7 @@ export default function ReplyComposer({
     onSubmit,
     onSubmitted,
     refocusAfterSubmit = true,
+    onFocus,
 }: Props) {
     const [text, setText] = useState("");
     const [busy, setBusy] = useState(false);
@@ -29,7 +30,7 @@ export default function ReplyComposer({
         try {
             await onSubmit(body);
             setText("");
-            onSubmitted?.(); // <-- tell parent to hide the composer
+            onSubmitted?.();
             if (refocusAfterSubmit) {
                 requestAnimationFrame(() => ref.current?.focus());
             }
@@ -51,6 +52,7 @@ export default function ReplyComposer({
                 multiline
                 returnKeyType="send"
                 onSubmitEditing={submit}
+                onFocus={onFocus}             // ⬅️ NEW
             />
             <Pressable onPress={submit} disabled={!canPost} style={[styles.btn, !canPost && { opacity: 0.6 }]}>
                 {busy ? <ActivityIndicator /> : <Text style={styles.btnText}>Reply</Text>}

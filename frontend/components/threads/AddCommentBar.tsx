@@ -1,4 +1,4 @@
-// components/AddCommentBar.tsx
+// components/threads/AddCommentBar.tsx
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
     View,
@@ -7,8 +7,8 @@ import {
     Text,
     StyleSheet,
     ActivityIndicator,
-    KeyboardAvoidingView,
     Platform,
+    Keyboard,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme";
@@ -49,6 +49,7 @@ export default function AddCommentBar({
             score: 0,
             isDeleted: false,
             replyCount: 0,
+            userVote: 0,
         }),
         [author, threadId]
     );
@@ -77,40 +78,49 @@ export default function AddCommentBar({
             onServerError?.(temp.id, err);
         } finally {
             setSubmitting(false);
-            // keep focus for fast comment streams
-            requestAnimationFrame(() => inputRef.current?.focus());
+            // Close the keyboard and blur the input so it doesn't pop back up
+            inputRef.current?.blur();
+            Keyboard.dismiss();
         }
-    }, [text, submitting, createTemp, onOptimisticCreate, onServerConfirm, onServerError, threadId, author]);
+    }, [
+        text,
+        submitting,
+        createTemp,
+        onOptimisticCreate,
+        onServerConfirm,
+        onServerError,
+        threadId,
+        author,
+    ]);
 
     const bottomPad = useMemo(() => Math.max(insets.bottom, 8), [insets.bottom]);
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.select({ ios: "padding", android: undefined })}
-            keyboardVerticalOffset={Platform.select({ ios: 64, android: 0 }) ?? 0}
-        >
-            <View style={[styles.bar, { paddingBottom: bottomPad }]}>
-                <TextInput
-                    ref={inputRef}
-                    style={styles.input}
-                    placeholder="Write a comment…"
-                    placeholderTextColor={colors.nextDarkest}
-                    multiline
-                    value={text}
-                    onChangeText={setText}
-                    editable={!submitting}
-                    returnKeyType="send"
-                    onSubmitEditing={onSubmit}
-                />
-                <Pressable
-                    style={({ pressed }) => [styles.postBtn, (pressed || submitting || !canPost) && styles.postBtnDisabled]}
-                    onPress={onSubmit}
-                    disabled={!canPost}
-                >
-                    {submitting ? <ActivityIndicator /> : <Text style={styles.postText}>Post</Text>}
-                </Pressable>
-            </View>
-        </KeyboardAvoidingView>
+        <View style={[styles.bar, { paddingBottom: bottomPad }]}>
+            <TextInput
+                ref={inputRef}
+                style={styles.input}
+                placeholder="Write a comment…"
+                placeholderTextColor={colors.nextDarkest}
+                multiline
+                value={text}
+                onChangeText={setText}
+                editable={!submitting}
+                blurOnSubmit={true}
+                returnKeyType={Platform.select({ ios: "default", android: "none" }) ?? "default"}
+                onSubmitEditing={onSubmit}
+            />
+            <Pressable
+                style={({ pressed }) => [
+                    styles.postBtn,
+                    (pressed || submitting || !canPost) && styles.postBtnDisabled,
+                ]}
+                onPress={onSubmit}
+                disabled={!canPost}
+            >
+                {submitting ? <ActivityIndicator /> : <Text style={styles.postText}>Post</Text>}
+            </Pressable>
+        </View>
     );
 }
 

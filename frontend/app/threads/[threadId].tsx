@@ -12,22 +12,20 @@ import HiddenToggle from "@/components/threads/HiddenToggle";
 import { useCommentsList } from "@/hooks/useCommentsList";
 import { MessageCircle } from "lucide-react-native";
 import { ArrowBigUp } from "lucide-react-native";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 const PAGE_SIZE = 20;
 
-// TEMP current user (until auth)
 const CURRENT_AUTHOR: Author = { authorId: "me", username: "You", profilePhotoUrl: null };
-const CURRENT_USER_ID = CURRENT_AUTHOR.username; // or CURRENT_AUTHOR.authorId
+const CURRENT_USER_ID = CURRENT_AUTHOR.username;
 
 export default function ThreadScreen() {
     const { threadId } = useLocalSearchParams<{ threadId: string }>();
 
-    // thread header
     const [thread, setThread] = useState<ThreadResponse | null>(null);
     const [loadingThread, setLoadingThread] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // comments hook (list, pagination, optimistic create)
     const {
         comments,
         token,
@@ -46,7 +44,9 @@ export default function ThreadScreen() {
 
     const listRef = useRef<FlatList<CommentResponse>>(null);
 
-    // load thread + initial comments
+    // keyboard lift for the bottom composer + extra list padding
+    const { keyboardHeight, keyboardShown } = useKeyboardHeight();
+
     useEffect(() => {
         let mounted = true;
         const run = async () => {
@@ -78,7 +78,14 @@ export default function ThreadScreen() {
         }
     }, [loadInitial]);
 
-    // ⬇️ moved the "Comments" label OUTSIDE the card
+    // Let children scroll themselves into view on input focus
+    const scrollParentTo = useCallback((y: number) => {
+        // keep a small margin above keyboard/composer
+        const margin = 80;
+        const offset = Math.max(0, y - margin);
+        listRef.current?.scrollToOffset({ offset, animated: true });
+    }, []);
+
     const header = useMemo(
         () => (
             <>
@@ -116,9 +123,10 @@ export default function ThreadScreen() {
                 showHiddenComments={showHiddenComments}
                 onHiddenBelowZeroChange={markHiddenLocal}
                 currentUserId={CURRENT_USER_ID}
+                scrollParentTo={scrollParentTo}           // ⬅️ NEW
             />
         ),
-        [threadId, showHiddenComments, markHiddenLocal]
+        [threadId, showHiddenComments, markHiddenLocal, scrollParentTo]
     );
 
     if (loadingThread) {
@@ -163,19 +171,33 @@ export default function ThreadScreen() {
                 renderItem={renderItem}
                 ListFooterComponent={listFooter}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-                contentContainerStyle={{ paddingBottom: LIST_BOTTOM_PADDING }}
+                contentContainerStyle={{
+                    paddingBottom: LIST_BOTTOM_PADDING + (keyboardShown ? keyboardHeight : 0), // ⬅️ add space when keyboard up
+                }}
                 removeClippedSubviews
                 initialNumToRender={12}
                 windowSize={10}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="interactive"
+                contentInsetAdjustmentBehavior="automatic"
             />
 
-            <View style={styles.addBarWrap}>
+            {/* Absolutely positioned composer; lifted above keyboard height */}
+            <View
+                pointerEvents="box-none"
+                style={[
+                    styles.addBarWrap,
+                    { bottom: keyboardShown ? keyboardHeight : 0 }, // ⬅️ key line
+                ]}
+            >
                 <AddCommentBar
                     threadId={threadId!}
                     author={CURRENT_AUTHOR}
                     onOptimisticCreate={(temp) => {
                         onOptimisticCreate(temp);
-                        requestAnimationFrame(() => listRef.current?.scrollToOffset({ offset: 0, animated: true }));
+                        requestAnimationFrame(() =>
+                            listRef.current?.scrollToOffset({ offset: 0, animated: true })
+                        );
                     }}
                     onServerConfirm={onServerConfirm}
                     onServerError={onServerError}
@@ -206,7 +228,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     pillText: { color: colors.midBlue, fontWeight: "600" },
-    // ⬇️ new: outside-the-card "Comments" header
     commentsHeader: {
         marginTop: 8,
         marginBottom: 4,
