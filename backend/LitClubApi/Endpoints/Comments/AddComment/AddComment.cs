@@ -1,6 +1,5 @@
 using Ardalis.ApiEndpoints;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Comments;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
@@ -88,7 +87,7 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
             etag: threadResp.ETag,
             mutate: t =>
             {
-                t.CommentCount = t.CommentCount + 1;
+                t.CommentCount++;
                 t.Updated = DateTime.UtcNow;
             },
             cancellationToken: cancellationToken);
@@ -108,7 +107,7 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
                 etag: parentResp.ETag,
                 mutate: p =>
                 {
-                    p.ReplyCount = p.ReplyCount + 1;
+                    p.ReplyCount++;
                     p.Updated = DateTime.UtcNow;
                 },
                 cancellationToken: cancellationToken);
