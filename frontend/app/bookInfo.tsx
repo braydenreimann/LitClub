@@ -105,11 +105,9 @@ export default function BookInfoScreen() {
     {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
-            <Header />
             <ScrollView>
-                <View style={{flexDirection:'row'} } >
+                <View style={[{flexDirection:'row'},]} >
                     <BackButton /> 
-                    <Text style={globalStyles.heading} > Book Information </Text>
                 </View>
 
                 <View style={infoStyle.currentRead}>

@@ -26,13 +26,27 @@ import { useLitClubs } from '@/LitClubImport/LitClubContext';
 import Constants from 'expo-constants';
 import { User } from '@/domain/models';
 import { useSession } from '@/auth/authContext';
+import { GenresSelector } from '@/components/genresSelector';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 const LAN_IP = hostFromExpo ?? '10.0.0.252'
 const API_BASE_URL = `http://${LAN_IP}:5112`
 const apiUrl = `${API_BASE_URL}/litclubs`;
 
+function BackButton() {
+    const router = useRouter();
+    return (
+        <Pressable>
+            <Link href="/bookclubs" onPress={() => router.back()}>
+                <EvilIcons name="chevron-left" size={50} color="#193350" style={{marginLeft: 0}}/>
+            </Link>
+        </Pressable>
+    );
+}
 
+const GENRES = [
+    'Fantasy', 'Romance', 'Fiction', 'Science-Fiction', 'Drama', 'Mystery', 'Non-Fiction', 'Thriller', 'Horror', 'Historical', 'Poetry', 'Biography', 'Memoir', 'Young Adult', 'True Crime', 'Science', 'Western Fiction', 'Philopshical', 'Action Fiction'
+];
 // Define user state
 export default function CreateLitClub() {
     const [fontsLoaded] = useFonts({
@@ -52,7 +66,7 @@ export default function CreateLitClub() {
     // club form inputs
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [preferredGenres, setPreferredGenres] = useState('');
+    const [preferredGenres, setPreferredGenres] = useState<string[]>([]);
     const [privateClub, setPrivateClub] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -87,7 +101,7 @@ export default function CreateLitClub() {
             name: name.trim(),
             ownerUserId: user.id,
             description: description.trim(),
-            preferredGenres: preferredGenres ? preferredGenres.split(',').map(genre => genre.trim()) : [],
+            preferredGenres: preferredGenres,
             privateClub,
             memberUserIds: [user.id],
             libraryId: '',
@@ -124,9 +138,12 @@ export default function CreateLitClub() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream, }}>
+            <View style={{flexDirection:'row', paddingTop: 90, margin: 10} } >
+                <BackButton /> 
+                <Text style={[globalStyles.heading, {paddingTop: 0, paddingBottom: 10}]}>Create a New Lit Club</Text>
+            </View>
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={[globalStyles.heading, {paddingBottom: 50, paddingTop: 80}]}>Create a New Lit Club</Text>
-
+                
                 {/* Club Name */}
                 <Text style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest }]}>Enter the Name of Your LitClub</Text>
                 <TextInput
@@ -150,14 +167,8 @@ export default function CreateLitClub() {
                 />
 
                 {/* Genres */}
-                <Text style={[globalStyles.subheading, { paddingTop: 30, fontSize: 18, color: colors.darkest }]}>Preferred Genres (Comma Separated)</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="e.g., Fiction, Mystery, Sci-Fi"
-                    placeholderTextColor={'grey'}
-                    value={preferredGenres}
-                    onChangeText={setPreferredGenres}
-                />
+                <Text style={[globalStyles.subheading, { paddingTop: 30, fontSize: 18, color: colors.darkest, paddingBottom: 10 }]}>Preferred Genres</Text>
+                <GenresSelector selected={preferredGenres} onChange={setPreferredGenres} />
 
                 {/* Privacy toggle */}
                 <Pressable

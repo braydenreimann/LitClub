@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { ActivityIndicator, Platform, Pressable } from 'react-native';
-import { ThemedText } from '../components/themed-text';
-import { ThemedView } from '../components/themed-view';
 import { Link, Stack, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
 import ReadingList from '../components/ReadingList';
-import TopThreeBooks from '../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import ClubMembers from '@/components/ClubMembers';
@@ -24,6 +21,7 @@ import { useLocalSearchParams } from 'expo-router';
 import Constants from 'expo-constants';
 import { User } from '@/domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GenresSelector } from '@/components/genresSelector';
 
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
@@ -45,9 +43,10 @@ function Jump2discButton() {
     );
 }
 function BackButton() {
+    const router = useRouter();
     return (
         <Pressable>
-            <Link href="/profile">
+            <Link href="/bookclubs" onPress={() => router.back()}>
                 <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}/>
             </Link>
         </Pressable>
@@ -70,7 +69,23 @@ export default function LitClubScreen() {
     const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
 
     const [actionLoading, setActionLoading] = useState(false);
+    const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
     const [user, setUser] = useState<{ id: string } | null>(null);
+
+    useEffect(() => {
+    const loadArchivedClubs = async () => {
+      const saved = await AsyncStorage.getItem('archivedClubs');
+      if (saved) {
+        setArchivedClubIds(JSON.parse(saved));
+      }
+    };
+    loadArchivedClubs();
+  }, []);
+
+  //save when changed
+  useEffect(() => {
+    AsyncStorage.setItem('archivedClubs', JSON.stringify(archivedClubIds));
+  }, [archivedClubIds]);
 
     useEffect(() => { //chat-gpt is a quadrillion dollar idea
         // Define an async function inside useEffect
@@ -180,6 +195,26 @@ export default function LitClubScreen() {
         );
     }
 
+    const isArchived = archivedClubIds.includes(club.id);
+
+    const handleArchiveToggle = async () => {
+        if (isArchived) { // unarchive
+            setArchivedClubIds(prev => prev.filter(id => id !== club.id));
+            Alert.alert('Club unarchived.');
+        } else { // archive
+            setArchivedClubIds(prev => [...prev, club.id]);
+            Alert.alert('Club archived.');
+        }
+
+        await AsyncStorage.setItem('archivedClubs', JSON.stringify(
+            isArchived
+                ? archivedClubIds.filter(id => id !== club.id)
+                : [...archivedClubIds, club.id]
+        ));
+
+        router.replace('/bookclubs');
+    }; // help from AI to make archiving function
+
     return (
             <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}> 
                     <View style={{flexDirection:'row', paddingTop: 25 } } >
@@ -240,7 +275,7 @@ export default function LitClubScreen() {
                 <Pressable
                     disabled={actionLoading}
                     onPress={isOwner ? handleDeleteClub : handleLeaveClub}
-                    style={[litStyles.actionButton, { backgroundColor: colors.midBlue}]}
+                    style={[litStyles.deleteButton, { backgroundColor: colors.midBlue}]}
                 >
                     <Text style={[globalStyles.body, { color: 'white', textAlign: 'center', textAlignVertical: 'center' }]}>
                         {actionLoading 
@@ -251,6 +286,17 @@ export default function LitClubScreen() {
                         }
                     </Text>
                 </Pressable>    
+
+                <Pressable
+                    disabled={actionLoading}
+                    onPress={handleArchiveToggle}
+                    style={[litStyles.archiveButton, { backgroundColor: colors.yellow}]}
+                >
+                    <Text style={[globalStyles.body, { color: colors.darkest, textAlign: 'center', textAlignVertical: 'center' }]}>
+                        {isArchived ? "Unarchive Club" : "Archive Club"
+                        }
+                    </Text>
+                </Pressable> 
                 
         </ScrollView>
     );
@@ -347,11 +393,18 @@ const litStyles = StyleSheet.create({
         textAlignVertical: "center",
 
     },
-    actionButton: {
-        marginVertical: 40,
+    deleteButton: {
+        marginTop: 40,
         marginHorizontal: 30,
         padding: 15,
         borderRadius: 12,
 
+    },
+    archiveButton: {
+        marginTop: 25,
+        marginHorizontal: 30,
+        padding: 15,
+        borderRadius: 12,
+        marginBottom: 40,
     },
 });

@@ -24,6 +24,7 @@ export default function AllLitClubs() {
 
   const [user, setUser] = useState<User | null>(null)
   const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
+  const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -34,6 +35,21 @@ export default function AllLitClubs() {
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
+
+  useEffect(() => {
+    const loadArchivedClubs = async () => {
+      const saved = await AsyncStorage.getItem('archivedClubs');
+      if (saved) {
+        setArchivedClubIds(JSON.parse(saved));
+      }
+    };
+    loadArchivedClubs();
+  }, []);
+
+  //save when changed
+  useEffect(() => {
+    AsyncStorage.setItem('archivedClubs', JSON.stringify(archivedClubIds));
+  }, [archivedClubIds]);
 
   useEffect(() => { //from profile.tsx
         const loadSession = async () => {
@@ -74,9 +90,10 @@ export default function AllLitClubs() {
   }
   
   const userId = user?.id ?? '';
-  const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
-  const leaderClubs = litClubs.filter(c => c.ownerUserId === userId);
-  const archivedClubs = litClubs.filter(c => c.privateClub); // example filter
+  const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId) && !archivedClubIds.includes(c.id));
+  const leaderClubs = litClubs.filter(c => c.ownerUserId === userId && !archivedClubIds.includes(c.id));
+  const archivedClubs = litClubs.filter(c => archivedClubIds.includes(c.id)); // example filter
+
   
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
@@ -115,9 +132,7 @@ export default function AllLitClubs() {
                                     
             <Pressable
               key={club.id}
-              style={globalStyles.litclubCard}
-              onPress={() => Alert.alert(`Opening ${club.name}`)} 
-            >
+              style={globalStyles.litclubCard}            >
             <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild > 
               <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
             </Link>
@@ -136,7 +151,6 @@ export default function AllLitClubs() {
               <Pressable
                 key={club.id}
                 style={globalStyles.litclubCard}
-                onPress={() => Alert.alert(`Opening ${club.name}`)} 
               >
                 <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild > 
                   <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
@@ -155,19 +169,12 @@ export default function AllLitClubs() {
               archivedClubs.map((club) => (  
               <Pressable
                   key={club.id}
-                  style={[globalStyles.litclubCard, { backgroundColor: colors.midBlue }]}
-                  onPress={() => {
-                  /*TODO make the buttons go to their clubs*/
-                  Alert.alert(`Opening archived club ${club.name}`) 
-              }} >
-              <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild> 
-              <Text style={[globalStyles.cardFont, 
-                 { textDecorationLine: 'line-through',
-        
-                  }]} adjustsFontSizeToFit={true}>
-                  {club.name}
+                  style={[globalStyles.litclubCard, { backgroundColor: colors.midBlue }]}>
+                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name },}} asChild> 
+                  <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >
+                    {club.name}
                   </Text>
-                  </Link>
+                </Link>
               </Pressable>
                                    
            ))
