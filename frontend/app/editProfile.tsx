@@ -116,7 +116,10 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <ScrollView style={[globalStyles.container, styles.container]}>
+    <ScrollView
+      style={[globalStyles.container, styles.container]}
+      contentContainerStyle={{ paddingBottom: 80 }}
+    >
       <Text style={globalStyles.heading}>Edit Your Profile</Text>
 
       {/* Email (readonly) */}

@@ -120,13 +120,13 @@ export default function ProfileScreen() {
             <Header />
             <ScrollView>
             <View style={profStyles.nameRow}>
-                <Text style={[globalStyles.heading, {paddingTop: 15}]}>
+                <View style={profStyles.nameSection}>
+                    <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
                     {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
-                    {"\n"}
-                    <Text style={globalStyles.body}>{'she/they'}</Text>
-                </Text>
+                    </Text>
+                    <Text style={globalStyles.body}>she/he/they</Text>
+                </View>
 
-                {/* Buttons next to the name */}
                 <View style={profStyles.iconRow}>
                     <SettingsButton />
                     <StatsButton />
@@ -342,16 +342,22 @@ const profStyles = StyleSheet.create({
         textAlignVertical: "center",
     },
     nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    paddingTop: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
+        paddingTop: 15,
+    },
+    nameSection: {
+        flexShrink: 1,
+        flexWrap: 'wrap',
+        maxWidth: '70%',
     },
     iconRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10, 
+        flexShrink: 0,
     },
 
 });
