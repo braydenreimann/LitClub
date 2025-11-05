@@ -86,7 +86,7 @@ export async function getTopThree(userId: string): Promise<DisplayBook[] | null>
     }
 }
 
-export async function getBookshelf(userId: string, status: number): Promise<DisplayBook[] | null> {
+export async function getBookshelfByStatus(userId: string, status: number): Promise<DisplayBook[] | null> { //Specifically for sorting by status for parallax reading lists.
     try {
         const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks`);
         if (!response.ok) {
@@ -120,7 +120,7 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
         const displayBooks: DisplayBook[] = fullBooks
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
-                id: b.id, //misnomer, actually returns index
+                id: b.id, 
                 title: b.title,
                 coverImageUrl: b.coverImageUrl// use the real book title now
             }));
