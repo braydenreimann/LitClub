@@ -30,6 +30,7 @@ export type CommentResponse = {
     score: number;
     isDeleted: boolean;
     replyCount: number;
+    userVote?: VoteDirection | null;
 };
 
 export type CommentListResponse = {
@@ -37,4 +38,4 @@ export type CommentListResponse = {
     continuationToken?: string | null;
 };
 
-export type VoteDirection = 1 | -1;
+export type VoteDirection = -1 | 0 | 1;
