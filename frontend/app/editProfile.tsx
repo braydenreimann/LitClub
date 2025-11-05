@@ -73,8 +73,13 @@ export default function EditProfileScreen() {
   };
 
   const handleSave = async () => {
-    if (!firstName || !lastName) {
-      Alert.alert('Missing information', 'Please fill out your first and last name.');
+    if (!firstName || !email) {
+      Alert.alert('Missing information', 'Please make sure you have a first name and an email');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
       return;
     }
 
@@ -117,9 +122,11 @@ export default function EditProfileScreen() {
       {/* Email (readonly) */}
       <Text style={styles.label}>Email</Text>
       <TextInput
-        style={[styles.input, styles.readonly]}
+        style={styles.input}
         value={email}
-        editable={false}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
       />
 
       {/* Username (readonly) */}
@@ -139,7 +146,7 @@ export default function EditProfileScreen() {
       />
 
       {/* Last Name */}
-      <Text style={styles.label}>Last Name *</Text>
+      <Text style={styles.label}>Last Name</Text>
       <TextInput
         style={styles.input}
         value={lastName}
@@ -187,6 +194,12 @@ export default function EditProfileScreen() {
           thumbColor={colors.cream}
         />
       </View>
+      <TouchableOpacity
+        style={[styles.button, styles.passwordButton]}
+          onPress={() => router.push('/changePassword')}
+        >
+          <Text style={styles.buttonText}>Change Password</Text>
+      </TouchableOpacity>
 
       {/* Buttons */}
       <View style={styles.buttonRow}>
@@ -277,6 +290,10 @@ const styles = StyleSheet.create({
   },
   discardButton: {
     backgroundColor: colors.teal,
+  },
+    passwordButton: {
+    backgroundColor: colors.nextDarkest,
+    marginTop: 16,
   },
   buttonText: {
     fontFamily: fonts.subheading,
