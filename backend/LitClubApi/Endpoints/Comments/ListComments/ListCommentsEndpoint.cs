@@ -21,6 +21,8 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
     {
         try
         {
+            var pk = new PartitionKey(request.ThreadId);
+
             var q = new QueryDefinition(@"
                 SELECT * FROM c
                 WHERE c.itemType = 'comment'
@@ -32,8 +34,9 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
                 .WithParameter("@t", request.ThreadId);
 
             var it = cosmosContext.Threads.GetItemQueryIterator<Comment>(
-                q, request.ContinuationToken,
-                new QueryRequestOptions { MaxItemCount = request.PageSize, PartitionKey = new PartitionKey(request.ThreadId) });
+                q,
+                request.ContinuationToken,
+                new QueryRequestOptions { MaxItemCount = request.PageSize, PartitionKey = pk });
 
             var items = new List<CommentResponse>();
             FeedResponse<Comment>? page = null;
@@ -41,7 +44,63 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
             if (it.HasMoreResults)
             {
                 page = await it.ReadNextAsync(cancellationToken);
-                foreach (var cmt in page) items.Add(cmt.ToResponse());
+
+                // Map base comments first
+                var baseList = page.ToList();
+
+                // If userId provided, fetch their votes for these comment IDs
+                Dictionary<string, sbyte>? votesByCommentId = null;
+                if (!string.IsNullOrWhiteSpace(request.UserId) && baseList.Count > 0)
+                {
+                    var votesQ = new QueryDefinition(@"
+        SELECT c.CommentId, c.Vote FROM c
+        WHERE c.threadId = @t
+          AND c.UserId = @u
+          AND (
+               (IS_DEFINED(c.itemType) AND c.itemType = 'commentVote')
+            OR (IS_DEFINED(c.ItemType) AND c.ItemType = 'commentVote')
+          )")
+                        .WithParameter("@t", request.ThreadId)
+                        .WithParameter("@u", request.UserId);
+
+                    var voteIt = cosmosContext.Threads.GetItemQueryIterator<dynamic>(
+                        votesQ, null, new QueryRequestOptions { PartitionKey = pk });
+
+                    votesByCommentId = new Dictionary<string, sbyte>(baseList.Count);
+                    while (voteIt.HasMoreResults)
+                    {
+                        var votePage = await voteIt.ReadNextAsync(cancellationToken);
+                        foreach (var v in votePage)
+                        {
+                            string cid = v.CommentId;
+                            sbyte vote = (sbyte)v.Vote;
+                            // Keep the latest occurrence; duplicates shouldn't happen, but be robust.
+                            votesByCommentId[cid] = vote;
+                        }
+                    }
+                }
+
+                // Build final response list with optional UserVote
+                foreach (var cmt in baseList)
+                {
+                    sbyte? uv = null;
+                    if (votesByCommentId != null && votesByCommentId.TryGetValue(cmt.Id, out var v)) uv = v;
+
+                    items.Add(new CommentResponse
+                    {
+                        Id = cmt.Id,
+                        ThreadId = cmt.ThreadId,
+                        Author = cmt.Author,
+                        Body = cmt.Body,
+                        ParentCommentId = cmt.ParentCommentId,
+                        Created = cmt.Created,
+                        Updated = cmt.Updated,
+                        Score = cmt.Score,
+                        IsDeleted = cmt.IsDeleted,
+                        ReplyCount = cmt.ReplyCount,
+                        UserVote = uv
+                    });
+                }
             }
 
             return Ok(new ListCommentsResponse
@@ -50,8 +109,9 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
                 ContinuationToken = page?.ContinuationToken
             });
         }
-        catch (CosmosException)
+        catch (CosmosException ex)
         {
+            Console.WriteLine($"[ListComments] Cosmos error {(int)ex.StatusCode} {ex.StatusCode}: {ex.Message}");
             return StatusCode(500, "Unable to access database");
         }
     }

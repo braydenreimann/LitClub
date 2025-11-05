@@ -12,4 +12,7 @@ public sealed class ListCommentsRequest
 
     [FromQuery(Name = "continuationToken")]
     public string? ContinuationToken { get; init; }
+
+    [FromQuery(Name = "userId")]
+    public string? UserId { get; init; }
 }

@@ -14,4 +14,5 @@ public sealed class CommentResponse
     public int Score { get; init; }
     public bool IsDeleted { get; init; }
     public int ReplyCount { get; init; }
+    public sbyte? UserVote { get; init; }
 }
