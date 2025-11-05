@@ -16,5 +16,6 @@ public sealed class VoteRequest
 
 public sealed class VoteBody
 {
-    public required VoteEnum Vote { get; init; }
+    public required string UserId { get; init; }   // client-provided for now
+    public required VoteEnum Vote { get; init; }   // -1, 0, +1
 }
