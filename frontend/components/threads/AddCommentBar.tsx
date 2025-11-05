@@ -1,4 +1,3 @@
-// components/threads/AddCommentBar.tsx
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
     View,
@@ -21,6 +20,7 @@ type AddCommentBarProps = {
     onOptimisticCreate: (temp: CommentResponse) => void;
     onServerConfirm?: (tempId: string, saved: CommentResponse) => void;
     onServerError?: (tempId: string, err: unknown) => void;
+    onFocusChange?: (focused: boolean) => void;   // ← NEW
 };
 
 export default function AddCommentBar({
@@ -29,6 +29,7 @@ export default function AddCommentBar({
     onOptimisticCreate,
     onServerConfirm,
     onServerError,
+    onFocusChange,
 }: AddCommentBarProps) {
     const insets = useSafeAreaInsets();
     const [text, setText] = useState("");
@@ -78,20 +79,10 @@ export default function AddCommentBar({
             onServerError?.(temp.id, err);
         } finally {
             setSubmitting(false);
-            // Close the keyboard and blur the input so it doesn't pop back up
             inputRef.current?.blur();
             Keyboard.dismiss();
         }
-    }, [
-        text,
-        submitting,
-        createTemp,
-        onOptimisticCreate,
-        onServerConfirm,
-        onServerError,
-        threadId,
-        author,
-    ]);
+    }, [text, submitting, createTemp, onOptimisticCreate, onServerConfirm, onServerError, threadId, author]);
 
     const bottomPad = useMemo(() => Math.max(insets.bottom, 8), [insets.bottom]);
 
@@ -109,6 +100,8 @@ export default function AddCommentBar({
                 blurOnSubmit={true}
                 returnKeyType={Platform.select({ ios: "default", android: "none" }) ?? "default"}
                 onSubmitEditing={onSubmit}
+                onFocus={() => onFocusChange?.(true)}     // ← NEW
+                onBlur={() => onFocusChange?.(false)}     // ← NEW
             />
             <Pressable
                 style={({ pressed }) => [

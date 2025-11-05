@@ -1,6 +1,5 @@
-// components/threads/CommentItem.tsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, Pressable, StyleSheet, ActivityIndicator, LayoutChangeEvent } from "react-native";
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { colors } from "@/theme";
 import type { CommentResponse, Author } from "@/domain/models/thread-types";
 import { addReply, voteComment } from "@/services/commentsService";
@@ -16,7 +15,6 @@ type Props = {
     currentUserId: string;
     showHiddenComments?: boolean;
     onHiddenBelowZeroChange?: (commentId: string, hidden: boolean) => void;
-    scrollParentTo?: (y: number) => void; // ⬅️ NEW
 };
 
 export default function CommentItem({
@@ -26,7 +24,6 @@ export default function CommentItem({
     currentUserId,
     showHiddenComments = false,
     onHiddenBelowZeroChange,
-    scrollParentTo,
 }: Props) {
     const [expanded, setExpanded] = useState(false);
     const [showReplyBox, setShowReplyBox] = useState(false);
@@ -143,18 +140,12 @@ export default function CommentItem({
         [expanded, threadId, currentAuthor, comment.id, optimisticAdd, confirmReplace, rollbackRemove]
     );
 
-    // measure our top Y to allow scrolling into view on input focus
-    const topYRef = useRef(0);
-    const onLayout = useCallback((e: LayoutChangeEvent) => {
-        topYRef.current = e.nativeEvent.layout.y;
-    }, []);
-
-    // hide top-level if score < 0 and hidden-not-shown
+    // Hide top-level if score < 0 and hidden-not-shown
     if (comment.isDeleted) return null;
     if (!showHiddenComments && localScore < 0) return null;
 
     return (
-        <View style={styles.wrap} onLayout={onLayout}>
+        <View style={styles.wrap}>
             <View style={styles.headerRow}>
                 <Text style={styles.username}>{comment.author.username}</Text>
             </View>
@@ -173,8 +164,7 @@ export default function CommentItem({
                         setShowReplyBox((s) => !s);
                         if (!expanded) setExpanded(true);
                         ensureLoaded();
-                        // scroll into view when opening the composer
-                        scrollParentTo?.(topYRef.current);
+                        // ⛔️ removed any auto-scroll on reply open
                     }}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
@@ -193,10 +183,11 @@ export default function CommentItem({
             {showReplyBox && (
                 <ReplyComposer
                     onSubmit={submitReply}
-                    onFocus={() => scrollParentTo?.(topYRef.current)}
-                    refocusAfterSubmit={false}   // ⬅️ prevent re-opening keyboard
+                    // ⛔️ no onFocus scroll; keep composer in place
+                    refocusAfterSubmit={false}
                 />
             )}
+
             {expanded && (
                 <View style={styles.replies}>
                     {loading && replies.length === 0 ? (

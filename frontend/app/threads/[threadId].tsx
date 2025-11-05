@@ -1,4 +1,3 @@
-// app/threads/[threadId].tsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, FlatList, RefreshControl, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
@@ -11,7 +10,6 @@ import AddCommentBar from "@/components/threads/AddCommentBar";
 import HiddenToggle from "@/components/threads/HiddenToggle";
 import { useCommentsList } from "@/hooks/useCommentsList";
 import { MessageCircle } from "lucide-react-native";
-import { ArrowBigUp } from "lucide-react-native";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 const PAGE_SIZE = 20;
@@ -44,8 +42,8 @@ export default function ThreadScreen() {
 
     const listRef = useRef<FlatList<CommentResponse>>(null);
 
-    // keyboard lift for the bottom composer + extra list padding
     const { keyboardHeight, keyboardShown } = useKeyboardHeight();
+    const [commentBarFocused, setCommentBarFocused] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -78,14 +76,6 @@ export default function ThreadScreen() {
         }
     }, [loadInitial]);
 
-    // Let children scroll themselves into view on input focus
-    const scrollParentTo = useCallback((y: number) => {
-        // keep a small margin above keyboard/composer
-        const margin = 80;
-        const offset = Math.max(0, y - margin);
-        listRef.current?.scrollToOffset({ offset, animated: true });
-    }, []);
-
     const header = useMemo(
         () => (
             <>
@@ -97,10 +87,6 @@ export default function ThreadScreen() {
                     <Text style={[globalStyles.body, { marginTop: 8 }]}>{thread?.body}</Text>
 
                     <View style={styles.actions}>
-                        {/* <View style={[styles.pill, styles.pillRow]}>
-                            <ArrowBigUp size={14} color={colors.midBlue} />
-                            <Text style={styles.pillText}>{thread?.score ?? 0}</Text>
-                        </View> */}
                         <View style={[styles.pill, styles.pillRow]}>
                             <MessageCircle size={14} color={colors.midBlue} />
                             <Text style={styles.pillText}>{thread?.commentCount ?? 0}</Text>
@@ -123,10 +109,9 @@ export default function ThreadScreen() {
                 showHiddenComments={showHiddenComments}
                 onHiddenBelowZeroChange={markHiddenLocal}
                 currentUserId={CURRENT_USER_ID}
-                scrollParentTo={scrollParentTo}           // ⬅️ NEW
             />
         ),
-        [threadId, showHiddenComments, markHiddenLocal, scrollParentTo]
+        [threadId, showHiddenComments, markHiddenLocal]
     );
 
     if (loadingThread) {
@@ -172,7 +157,7 @@ export default function ThreadScreen() {
                 ListFooterComponent={listFooter}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                 contentContainerStyle={{
-                    paddingBottom: LIST_BOTTOM_PADDING + (keyboardShown ? keyboardHeight : 0), // ⬅️ add space when keyboard up
+                    paddingBottom: LIST_BOTTOM_PADDING + (keyboardShown ? keyboardHeight : 0),
                 }}
                 removeClippedSubviews
                 initialNumToRender={12}
@@ -182,12 +167,11 @@ export default function ThreadScreen() {
                 contentInsetAdjustmentBehavior="automatic"
             />
 
-            {/* Absolutely positioned composer; lifted above keyboard height */}
             <View
                 pointerEvents="box-none"
                 style={[
                     styles.addBarWrap,
-                    { bottom: keyboardShown ? keyboardHeight : 0 }, // ⬅️ key line
+                    { bottom: keyboardShown && commentBarFocused ? keyboardHeight : 0 },
                 ]}
             >
                 <AddCommentBar
@@ -201,6 +185,7 @@ export default function ThreadScreen() {
                     }}
                     onServerConfirm={onServerConfirm}
                     onServerError={onServerError}
+                    onFocusChange={setCommentBarFocused}   // keep lifting only for main composer
                 />
             </View>
         </View>

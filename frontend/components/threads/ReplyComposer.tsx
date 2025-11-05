@@ -1,6 +1,5 @@
-// components/threads/ReplyComposer.tsx
 import React, { useCallback, useRef, useState } from "react";
-import { View, TextInput, Pressable, Text, ActivityIndicator, StyleSheet } from "react-native";
+import { View, TextInput, Pressable, Text, ActivityIndicator, StyleSheet, Keyboard } from "react-native";
 import { colors } from "@/theme";
 
 type Props = {
@@ -8,7 +7,8 @@ type Props = {
     onSubmit: (text: string) => Promise<void> | void;
     onSubmitted?: () => void;
     refocusAfterSubmit?: boolean;
-    onFocus?: () => void; // ⬅️ NEW
+    onFocus?: () => void;
+    autoFocus?: boolean;               // ⬅️ NEW
 };
 
 export default function ReplyComposer({
@@ -17,6 +17,7 @@ export default function ReplyComposer({
     onSubmitted,
     refocusAfterSubmit = true,
     onFocus,
+    autoFocus = true,                  // ⬅️ default: open keyboard when shown
 }: Props) {
     const [text, setText] = useState("");
     const [busy, setBusy] = useState(false);
@@ -31,8 +32,11 @@ export default function ReplyComposer({
             await onSubmit(body);
             setText("");
             onSubmitted?.();
+            // Dismiss keyboard so screen returns to read mode
+            ref.current?.blur();
+            Keyboard.dismiss();
             if (refocusAfterSubmit) {
-                requestAnimationFrame(() => ref.current?.focus());
+                // keep as-is; parents usually pass false for replies
             }
         } finally {
             setBusy(false);
@@ -52,7 +56,8 @@ export default function ReplyComposer({
                 multiline
                 returnKeyType="send"
                 onSubmitEditing={submit}
-                onFocus={onFocus}             // ⬅️ NEW
+                onFocus={onFocus}
+                autoFocus={autoFocus}        // ⬅️ focus when mounted → keyboard opens
             />
             <Pressable onPress={submit} disabled={!canPost} style={[styles.btn, !canPost && { opacity: 0.6 }]}>
                 {busy ? <ActivityIndicator /> : <Text style={styles.btnText}>Reply</Text>}
