@@ -6,7 +6,12 @@ public class Comment
 {
     [JsonProperty(PropertyName = "id")]
     public string Id { get; init; } = Guid.NewGuid().ToString();
+    // Partition key — must exist in stored JSON
+    [JsonProperty(PropertyName = "threadId")]
     public required string ThreadId { get; init; }
+    // Discriminator for the shared container
+    [JsonProperty(PropertyName = "itemType")]
+    public string ItemType => "comment";
     public required Author Author { get; init; }
     public required string Body { get; set; }
     public string? ParentCommentId { get; init; }

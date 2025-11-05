@@ -265,25 +265,6 @@ using (var scope = app.Services.CreateScope())
         Username = "johngreen",
     };
 
-    LitClubApi.Endpoints.Threads.AddThread.ThreadDocument thread = new()
-    {
-        Id = "1",
-        ThreadId = "1",
-        Author = author,
-        Title = "Chapter 1 Thread",
-        Body = "This is the thread for Chapter 1 of The Fault in Our Stars",
-        BookId = "1",
-        ChapterNumber = 1
-    };
-
-    Comment comment = new()
-    {
-        ThreadId = thread.Id,
-        Author = author,
-        Body = "This is a great comment on a thread!",
-        ParentCommentId = null,
-    };
-
     int i = 0;
     foreach (Book b in booklist)
     {

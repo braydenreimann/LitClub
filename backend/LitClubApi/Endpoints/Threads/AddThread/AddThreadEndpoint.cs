@@ -6,11 +6,11 @@ using Microsoft.Azure.Cosmos;
 namespace LitClubApi.Endpoints.Threads.AddThread;
 
 [ApiController]
-public partial class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
+public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<AddThreadRequest>
     .WithActionResult<ThreadResponse>
 {
-    [HttpPost("threads")]
+    [HttpPost("threads", Name = "AddThread")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ThreadResponse), StatusCodes.Status201Created)]
@@ -19,18 +19,22 @@ public partial class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
         AddThreadRequest request,
         CancellationToken cancellationToken = default)
     {
-        // Map to domain
-        Domain.Thread thread = AddThreadMapper.ToDomain(request);
+        // Domain.Thread now serializes threadId (PK) and itemType automatically.
+        var thread = new Domain.Thread
+        {
+            Author = request.Author,
+            Title = request.Title,
+            Body = request.Body,
+            BookId = request.BookId,
+            ChapterNumber = request.ChapterNumber,
+            LitClubId = request.LitClubId
+        };
 
-        // Prepare persistence doc (adds threadId + itemType for the shared container)
-        ThreadDocument doc = AddThreadMapper.ToDocument(thread);
-
-        var pk = new PartitionKey(doc.ThreadId);
-
+        var pk = new PartitionKey(thread.ThreadId);
         try
         {
             await cosmosContext.Threads.CreateItemAsync(
-                item: doc,
+                item: thread,
                 partitionKey: pk,
                 cancellationToken: cancellationToken);
         }

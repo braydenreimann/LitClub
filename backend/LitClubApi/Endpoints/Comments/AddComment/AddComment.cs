@@ -4,7 +4,6 @@ using LitClubApi.Endpoints.Comments;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using Newtonsoft.Json;
 
 namespace LitClubApi.Endpoints.Comments.AddComment;
 
@@ -63,7 +62,7 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
             }
         }
 
-        // 3) Create the new comment document
+        // 3) Create the new comment (Domain.Comment now has threadId + itemType)
         var comment = new Comment
         {
             ThreadId = threadId,
@@ -72,24 +71,9 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
             ParentCommentId = parentId
         };
 
-        var commentDoc = new CommentDocument
-        {
-            Id = comment.Id,
-            ThreadId = comment.ThreadId,
-            ItemType = "comment",
-            Author = comment.Author,
-            Body = comment.Body,
-            ParentCommentId = comment.ParentCommentId,
-            Created = comment.Created,
-            Updated = comment.Updated,
-            Score = comment.Score,
-            IsDeleted = comment.IsDeleted,
-            ReplyCount = comment.ReplyCount
-        };
-
         try
         {
-            await cosmosContext.Threads.CreateItemAsync(commentDoc, pk, cancellationToken: cancellationToken);
+            await cosmosContext.Threads.CreateItemAsync(comment, pk, cancellationToken: cancellationToken);
         }
         catch (CosmosException)
         {
@@ -153,19 +137,8 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
         {
             try
             {
-                // Load latest (first attempt uses provided ETag to guard)
-                ItemResponse<T> read;
-                if (attempt == 0)
-                {
-                    // Try to mutate a local copy from the initial read by fetching again to ensure we have the object
-                    read = await container.ReadItemAsync<T>(id, pk, cancellationToken: cancellationToken);
-                    currentEtag = read.ETag;
-                }
-                else
-                {
-                    read = await container.ReadItemAsync<T>(id, pk, cancellationToken: cancellationToken);
-                    currentEtag = read.ETag;
-                }
+                var read = await container.ReadItemAsync<T>(id, pk, cancellationToken: cancellationToken);
+                currentEtag = read.ETag;
 
                 var doc = read.Resource!;
                 mutate(doc);
@@ -176,8 +149,7 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.PreconditionFailed)
             {
-                // ETag mismatch → retry
-                continue;
+                continue; // retry on ETag mismatch
             }
             catch (CosmosException ex)
             {
@@ -186,26 +158,5 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
         }
 
         return (false, "ETag precondition failed after retries.");
-    }
-
-    private sealed class CommentDocument
-    {
-        [JsonProperty(PropertyName = "id")]
-        public required string Id { get; init; }
-
-        [JsonProperty(PropertyName = "threadId")]
-        public required string ThreadId { get; init; }
-
-        [JsonProperty(PropertyName = "itemType")]
-        public string ItemType { get; init; } = "comment";
-
-        public required Author Author { get; init; }
-        public required string Body { get; init; }
-        public string? ParentCommentId { get; init; }
-        public DateTime Created { get; init; }
-        public DateTime? Updated { get; init; }
-        public int Score { get; init; }
-        public bool IsDeleted { get; init; }
-        public int ReplyCount { get; init; }
     }
 }
