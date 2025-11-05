@@ -1,23 +1,15 @@
 using Azure.Storage.Blobs; //dotnet add package Azure.Storage.Blobs in LitClubApi project folder
-using Azure.Storage.Blobs.Models;
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.Blobs;
-using LitClubApi.Endpoints.Blobs.GenerateSas;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.ObjectModel;
-using System.Net.Sockets;
-using System.Reflection.Metadata;
-using System.Security.Policy;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
 
