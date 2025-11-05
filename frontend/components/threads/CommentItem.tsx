@@ -13,7 +13,7 @@ type Props = {
     comment: CommentResponse;
     threadId: string;
     currentAuthor: Author;
-    currentUserId: string; // <- used for userVote API
+    currentUserId: string;
     showHiddenComments?: boolean;
     onHiddenBelowZeroChange?: (commentId: string, hidden: boolean) => void;
 };
@@ -30,11 +30,10 @@ export default function CommentItem({
     const [showReplyBox, setShowReplyBox] = useState(false);
     const [showHiddenReplies, setShowHiddenReplies] = useState(false);
 
-    // top-level local score + vote
+    // local top-level state (score + user's vote)
     const [localScore, setLocalScore] = useState(comment.score);
-    const [localUserVote, setLocalUserVote] = useState<-1 | 0 | 1>(comment.userVote ?? 0);
+    const [localUserVote, setLocalUserVote] = useState<-1 | 0 | 1>((comment.userVote ?? 0) as -1 | 0 | 1);
 
-    // notify parent when local score crosses < 0 threshold
     const wasHiddenRef = useRef<boolean>(localScore < 0);
     useEffect(() => {
         const isHidden = localScore < 0;
@@ -44,7 +43,6 @@ export default function CommentItem({
         }
     }, [localScore, comment.id, onHiddenBelowZeroChange]);
 
-    // replies hook (data + pagination + optimistic ops)
     const {
         replies,
         token,
@@ -76,7 +74,7 @@ export default function CommentItem({
         await ensureLoaded();
     }, [expanded, ensureLoaded]);
 
-    // top-level vote change (Reddit-style)
+    // top-level vote change
     const onChangeTopLevelVote = useCallback(
         async (nextVote: -1 | 0 | 1) => {
             const prev = localUserVote;
@@ -84,11 +82,10 @@ export default function CommentItem({
 
             if (delta !== 0) setLocalScore((s) => s + delta);
             setLocalUserVote(nextVote);
-
             try {
                 const res = await voteComment(threadId, comment.id, currentUserId, nextVote);
                 setLocalScore(res.score);
-                setLocalUserVote(res.userVote);
+                setLocalUserVote(res.userVote as -1 | 0 | 1);
             } catch {
                 if (delta !== 0) setLocalScore((s) => s - delta);
                 setLocalUserVote(prev);
@@ -100,20 +97,17 @@ export default function CommentItem({
     // reply vote change
     const onChangeReplyVote = useCallback(
         async (replyId: string, nextVote: -1 | 0 | 1) => {
-            // optimistic
-            applyVote(replyId, nextVote);
+            applyVote(replyId, nextVote); // optimistic
             try {
                 const res = await voteComment(threadId, replyId, currentUserId, nextVote);
-                applyVote(replyId, res.userVote); // reconcile; score is recomputed with delta inside hook
+                applyVote(replyId, res.userVote as -1 | 0 | 1);
             } catch {
-                // revert:
                 applyVote(replyId, 0);
             }
         },
         [threadId, currentUserId, applyVote]
     );
 
-    // submit reply (optimistic)
     const submitReply = useCallback(
         async (body: string) => {
             if (!expanded) setExpanded(true);
@@ -122,10 +116,7 @@ export default function CommentItem({
             const temp: CommentResponse = {
                 id: `temp-reply-${now}`,
                 threadId,
-                author: {
-                    ...currentAuthor,
-                    profilePhotoUrl: currentAuthor.profilePhotoUrl ?? null,
-                },
+                author: { ...currentAuthor, profilePhotoUrl: currentAuthor.profilePhotoUrl ?? null },
                 body,
                 parentCommentId: comment.id,
                 created: new Date(now).toISOString(),
@@ -145,7 +136,7 @@ export default function CommentItem({
                 };
                 const saved = await addReply(threadId, comment.id, cleanedAuthor, body);
                 confirmReplace(temp.id, saved);
-                setShowReplyBox(false); // close on success
+                setShowReplyBox(false);
             } catch {
                 rollbackRemove(temp.id);
             }
@@ -153,21 +144,25 @@ export default function CommentItem({
         [expanded, threadId, currentAuthor, comment.id, optimisticAdd, confirmReplace, rollbackRemove]
     );
 
-    // hide top-level if score < 0 and showHiddenComments is false
+    // hide top-level if score < 0 and hidden-not-shown
     if (comment.isDeleted) return null;
     if (!showHiddenComments && localScore < 0) return null;
 
     return (
         <View style={styles.wrap}>
-            <View style={styles.row}>
+            <View style={styles.headerRow}>
                 <Text style={styles.username}>{comment.author.username}</Text>
-                <Text style={styles.body}>{comment.body}</Text>
             </View>
 
-            <View style={styles.metaRow}>
-                <Text style={styles.meta}>▲ {localScore}</Text>
+            <Text style={styles.body}>{comment.body}</Text>
 
-                <VoteButtons currentVote={localUserVote} onChange={onChangeTopLevelVote} />
+            {/* Horizontal meta/actions row with VoteButtons first */}
+            <View style={styles.actionsRow}>
+                <VoteButtons
+                    currentVote={localUserVote}
+                    score={localScore}
+                    onChange={onChangeTopLevelVote}
+                />
 
                 <Pressable
                     onPress={() => {
@@ -200,11 +195,12 @@ export default function CommentItem({
                             <View key={r.id} style={styles.replyRow}>
                                 <Text style={styles.username}>{r.author.username}</Text>
                                 <Text style={styles.body}>{r.body}</Text>
+
                                 <View style={styles.replyMetaRow}>
-                                    <Text style={styles.meta}>▲ {r.score}</Text>
                                     <VoteButtons
                                         compact
                                         currentVote={(r.userVote ?? 0) as -1 | 0 | 1}
+                                        score={r.score}
                                         onChange={(next) => onChangeReplyVote(r.id, next)}
                                     />
                                 </View>
@@ -233,15 +229,15 @@ export default function CommentItem({
 
 const styles = StyleSheet.create({
     wrap: { paddingVertical: 10, borderBottomWidth: 1, borderColor: "#e6e2da" },
-    row: { flexDirection: "row", flexWrap: "wrap" },
-    username: { fontWeight: "700", color: colors.midBlue, marginRight: 6 },
-    body: { color: colors.darkest, flexShrink: 1 },
-    metaRow: { marginTop: 6, flexDirection: "row", alignItems: "center", gap: 12, flexWrap: "wrap" },
-    meta: { color: colors.nextDarkest, fontSize: 12 },
+    headerRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
+    username: { fontWeight: "500", color: colors.midBlue },
+    body: { color: colors.darkest, marginTop: 2 },
+    actionsRow: { marginTop: 8, flexDirection: "row", alignItems: "center", gap: 16, flexWrap: "wrap" },
     action: { color: colors.midBlue, fontSize: 12, fontWeight: "600" },
     viewReplies: { color: colors.midBlue, fontSize: 12, fontWeight: "700" },
+
     replies: { marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: colors.midBlue },
-    replyRow: { marginTop: 8 },
-    replyMetaRow: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 4 },
+    replyRow: { marginTop: 10 },
+    replyMetaRow: { marginTop: 6, flexDirection: "row", alignItems: "center", gap: 12 },
     moreReplies: { color: colors.midBlue, marginTop: 6, fontWeight: "600" },
 });

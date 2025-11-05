@@ -10,12 +10,13 @@ import CommentItem from "@/components/threads/CommentItem";
 import AddCommentBar from "@/components/threads/AddCommentBar";
 import HiddenToggle from "@/components/threads/HiddenToggle";
 import { useCommentsList } from "@/hooks/useCommentsList";
+import { MessageCircle } from "lucide-react-native";
+import { ArrowBigUp } from "lucide-react-native";
 
 const PAGE_SIZE = 20;
 
 // TEMP current user (until auth)
 const CURRENT_AUTHOR: Author = { authorId: "me", username: "You", profilePhotoUrl: null };
-// Which identifier are you sending to the backend as userId?
 const CURRENT_USER_ID = CURRENT_AUTHOR.username; // or CURRENT_AUTHOR.authorId
 
 export default function ThreadScreen() {
@@ -56,7 +57,7 @@ export default function ThreadScreen() {
                 const t = await getThread(threadId);
                 if (!mounted) return;
                 setThread(t);
-                await loadInitial(); // load comments via hook
+                await loadInitial();
             } catch (e: any) {
                 if (!mounted) return;
                 setError(e?.message || "Failed to load thread.");
@@ -65,9 +66,7 @@ export default function ThreadScreen() {
             }
         };
         run();
-        return () => {
-            mounted = false;
-        };
+        return () => { mounted = false; };
     }, [threadId, loadInitial]);
 
     const onRefresh = useCallback(async () => {
@@ -79,22 +78,31 @@ export default function ThreadScreen() {
         }
     }, [loadInitial]);
 
+    // ⬇️ moved the "Comments" label OUTSIDE the card
     const header = useMemo(
         () => (
-            <View style={styles.postCard}>
-                <Text style={styles.title}>{thread?.title ?? "(Untitled thread)"}</Text>
-                <Text style={styles.meta}>
-                    by {thread?.author?.username ?? "unknown"} • {new Date(thread?.created ?? Date.now()).toLocaleString()}
-                </Text>
-                <Text style={[globalStyles.body, { marginTop: 8 }]}>{thread?.body}</Text>
+            <>
+                <View style={styles.postCard}>
+                    <Text style={styles.title}>{thread?.title ?? "(Untitled thread)"}</Text>
+                    <Text style={styles.meta}>
+                        by {thread?.author?.username ?? "unknown"} • {new Date(thread?.created ?? Date.now()).toLocaleString()}
+                    </Text>
+                    <Text style={[globalStyles.body, { marginTop: 8 }]}>{thread?.body}</Text>
 
-                <View style={styles.actions}>
-                    <View style={styles.pill}><Text style={styles.pillText}>▲ {thread?.score ?? 0}</Text></View>
-                    <View style={styles.pill}><Text style={styles.pillText}>💬 {thread?.commentCount ?? 0}</Text></View>
+                    <View style={styles.actions}>
+                        {/* <View style={[styles.pill, styles.pillRow]}>
+                            <ArrowBigUp size={14} color={colors.midBlue} />
+                            <Text style={styles.pillText}>{thread?.score ?? 0}</Text>
+                        </View> */}
+                        <View style={[styles.pill, styles.pillRow]}>
+                            <MessageCircle size={14} color={colors.midBlue} />
+                            <Text style={styles.pillText}>{thread?.commentCount ?? 0}</Text>
+                        </View>
+                    </View>
                 </View>
 
-                <Text style={styles.sectionLabel}>Comments</Text>
-            </View>
+                <Text style={styles.commentsHeader}>Comments</Text>
+            </>
         ),
         [thread]
     );
@@ -149,11 +157,7 @@ export default function ThreadScreen() {
         <View style={globalStyles.container}>
             <FlatList
                 ref={listRef}
-                data={
-                    showHiddenComments
-                        ? comments
-                        : comments.filter((c) => !c.isDeleted && c.score >= 0)
-                }
+                data={showHiddenComments ? comments : comments.filter((c) => !c.isDeleted && c.score >= 0)}
                 keyExtractor={(item) => item.id}
                 ListHeaderComponent={header}
                 renderItem={renderItem}
@@ -184,22 +188,42 @@ export default function ThreadScreen() {
 const styles = StyleSheet.create({
     center: { alignItems: "center", justifyContent: "center" },
     postCard: {
-        backgroundColor: "#fff", borderColor: colors.midBlue, borderWidth: 2,
-        borderRadius: 12, padding: 12, marginBottom: 12,
+        backgroundColor: "#fff",
+        borderColor: colors.midBlue,
+        borderWidth: 2,
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 12,
     },
     title: { fontSize: 22, fontWeight: "700", color: colors.midBlue },
     meta: { marginTop: 4, fontSize: 12, color: colors.nextDarkest },
     actions: { marginTop: 10, flexDirection: "row", gap: 8 },
     pill: {
-        borderWidth: 1, borderColor: colors.midBlue, borderRadius: 999,
-        paddingVertical: 4, paddingHorizontal: 10, backgroundColor: colors.cream,
+        borderWidth: 1,
+        borderColor: colors.midBlue,
+        borderRadius: 999,
+        paddingVertical: 4,
+        paddingHorizontal: 10,
     },
     pillText: { color: colors.midBlue, fontWeight: "600" },
-    sectionLabel: { marginTop: 16, fontSize: 16, fontWeight: "700", color: colors.midBlue },
+    // ⬇️ new: outside-the-card "Comments" header
+    commentsHeader: {
+        marginTop: 8,
+        marginBottom: 4,
+        fontSize: 18,
+        fontWeight: "700",
+        color: colors.midBlue,
+    },
     moreBtn: {
-        alignSelf: "center", marginTop: 12, paddingVertical: 8, paddingHorizontal: 16,
-        borderRadius: 999, borderWidth: 1, borderColor: colors.midBlue,
+        alignSelf: "center",
+        marginTop: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 999,
+        borderWidth: 1,
+        borderColor: colors.midBlue,
     },
     moreText: { color: colors.midBlue, fontWeight: "600" },
     addBarWrap: { position: "absolute", left: 0, right: 0, bottom: 0 },
+    pillRow: { flexDirection: "row", alignItems: "center", gap: 6 },
 });
