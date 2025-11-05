@@ -134,25 +134,25 @@ export default function ProfileScreen() {
                 </View>
             </View>
                 
-                <View style={profStyles.profileHeader}>
-                    {/* profile icon TODO change to PFP */}
-                    <EvilIcons name="user" size={75} color={colors.darkest} />
-                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
-                        <Text style={globalStyles.subheading}>
-                            {user ? `@${user.userName}` : 'Loading...'}
-                        </Text>
+            <View style={profStyles.profileHeader}>
+                {/* profile icon TODO change to PFP */}
+                <EvilIcons name="user" size={75} color={colors.darkest} />
+                <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
+                    <Text style={globalStyles.subheading}>
+                        {user ? `@${user.userName}` : 'Loading...'}
+                    </Text>
 
-                        <Text
-                            style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
-                            numberOfLines={0}
-                        >
-                            {user ? user.bio : 'Loading...'}
-                        </Text>
-                    </View>
-
-                    {/*be able to edit the bio */}
-
+                    <Text
+                        style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
+                        numberOfLines={0}
+                    >
+                        {user ? user.bio : 'Loading...'}
+                    </Text>
                 </View>
+
+                {/*be able to edit the bio */}
+
+            </View>
 
                 {/*this is the part where we show the lists of the books*/}
                 <View>

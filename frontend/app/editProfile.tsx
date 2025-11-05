@@ -14,6 +14,10 @@ import {
 import { globalStyles } from '../styles/globalStyles';
 import { colors, fonts } from '../theme';
 import { User } from '../domain/models';
+import { editUser } from '../services/usersService'; 
+import { components } from '../schema/openapi-types'; 
+
+import { EditUserInput } from '../api-mappers/users/users-mappers'; 
 
 const pronounOptions = [
   'he', 'him', 'his',
@@ -59,6 +63,23 @@ export default function EditProfileScreen() {
     loadUser();
   }, []);
 
+  useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
+
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+  }, []);
+
   const togglePronoun = (p: string) => {
     setSelectedPronouns((prev) => {
       if (prev.includes(p)) {
@@ -85,6 +106,38 @@ export default function EditProfileScreen() {
 
     if (!user) return;
 
+  const input: EditUserInput = {
+    userId: user.id,
+    firstName,
+    lastName,
+    email,
+    bio: biography,
+    privateAccount,
+    // optionally include pronouns or other fields
+  };
+
+
+    try {
+      const result = await editUser(input); // pass ONE object
+      if (!result.success) {
+        console.error('Failed to save user:', result.error);
+        Alert.alert('Error', 'Failed to save your changes.');
+        return;
+      }
+
+      // Update local session
+      const updatedUser = { ...user, ...input };
+      await AsyncStorage.setItem('session', JSON.stringify(updatedUser));
+
+      Alert.alert('Success', 'Your changes have been saved.');
+      router.push('/profile');
+
+    } catch (err) {
+      console.error('Unexpected error saving user:', err);
+      Alert.alert('Error', 'Failed to save your changes.');
+    }
+
+{/*
     const updatedUser = {
       ...user,
       firstName,
@@ -105,7 +158,7 @@ export default function EditProfileScreen() {
     } catch (error) {
       console.error('Error saving user:', error);
       Alert.alert('Error', 'Failed to save your changes.');
-    }
+    }*/}
   };
 
   const handleDiscard = () => {
