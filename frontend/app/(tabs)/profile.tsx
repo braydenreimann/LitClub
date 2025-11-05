@@ -4,7 +4,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 import { Platform, Pressable } from 'react-native';
 import { ThemedText } from '../../components/themed-text';
 import { ThemedView } from '../../components/themed-view';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../../components/SearchBar';
 import Header from '../../components/headerWithSearch';
@@ -28,9 +28,9 @@ import BodyText from '@/components/BodyText';
 
 function EditButton() {
     return (
-        <Link href="/editProfilePage">
+        <Pressable onPress={() => router.push('/editProfile')}>
             <Foundation name="pencil" size={20} color={colors.darkest} />
-        </Link>
+        </Pressable>
     );
 }
 function SettingsButton() {
@@ -123,7 +123,7 @@ export default function ProfileScreen() {
                 <Text style={[globalStyles.heading, {paddingTop: 15}]}>
                     {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
                     {"\n"}
-                    <Text style={globalStyles.body}>{'she/he/they'}</Text>
+                    <Text style={globalStyles.body}>{'she/they'}</Text>
                 </Text>
 
                 {/* Buttons next to the name */}
