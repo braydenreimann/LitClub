@@ -13,4 +13,5 @@ public class Book
     public string? Description { get; set; }
     public string? CoverImageUrl { get; set; }
     public List<Edition> Editions { get; set; } = [];
+    public List<string>? ChapterThreadIds { get; set; } = [];
 }

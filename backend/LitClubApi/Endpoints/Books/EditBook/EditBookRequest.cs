@@ -19,4 +19,5 @@ public sealed class EditBookBody
     public string? Genre { get; init; }
     public string? Description { get; init; }
     public string? CoverImageUrl { get; init; }
+    public List<string>? ChapterThreadIds { get; init; }
 }

@@ -13,13 +13,12 @@ public sealed class CosmosContext : ICosmosContext
         Users = client.GetContainer(o.DatabaseId, o.UsersContainerId);
         LitClubs = client.GetContainer(o.DatabaseId, o.LitClubsContainerId);
         Libraries = client.GetContainer(o.DatabaseId, o.LibrariesContainerId);
+        Threads = client.GetContainer(o.DatabaseId, o.ThreadsContainerId);
     }
 
     public Container Books { get; }
-
     public Container Users { get; }
-
     public Container LitClubs { get; }
-
     public Container Libraries { get; }
+    public Container Threads { get; }
 }

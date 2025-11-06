@@ -1,4 +1,0 @@
-#!/bin/bash
-
-mkdir -p schema
-curl http://localhost:5112/swagger/v1/swagger.json -o schema/openapi.v1.json

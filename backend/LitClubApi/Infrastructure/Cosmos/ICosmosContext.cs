@@ -8,4 +8,5 @@ public interface ICosmosContext
     Container Users { get; }
     Container LitClubs { get; }
     Container Libraries { get; }
+    Container Threads { get; }
 }

@@ -10,6 +10,7 @@ export type User = {
     userName: string;
     email: string;
     bio: string;
+    pronouns: string[];
     profilePhotoUrl: string;
     preferredGenres: string[];
     privateAccount: boolean;
@@ -19,6 +20,7 @@ export type User = {
     blockedUserIds: string[];
     litClubIds: string[];
     created: string;
+    password: string; //Sofia put this here
 }
 
 export type Edition = {

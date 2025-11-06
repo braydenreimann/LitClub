@@ -36,6 +36,7 @@
     "expo-updates": "~29.0.11",
     "expo-web-browser": "~15.0.7",
     "formik": "^2.4.6",
+    "lucide-react-native": "^0.552.0",
     "openapi-fetch": "^0.15.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",

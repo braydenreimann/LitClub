@@ -4,6 +4,55 @@
  */
 
 export interface paths {
+    "/threads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    bookId?: string;
+                    litClubId?: string;
+                    userId?: string;
+                    sort?: string;
+                    pageSize?: number;
+                    continuationToken?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListThreadsResponse"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post: operations["AddThread"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users": {
         parameters: {
             query?: never;
@@ -257,6 +306,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/threads/{threadId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListComments"];
+        put?: never;
+        post: operations["AddComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/books/{bookId}/editions": {
         parameters: {
             query?: never;
@@ -479,6 +544,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/threads/{threadId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["threads"];
+        put?: never;
+        post?: never;
+        delete: operations["DeleteThread"];
+        options?: never;
+        head?: never;
+        patch: operations["PatchThread"];
         trace?: never;
     };
     "/users/{userId}": {
@@ -706,6 +787,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/threads/{threadId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["DeleteComment"];
+        options?: never;
+        head?: never;
+        patch: operations["EditComment"];
         trace?: never;
     };
     "/books/{bookId}/editions/{editionId}": {
@@ -1063,6 +1160,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/threads/{threadId}/comments/{commentId}/replies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListReplies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/login": {
         parameters: {
             query?: never;
@@ -1127,6 +1240,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/threads/{threadId}/comments/{commentId}/vote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    threadId: string;
+                    commentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VoteBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VoteResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1139,6 +1319,12 @@ export interface components {
             genre: string | null;
             description?: string | null;
             coverImageUrl?: string | null;
+            chapterThreadIds?: string[] | null;
+        };
+        AddCommentBody: {
+            author: components["schemas"]["Author"];
+            body: string | null;
+            parentCommentId?: string | null;
         };
         AddEditionBody: {
             format: components["schemas"]["EditionFormatContract"];
@@ -1171,6 +1357,15 @@ export interface components {
             memberUserIds?: string[] | null;
             libraryId?: string | null;
         };
+        AddThreadRequest: {
+            author: components["schemas"]["Author"];
+            title?: string | null;
+            body: string | null;
+            bookId?: string | null;
+            /** Format: int32 */
+            chapterNumber?: number | null;
+            litClubId?: string | null;
+        };
         AddUserRequest: {
             firstName: string | null;
             lastName: string | null;
@@ -1183,6 +1378,11 @@ export interface components {
             privateAccount?: boolean;
             publicInteractionRestricted?: boolean;
         };
+        Author: {
+            authorId: string | null;
+            username: string | null;
+            profilePhotoUrl?: string | null;
+        };
         BookResponse: {
             id: string | null;
             title: string | null;
@@ -1193,6 +1393,25 @@ export interface components {
             description?: string | null;
             coverImageUrl?: string | null;
             editions?: components["schemas"]["EditionResponse"][] | null;
+            chapterThreadIds?: string[] | null;
+        };
+        CommentResponse: {
+            id: string | null;
+            threadId: string | null;
+            author: components["schemas"]["Author"];
+            body: string | null;
+            parentCommentId?: string | null;
+            /** Format: date-time */
+            created?: string;
+            /** Format: date-time */
+            updated?: string | null;
+            /** Format: int32 */
+            score?: number;
+            isDeleted?: boolean;
+            /** Format: int32 */
+            replyCount?: number;
+            /** Format: int32 */
+            userVote?: number | null;
         };
         CreateAccountRequest: {
             firstName: string | null;
@@ -1214,6 +1433,10 @@ export interface components {
             genre?: string | null;
             description?: string | null;
             coverImageUrl?: string | null;
+            chapterThreadIds?: string[] | null;
+        };
+        EditCommentBody: {
+            body?: string | null;
         };
         EditEditionBody: {
             format?: components["schemas"]["EditionFormatContract"];
@@ -1244,6 +1467,10 @@ export interface components {
             privateClub?: boolean | null;
             memberUserIds?: string[] | null;
             libraryId?: string | null;
+        };
+        EditThreadBody: {
+            title?: string | null;
+            body?: string | null;
         };
         EditUserBody: {
             firstName?: string | null;
@@ -1300,6 +1527,10 @@ export interface components {
             books: components["schemas"]["BookResponse"][] | null;
             continuationToken?: string | null;
         };
+        ListCommentsResponse: {
+            items: components["schemas"]["CommentResponse"][] | null;
+            continuationToken?: string | null;
+        };
         ListEditionsResponse: {
             editions: components["schemas"]["EditionResponse"][] | null;
         };
@@ -1308,6 +1539,14 @@ export interface components {
         };
         ListLitClubsResponse: {
             litClubs: components["schemas"]["LitClubResponse"][] | null;
+            continuationToken?: string | null;
+        };
+        ListRepliesResponse: {
+            items: components["schemas"]["CommentResponse"][] | null;
+            continuationToken?: string | null;
+        };
+        ListThreadsResponse: {
+            items: components["schemas"]["ThreadResponse"][] | null;
             continuationToken?: string | null;
         };
         ListUsersResponse: {
@@ -1349,6 +1588,25 @@ export interface components {
          * @enum {integer}
          */
         ShelfStatusContract: 0 | 1 | 2 | 3;
+        ThreadResponse: {
+            id: string | null;
+            author: components["schemas"]["Author"];
+            title?: string | null;
+            body: string | null;
+            bookId?: string | null;
+            /** Format: int32 */
+            chapterNumber?: number | null;
+            litClubId?: string | null;
+            /** Format: date-time */
+            created?: string;
+            /** Format: date-time */
+            updated?: string | null;
+            /** Format: int32 */
+            commentCount?: number;
+            /** Format: int32 */
+            score?: number;
+            isDeleted?: boolean;
+        };
         UserResponse: {
             id: string | null;
             firstName: string | null;
@@ -1367,6 +1625,22 @@ export interface components {
             /** Format: date-time */
             created?: string;
         };
+        VoteBody: {
+            userId: string | null;
+            vote: components["schemas"]["VoteEnum"];
+        };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        VoteEnum: 0 | 1 | -1;
+        VoteResponse: {
+            commentId: string | null;
+            /** Format: int32 */
+            score: number;
+            /** Format: int32 */
+            userVote: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -1376,6 +1650,248 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    AddThread: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AddThreadRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListComments: {
+        parameters: {
+            query?: {
+                pageSize?: number;
+                continuationToken?: string;
+                userId?: string;
+            };
+            header?: never;
+            path: {
+                threadId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListCommentsResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AddComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                threadId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddCommentBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    threads: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                threadId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeleteThread: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                threadId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": components["schemas"]["ProblemDetails"];
+                    "application/json": components["schemas"]["ProblemDetails"];
+                    "text/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PatchThread: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                threadId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditThreadBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     users: {
         parameters: {
             query?: never;
@@ -1482,6 +1998,97 @@ export interface operations {
             };
         };
     };
+    DeleteComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                threadId: string;
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": components["schemas"]["ProblemDetails"];
+                    "application/json": components["schemas"]["ProblemDetails"];
+                    "text/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EditComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                threadId: string;
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditCommentBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "book-editions-get": {
         parameters: {
             query?: never;
@@ -1568,6 +2175,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LibraryResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListReplies: {
+        parameters: {
+            query?: {
+                pageSize?: number;
+                continuationToken?: string;
+                userId?: string;
+            };
+            header?: never;
+            path: {
+                threadId: string;
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListRepliesResponse"];
                 };
             };
             /** @description Internal Server Error */

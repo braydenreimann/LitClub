@@ -1,21 +1,15 @@
 using Azure.Storage.Blobs; //dotnet add package Azure.Storage.Blobs in LitClubApi project folder
-using Azure.Storage.Blobs.Models;
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.Blobs;
-using LitClubApi.Endpoints.Blobs.GenerateSas;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
-using System.Net.Sockets;
-using System.Reflection.Metadata;
-using System.Security.Policy;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Collections.ObjectModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,11 +117,43 @@ using (var scope = app.Services.CreateScope())
     await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
                                                   // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
 
+    try
+    {
+        await db.GetContainer(o.ThreadsContainerId).DeleteContainerAsync();
+    }
+    catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+    {
+        // ignore
+    }
+
+    await db.CreateContainerIfNotExistsAsync(new ContainerProperties
+    {
+        Id = o.ThreadsContainerId,                      // ← use options
+        PartitionKeyPath = "/threadId",                 // partition key for both Thread and Comment
+        IndexingPolicy = new IndexingPolicy
+        {
+            Automatic = true,
+            IndexingMode = IndexingMode.Consistent,
+            IncludedPaths = { new IncludedPath { Path = "/*" } },
+            ExcludedPaths = { new ExcludedPath { Path = "/\"Body\"/?" } },
+            CompositeIndexes =
+        {
+            new Collection<CompositePath>
+            {
+                new() { Path = "/threadId", Order = CompositePathSortOrder.Ascending },
+                new() { Path = "/Score",    Order = CompositePathSortOrder.Descending },
+                new() { Path = "/Created",  Order = CompositePathSortOrder.Ascending }
+            }
+        }
+        }
+    });
+
     // Optional: seed (dev-only is recommended)
     var books = client.GetContainer(o.DatabaseId, o.BooksContainerId);
     var users = client.GetContainer(o.DatabaseId, o.UsersContainerId);
     var clubs = client.GetContainer(o.DatabaseId, o.LitClubsContainerId);
     var libs = client.GetContainer(o.DatabaseId, o.LibrariesContainerId);
+    var threads = client.GetContainer(o.DatabaseId, o.ThreadsContainerId);
 
     string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
     string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
@@ -169,6 +195,17 @@ using (var scope = app.Services.CreateScope())
         await blobClient.UploadAsync(stream, overwrite: true);
     }
 
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata",  "John-Green.png"); //Default profile image for John Green
+
+    blobName = "John-Green.png";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+
     Book book = new()
     {
         Id = "1",
@@ -178,14 +215,24 @@ using (var scope = app.Services.CreateScope())
         Genre = "Young adult novel",
         Description = "A book about two sick young lovers.",
         CoverImageUrl = "the-fault-in-our-stars.jpg",
-        Editions = [
-            new Edition {
+        Editions =
+        [
+            new Edition
+            {
                 Format = BookFormat.Paperback,
                 Publisher = "Penguin Books",
                 PublicationDate = DateOnly.Parse("April 8, 2014"),
                 PrintLength = 352,
                 Isbn13s = ["978-0142424179"]
             }
+        ],
+        ChapterThreadIds =
+        [
+            "thread-1", "thread-2", "thread-3", "thread-4", "thread-5",
+            "thread-6", "thread-7", "thread-8", "thread-9", "thread-10",
+            "thread-11", "thread-12", "thread-13", "thread-14", "thread-15",
+            "thread-16", "thread-17", "thread-18", "thread-19", "thread-20",
+            "thread-21", "thread-22", "thread-23", "thread-24", "thread-25"
         ]
     };
 
@@ -199,6 +246,7 @@ using (var scope = app.Services.CreateScope())
         PasswordHash = "johngreenpw",
         Bio = "I'm just a Nerdfighter that loves reading and science",
         PreferredGenres = ["Fiction", "Science-Fiction", "Romance", "Drama", "Thriller"],
+        ProfilePhotoUrl = "John-Green.png"
     };
 
     LitClub litClub = new()
@@ -227,8 +275,14 @@ using (var scope = app.Services.CreateScope())
         ]
     };
 
+    Author author = new()
+    {
+        AuthorId = "1",
+        Username = "johngreen",
+    };
+
     int i = 0;
-    foreach (Book b in booklist)
+    foreach (Book b in booklist) //Default profile booklist for testing purposes
     {
         ShelfStatus status = (ShelfStatus)(i % 4);
         DateOnly? started = null;
@@ -269,6 +323,8 @@ using (var scope = app.Services.CreateScope())
     await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
+
+    await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
 }
 
 var updateSpec = args.Contains("--updateSpec");
@@ -296,6 +352,5 @@ if (updateSpec)
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapUploadImageEndpoint();
 
 app.Run();

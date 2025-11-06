@@ -16,7 +16,8 @@ import { globalStyles } from '@/styles/globalStyles';
 
 import { Book } from '../domain/models';
 import { getBook } from '../services/booksService';
-import { getBookCoverUri } from '@/services/imagesService';
+import { getUriRead } from '@/services/imagesService';
+import { router } from "expo-router";
 
 // playing around with importing the book
 export interface bookImport {
@@ -80,7 +81,7 @@ export default function BookInfoScreen() {
         let alive = true;
 
         (async () => {
-            const uri = await getBookCoverUri(book?.coverImageUrl);
+            const uri = await getUriRead(book?.coverImageUrl);
             if (alive) setCoverUri(uri || "");
         })();
 
@@ -172,8 +173,16 @@ export default function BookInfoScreen() {
                 </View>
 
                 <Pressable
+                    onPress={() => {
+                        router.push("/threads/thread-1");
+                    }} >
+                    <Text>View the chapter 1 thread.</Text>
+                </Pressable>
+                <Pressable
                     style={infoStyle.forumBox}
-                    onPress={() => { Alert.alert('Forums to be implemented later...') }} >
+                    onPress={() => {
+                        Alert.alert('Forums to be implemented later...');
+                    }} >
                     <Text style={[globalStyles.body, { fontSize: 14, color: colors.midBlue }]}>
                         This is our most recent discussion!
                     </Text>

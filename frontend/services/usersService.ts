@@ -1,6 +1,8 @@
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, Edition, Book, LibraryBook, DisplayBook } from '../domain/models';
+import { client } from "@/client";
+import { toEditUserBody, EditUserInput } from "@/api-mappers/users/users-mappers";
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
@@ -17,6 +19,26 @@ export async function getUser(): Promise<User | null> {
     } catch (error) {
         console.error('Error retrieving user from session:', error);
         return null;
+    }
+}
+
+export async function getUserFromId(userId: string): Promise<User | null> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+
+        if (!response.ok) {
+            console.warn('Failed to fetch user', response.status);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const user: User = data as User;
+
+        return user;
+    } catch (error) {
+        console.error('Error fetching user from id:', error);
+        throw error;
     }
 }
 
@@ -86,7 +108,7 @@ export async function getTopThree(userId: string): Promise<DisplayBook[] | null>
     }
 }
 
-export async function getBookshelf(userId: string, status: number): Promise<DisplayBook[] | null> {
+export async function getBookshelfByStatus(userId: string, status: number): Promise<DisplayBook[] | null> { //Specifically for sorting by status for parallax reading lists.
     try {
         const response = await fetch(`${API_BASE_URL}/libraries/${userId}/libraryBooks`);
         if (!response.ok) {
@@ -120,7 +142,7 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
         const displayBooks: DisplayBook[] = fullBooks
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
-                id: b.id, //misnomer, actually returns index
+                id: b.id, 
                 title: b.title,
                 coverImageUrl: b.coverImageUrl// use the real book title now
             }));
@@ -131,3 +153,25 @@ export async function getBookshelf(userId: string, status: number): Promise<Disp
         return null;
     }
 }
+
+export async function editUser(input: EditUserInput) {
+  try {
+    const body = toEditUserBody(input);
+
+    const { data, error } = await client.PATCH("/users/{userId}", {
+      params: { path: { userId: input.userId } },
+      body,
+    });
+
+    if (error) {
+      console.error("Error editing user:", error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Unexpected error editing user:", err);
+    return { success: false, error: err };
+  }
+}
+
