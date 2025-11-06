@@ -195,6 +195,17 @@ using (var scope = app.Services.CreateScope())
         await blobClient.UploadAsync(stream, overwrite: true);
     }
 
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata",  "John-Green.png"); //Default profile image for John Green
+
+    blobName = "John-Green.png";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+
     Book book = new()
     {
         Id = "1",
@@ -235,6 +246,7 @@ using (var scope = app.Services.CreateScope())
         PasswordHash = "johngreenpw",
         Bio = "I'm just a Nerdfighter that loves reading and science",
         PreferredGenres = ["Fiction", "Science-Fiction", "Romance", "Drama", "Thriller"],
+        ProfilePhotoUrl = "John-Green.png"
     };
 
     LitClub litClub = new()
@@ -270,7 +282,7 @@ using (var scope = app.Services.CreateScope())
     };
 
     int i = 0;
-    foreach (Book b in booklist)
+    foreach (Book b in booklist) //Default profile booklist for testing purposes
     {
         ShelfStatus status = (ShelfStatus)(i % 4);
         DateOnly? started = null;
@@ -340,6 +352,5 @@ if (updateSpec)
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapUploadImageEndpoint();
 
 app.Run();

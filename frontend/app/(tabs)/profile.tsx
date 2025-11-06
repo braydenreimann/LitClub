@@ -23,6 +23,8 @@ import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
 import { useLitClubs } from '../../LitClubImport/LitClubContext';
+import { getUriRead } from '../../services/imagesService';
+import { getUserFromId } from '../../services/usersService'
 import BodyText from '@/components/BodyText';
 
 
@@ -83,6 +85,48 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
 
     const [user, setUser] = useState<User | null>(null)
     const { litClubs, loading, error } = useLitClubs();
+    const [profileUri, setProfileUri] = useState<string>("");
+
+    useEffect(() => {
+        let alive = true; // to prevent state updates after unmount
+
+        const loadUser = async () => {
+            try {
+                // Load session from AsyncStorage
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return;
+
+                const session: User = JSON.parse(sessionString);
+
+                // Fetch fresh user from backend using ID
+                const freshUser = await getUserFromId(session.id);
+                if (!freshUser) return;
+
+                if (!alive) return;
+
+                setUser(freshUser);
+
+                // Fetch profile photo URI if available
+                if (freshUser.profilePhotoUrl) {
+                    const uri = await getUriRead(freshUser.profilePhotoUrl);
+                    if (alive) setProfileUri(uri || "");
+                }
+            } catch (err) {
+                console.error('Failed to load user:', err);
+            }
+        };
+
+        loadUser();
+
+        return () => {
+            alive = false;
+        };
+    }, []);
+
+    const userId = user?.id ?? '';
+    const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
+    const leaderClubs = litClubs.filter(c => c.ownerUserId === userId);
+    const archivedClubs = litClubs.filter(c => c.privateClub); // example filter
 
     if (loading) {
         return (
@@ -119,6 +163,33 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
+                <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
+                <View style={profStyles.profileHeader}>
+                    <Image
+                        source={profileUri
+                            ? { uri: profileUri } 
+                            : require('../../assets/images/turkstra.jpg')}
+                        style={profStyles.profileImage}
+                    />
+
+                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
+                        <Text style={globalStyles.subheading}>
+                            {user ? `@${user.userName}` : 'Loading...'}
+                        </Text>
+
+                        <Text
+                            style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
+                            numberOfLines={0}
+                        >
+                            {user ? user.bio : 'Loading...'}
+                        </Text>
+                    Image</View>
+
+                    {/*be able to edit the bio */}
+                    <View style={profStyles.userBio}>
+                        <SettingsButton />
+                        <EditButton />
+                    </View>
             <View style={profStyles.nameRow}>
                 <View style={profStyles.nameSection}>
                     <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
@@ -211,7 +282,7 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
                             </Pressable>
 
                         ))
-                    ) : (<Text>You're not leading any clubs yet.</Text>)
+                    ) : (<Text>You&apos;re not leading any clubs yet.</Text>) //types apostrophe as literal
                     }
                 </View>
                 <Text style={globalStyles.subheading}> Archived LitClubs </Text>
@@ -285,6 +356,15 @@ const profStyles = StyleSheet.create({
     userBio: {
         flexDirection: "column",
         alignItems: "stretch",
+    },
+    profileImage: {
+        width: 100, 
+        height: 100,
+        backgroundColor: colors.teal,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
     },
     subheading: {
         fontFamily: fonts.subheading,

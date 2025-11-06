@@ -19,6 +19,7 @@ public sealed class EditUserBody
     public string? Email { get; init; }
     public string? Password { get; init; }
     public string? Bio { get; init; }
+    public List<string>? Pronouns { get; init; }
     public string? ProfilePhotoUrl { get; init; }
     public List<string>? PreferredGenres { get; init; }
     public bool? PrivateAccount { get; init; }

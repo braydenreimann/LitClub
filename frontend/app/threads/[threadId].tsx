@@ -9,7 +9,7 @@ import CommentItem from "@/components/threads/CommentItem";
 import AddCommentBar from "@/components/threads/AddCommentBar";
 import HiddenToggle from "@/components/threads/HiddenToggle";
 import { useCommentsList } from "@/hooks/useCommentsList";
-import { MessageCircle } from "lucide-react-native";
+import { MessageCircle } from "lucide-react-native"; //npm install lucide-react-native
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 const PAGE_SIZE = 20;

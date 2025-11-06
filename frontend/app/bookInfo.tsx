@@ -16,7 +16,7 @@ import { globalStyles } from '@/styles/globalStyles';
 
 import { Book } from '../domain/models';
 import { getBook } from '../services/booksService';
-import { getBookCoverUri } from '@/services/imagesService';
+import { getUri } from '@/services/imagesService';
 import { router } from "expo-router";
 
 // playing around with importing the book
@@ -81,7 +81,7 @@ export default function BookInfoScreen() {
         let alive = true;
 
         (async () => {
-            const uri = await getBookCoverUri(book?.coverImageUrl);
+            const uri = await getUri(book?.coverImageUrl);
             if (alive) setCoverUri(uri || "");
         })();
 

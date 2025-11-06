@@ -8,6 +8,7 @@ public sealed class UserResponse
     public required string UserName { get; init; }
     public required string Email { get; init; }
     public string? Bio { get; init; }
+    public List<string> Pronouns { get; init; } = [];
     public string? ProfilePhotoUrl { get; init; }
     public List<string> PreferredGenres { get; init; } = [];
     public bool PrivateAccount { get; init; }

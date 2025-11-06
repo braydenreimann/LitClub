@@ -6,20 +6,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
 
-namespace LitClubApi.Endpoints.Blobs.GenerateSas;
+namespace LitClubApi.Endpoints.Blobs.SasRead;
 
 [ApiController]
 public class Get(BlobServiceClient blobServiceClient, IOptions<BlobOptions> blobOptions) : EndpointBaseAsync
-    .WithRequest<GetSasRequest>
-    .WithActionResult<SasResponse>
+    .WithRequest<SasReadRequest>
+    .WithActionResult<SasReadResponse>
 {
-    [HttpGet("generate-sas/{blobName}")]
+    [HttpGet("generate-sas-read/{blobName}")]
     [Consumes("application/json")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(SasResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SasReadResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public override async Task<ActionResult<SasResponse>> HandleAsync(
-        GetSasRequest request,
+    public override async Task<ActionResult<SasReadResponse>> HandleAsync(
+        SasReadRequest request,
         CancellationToken cancellationToken = default)
     {
         var containerClient = blobServiceClient.GetBlobContainerClient(blobOptions.Value.ContainerName);
@@ -60,6 +60,6 @@ public class Get(BlobServiceClient blobServiceClient, IOptions<BlobOptions> blob
                 .Replace("localhost", host);
         }
 
-        return Ok(new SasResponse { SasUri = uriString });
+        return Ok(new SasReadResponse { SasUri = uriString });
     }
 }

@@ -12,6 +12,7 @@ public class LitClubUser
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
     public string? Bio { get; set; }
+    public List<string> Pronouns { get; set; } = [];
     public string? ProfilePhotoUrl { get; set; }
     public List<string> PreferredGenres { get; set; } = [];
     public bool PrivateAccount { get; set; } = false;
