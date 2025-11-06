@@ -352,6 +352,5 @@ if (updateSpec)
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapUploadImageEndpoint();
 
 app.Run();

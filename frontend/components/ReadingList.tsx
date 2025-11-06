@@ -12,7 +12,7 @@ import { globalStyles } from '../styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, DisplayBook } from '../domain/models';
 import { getUser, getBookshelfByStatus } from '../services/usersService';
-import { getUri } from '@/services/imagesService';
+import { getUriRead } from '@/services/imagesService';
 
 //eventually will fetch data from backend
 interface ReadingListProps {
@@ -63,7 +63,7 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
             const newUris: { [id: string]: string } = {}; //explicit typing needed
             await Promise.all( //ensure resolution of all cover images
                 shelf.map(async (book) => {
-                    const uri = await getUri(book.coverImageUrl);
+                    const uri = await getUriRead(book.coverImageUrl);
                     newUris[book.id] = uri || "";
                 })
             );

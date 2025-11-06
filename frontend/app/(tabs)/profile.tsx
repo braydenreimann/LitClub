@@ -23,7 +23,7 @@ import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
 import { useLitClubs } from '../../LitClubImport/LitClubContext';
-import { getUri } from '../../services/imagesService';
+import { getUriRead } from '../../services/imagesService';
 import { getUserFromId } from '../../services/usersService'
 
 
@@ -92,7 +92,7 @@ export default function ProfileScreen() {
 
                 // Fetch profile photo URI if available
                 if (freshUser.profilePhotoUrl) {
-                    const uri = await getUri(freshUser.profilePhotoUrl);
+                    const uri = await getUriRead(freshUser.profilePhotoUrl);
                     if (alive) setProfileUri(uri || "");
                 }
             } catch (err) {
