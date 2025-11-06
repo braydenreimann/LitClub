@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Platform, Pressable } from 'react-native';
@@ -27,7 +26,6 @@ import { getUriRead } from '../../services/imagesService';
 import { getUserFromId } from '../../services/usersService'
 import BodyText from '@/components/BodyText';
 
-
 function EditButton() {
     return (
         <Pressable onPress={() => router.push('/editProfile')}>
@@ -40,7 +38,6 @@ function SettingsButton() {
         <Link href="/settingsPage">
             <EvilIcons name="gear" size={30} color={colors.darkest} />
         </Link>
-
     );
 }
 function StatsButton() {
@@ -48,14 +45,12 @@ function StatsButton() {
         <Link href="/statsPage">
             <Foundation name="book-bookmark" size={30} color={colors.darkest} />
         </Link>
-
     );
 }
 
-
 export default function ProfileScreen() {
     /*for the sake of the litclubs
-        WITH BACKEND: implement this as a linked list of a users' joined book clubs */
+      WITH BACKEND: implement this as a linked list of a users' joined book clubs */
 
     const [fontsLoaded] = useFonts({
         Fraunces_700Bold,
@@ -66,7 +61,7 @@ export default function ProfileScreen() {
         if (fontsLoaded) SplashScreen.hideAsync();
     }, [fontsLoaded]);
 
-useEffect(() => { //chat-gpt is a quadrillion dollar idea
+    useEffect(() => {
         // Define an async function inside useEffect
         const loadSession = async () => {
             try {
@@ -124,9 +119,11 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
     }, []);
 
     const userId = user?.id ?? '';
-    const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
-    const leaderClubs = litClubs.filter(c => c.ownerUserId === userId);
-    const archivedClubs = litClubs.filter(c => c.privateClub); // example filter
+    const safeClubs = Array.isArray(litClubs) ? litClubs : [];
+
+    const userClubs = safeClubs.filter(c => c.memberUserIds?.includes(userId));
+    const leaderClubs = safeClubs.filter(c => c.ownerUserId === userId);
+    const archivedClubs = safeClubs.filter(c => !!c.privateClub);
 
     if (loading) {
         return (
@@ -152,22 +149,19 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
         );
     }
 
-    
-
-    const userId = user?.id ?? '';
-    const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
-    const leaderClubs = litClubs.filter(c => c.ownerUserId === userId);
-    const archivedClubs = litClubs.filter(c => c.privateClub); // example filter
-
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
-                <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
+                <Text style={globalStyles.heading}>
+                    {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"}
+                </Text>
+
+                {/* Header row: photo + bio + quick actions */}
                 <View style={profStyles.profileHeader}>
                     <Image
                         source={profileUri
-                            ? { uri: profileUri } 
+                            ? { uri: profileUri }
                             : require('../../assets/images/turkstra.jpg')}
                         style={profStyles.profileImage}
                     />
@@ -183,56 +177,38 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
                         >
                             {user ? user.bio : 'Loading...'}
                         </Text>
-                    Image</View>
+                    </View>
 
-                    {/*be able to edit the bio */}
+                    {/* quick actions */}
                     <View style={profStyles.userBio}>
                         <SettingsButton />
                         <EditButton />
                     </View>
-            <View style={profStyles.nameRow}>
-                <View style={profStyles.nameSection}>
-                    <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
-                    {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
-                    </Text>
-                    <Text style={globalStyles.body}>he/him</Text>
+                </View>
+                {/* ⬆️ close the header row here so the rest stacks vertically */}
+
+                {/* Name + action icons row */}
+                <View style={profStyles.nameRow}>
+                    <View style={profStyles.nameSection}>
+                        <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
+                            {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
+                        </Text>
+                        <Text style={globalStyles.body}>he/him</Text>
+                    </View>
+
+                    <View style={profStyles.iconRow}>
+                        <SettingsButton />
+                        <StatsButton />
+                        <EditButton />
+                    </View>
                 </View>
 
-                <View style={profStyles.iconRow}>
-                    <SettingsButton />
-                    <StatsButton />
-                    <EditButton />
-                </View>
-            </View>
-                
-            <View style={profStyles.profileHeader}>
-                {/* profile icon TODO change to PFP */}
-                <EvilIcons name="user" size={75} color={colors.darkest} />
-                <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
-                    <Text style={globalStyles.subheading}>
-                        {user ? `@${user.userName}` : 'Loading...'}
-                    </Text>
-
-                    <Text
-                        style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
-                        numberOfLines={0}
-                    >
-                        {user ? user.bio : 'Loading...'}
-                    </Text>
-                </View>
-
-                {/*be able to edit the bio */}
-
-            </View>
-
-                {/*this is the part where we show the lists of the books*/}
+                {/* Books Section */}
                 <View>
                     <TopThreeBooks />
                     <Text style={globalStyles.subheading}>Currently Reading</Text>
-                    {/* reading list for the currently reading*/}
                     <ReadingList status={1} />
                     <Text style={globalStyles.subheading}>Past Reads</Text>
-                    {/* reading list for the Past Reads*/}
                     <ReadingList status={0} />
                     <Text style={globalStyles.subheading}>Saved for Later</Text>
                     <ReadingList status={2} />
@@ -240,9 +216,8 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
                     <ReadingList status={3} />
                 </View>
 
-                {/*display the book clubs*/}
+                {/* Memberships */}
                 <Text style={globalStyles.subheading}> LitClub Memberships </Text>
-                { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}>
                     {loading ? (
                         <Text>Loading clubs...</Text>
@@ -250,101 +225,103 @@ useEffect(() => { //chat-gpt is a quadrillion dollar idea
                         <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
                     ) : userClubs.length ? (
                         userClubs.map((club) => (
-
                             <Pressable
                                 key={club.id}
                                 style={profStyles.litclubCard}
                                 onPress={() => Alert.alert(`Opening ${club.name}`)}
                             >
-                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >
-                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
+                                <Link
+                                    href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name } }}
+                                    asChild
+                                >
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
+                                        {club.name}
+                                    </Text>
                                 </Link>
                             </Pressable>
-
                         ))
-                    ) : (<Text>No memberships yet.</Text>)
-                    }
+                    ) : (
+                        <Text>No memberships yet.</Text>
+                    )}
                 </View>
+
+                {/* Leaderships */}
                 <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
-                { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}>
                     {leaderClubs.length ? (
                         leaderClubs.map((club) => (
-
                             <Pressable
                                 key={club.id}
                                 style={profStyles.litclubCard}
                                 onPress={() => Alert.alert(`Opening ${club.name}`)}
                             >
-                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >
-                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
+                                <Link
+                                    href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name } }}
+                                    asChild
+                                >
+                                    <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
+                                        {club.name}
+                                    </Text>
                                 </Link>
                             </Pressable>
-
                         ))
-                    ) : (<Text>You&apos;re not leading any clubs yet.</Text>) //types apostrophe as literal
-                    }
+                    ) : (
+                        <Text>You&apos;re not leading any clubs yet.</Text>
+                    )}
                 </View>
+
+                {/* Archived Clubs */}
                 <Text style={globalStyles.subheading}> Archived LitClubs </Text>
-                { /*format the GROUP of cards correctly*/}
                 <View style={globalStyles.cardGroup}>
                     {archivedClubs.length ? (
                         archivedClubs.map((club) => (
                             <Pressable
                                 key={club.id}
                                 style={[profStyles.litclubCard, { backgroundColor: colors.midBlue }]}
-                                onPress={() => {
-                                    /*TODO make the buttons go to their clubs*/
-                                    Alert.alert(`Opening archived club ${club.name}`)
-                                }} >
-                                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild>
-                                    <Text style={[globalStyles.cardFont,
-                                    {
-                                        textDecorationLine: 'line-through',
-
-                                    }]} adjustsFontSizeToFit={true}>
+                                onPress={() => Alert.alert(`Opening archived club ${club.name}`)}
+                            >
+                                <Link
+                                    href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name } }}
+                                    asChild
+                                >
+                                    <Text
+                                        style={[globalStyles.cardFont, { textDecorationLine: 'line-through' }]}
+                                        adjustsFontSizeToFit
+                                    >
                                         {club.name}
                                     </Text>
                                 </Link>
                             </Pressable>
-
                         ))
                     ) : (
-                        <Text style={[globalStyles.body, {paddingLeft: 15}]}>No archived clubs.</Text>
-                    )
-                    }
+                        <Text style={[globalStyles.body, { paddingLeft: 15 }]}>No archived clubs.</Text>
+                    )}
                 </View>
             </ScrollView>
         </View>
-
     );
 }
 
-
-
-
 /* /vidya's header and search bar
-    //profile photo left aligned
-    //big text fitstname last name
-    //smaller text @username
-    //normal small text bio
-    //divider
-    //top three centered heading
-    //three books
-    //currently reading centered heading
-    //iew all currently reading
-    //divider
-    //past reads centered heading
-    //scroll left right past reads
-    //divider
-    //saved for later centered heading
-    //scroll left right saved for later
-    //divider
-    //your LitClubs
-    //footer with the default buttons on it
-
+  //profile photo left aligned
+  //big text fitstname last name
+  //smaller text @username
+  //normal small text bio
+  //divider
+  //top three centered heading
+  //three books
+  //currently reading centered heading
+  //iew all currently reading
+  //divider
+  //past reads centered heading
+  //scroll left right past reads
+  //divider
+  //saved for later centered heading
+  //scroll left right saved for later
+  //divider
+  //your LitClubs
+  //footer with the default buttons on it
 */
-
 
 const profStyles = StyleSheet.create({
     profileHeader: {
@@ -358,7 +335,7 @@ const profStyles = StyleSheet.create({
         alignItems: "stretch",
     },
     profileImage: {
-        width: 100, 
+        width: 100,
         height: 100,
         backgroundColor: colors.teal,
         borderRadius: 50,
@@ -402,7 +379,6 @@ const profStyles = StyleSheet.create({
         lineHeight: 22,
         textAlign: "center",
         textAlignVertical: "center",
-
     },
     litclubCard: {
         width: 100,
@@ -436,8 +412,7 @@ const profStyles = StyleSheet.create({
     iconRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10, 
+        gap: 10,
         flexShrink: 0,
     },
-
 });
