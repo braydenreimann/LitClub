@@ -117,23 +117,25 @@ using (var scope = app.Services.CreateScope())
     await blobContainer.CreateIfNotExistsAsync(); //Syntax looks different from Cosmos setup because Blob Service only requires one container, and is not structured
                                                   // Images are set to public access for simplicity. Fix later by implementing SAS tokens.                                                   
 
-    // Threads container
+    try
+    {
+        await db.GetContainer(o.ThreadsContainerId).DeleteContainerAsync();
+    }
+    catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+    {
+        // ignore
+    }
+
     await db.CreateContainerIfNotExistsAsync(new ContainerProperties
     {
-        Id = "threads",
-        PartitionKeyPath = "/threadId",
+        Id = o.ThreadsContainerId,                      // ← use options
+        PartitionKeyPath = "/threadId",                 // partition key for both Thread and Comment
         IndexingPolicy = new IndexingPolicy
         {
             Automatic = true,
             IndexingMode = IndexingMode.Consistent,
-            IncludedPaths =
-        {
-            new IncludedPath { Path = "/*" }
-        },
-            ExcludedPaths =
-        {
-            new ExcludedPath { Path = "/\"Body\"/?" } // optional
-        },
+            IncludedPaths = { new IncludedPath { Path = "/*" } },
+            ExcludedPaths = { new ExcludedPath { Path = "/\"Body\"/?" } },
             CompositeIndexes =
         {
             new Collection<CompositePath>
@@ -202,14 +204,24 @@ using (var scope = app.Services.CreateScope())
         Genre = "Young adult novel",
         Description = "A book about two sick young lovers.",
         CoverImageUrl = "the-fault-in-our-stars.jpg",
-        Editions = [
-            new Edition {
+        Editions =
+        [
+            new Edition
+            {
                 Format = BookFormat.Paperback,
                 Publisher = "Penguin Books",
                 PublicationDate = DateOnly.Parse("April 8, 2014"),
                 PrintLength = 352,
                 Isbn13s = ["978-0142424179"]
             }
+        ],
+        ChapterThreadIds =
+        [
+            "thread-1", "thread-2", "thread-3", "thread-4", "thread-5",
+            "thread-6", "thread-7", "thread-8", "thread-9", "thread-10",
+            "thread-11", "thread-12", "thread-13", "thread-14", "thread-15",
+            "thread-16", "thread-17", "thread-18", "thread-19", "thread-20",
+            "thread-21", "thread-22", "thread-23", "thread-24", "thread-25"
         ]
     };
 
@@ -299,6 +311,8 @@ using (var scope = app.Services.CreateScope())
     await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
+
+    await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
 }
 
 var updateSpec = args.Contains("--updateSpec");
