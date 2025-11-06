@@ -8,4 +8,5 @@ public sealed class AddBookRequest
     public required string Genre { get; init; }
     public string? Description { get; init; }
     public string? CoverImageUrl { get; init; }
+    public List<string>? ChapterThreadIds { get; init; }
 }

@@ -14,6 +14,7 @@ public static class BookMapper
         Genre = book.Genre,
         Description = book.Description,
         CoverImageUrl = book.CoverImageUrl,
-        Editions = [.. book.Editions.Select(edition => edition.ToResponse())]
+        Editions = [.. book.Editions.Select(edition => edition.ToResponse())],
+        ChapterThreadIds = book.ChapterThreadIds ?? []
     };
 }

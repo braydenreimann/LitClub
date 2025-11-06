@@ -11,6 +11,7 @@ public static class AddBookMapper
         TotalChapters = request.TotalChapters,
         Genre = request.Genre,
         Description = request.Description,
-        CoverImageUrl = request.CoverImageUrl
+        CoverImageUrl = request.CoverImageUrl,
+        ChapterThreadIds = request.ChapterThreadIds
     };
 }
