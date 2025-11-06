@@ -1,6 +1,8 @@
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, Edition, Book, LibraryBook, DisplayBook } from '../domain/models';
+import { client } from "@/client";
+import { toEditUserBody, EditUserInput } from "@/api-mappers/users/users-mappers";
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
@@ -151,3 +153,25 @@ export async function getBookshelfByStatus(userId: string, status: number): Prom
         return null;
     }
 }
+
+export async function editUser(input: EditUserInput) {
+  try {
+    const body = toEditUserBody(input);
+
+    const { data, error } = await client.PATCH("/users/{userId}", {
+      params: { path: { userId: input.userId } },
+      body,
+    });
+
+    if (error) {
+      console.error("Error editing user:", error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Unexpected error editing user:", err);
+    return { success: false, error: err };
+  }
+}
+
