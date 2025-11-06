@@ -4,7 +4,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 import { Platform, Pressable } from 'react-native';
 import { ThemedText } from '../../components/themed-text';
 import { ThemedView } from '../../components/themed-view';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../../components/SearchBar';
 import Header from '../../components/headerWithSearch';
@@ -23,19 +23,20 @@ import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
 import { useLitClubs } from '../../LitClubImport/LitClubContext';
+import BodyText from '@/components/BodyText';
 
 
 function EditButton() {
     return (
-        <Link href="/editProfilePage">
-            <Foundation name="pencil" size={30} color="black" marginLeft="20" marginTop="10" />
-        </Link>
+        <Pressable onPress={() => router.push('/editProfile')}>
+            <Foundation name="pencil" size={20} color={colors.darkest} />
+        </Pressable>
     );
 }
 function SettingsButton() {
     return (
         <Link href="/settingsPage">
-            <EvilIcons name="gear" size={50} color="black" marginLeft="20" marginBottom="10" />
+            <EvilIcons name="gear" size={30} color={colors.darkest} />
         </Link>
 
     );
@@ -43,7 +44,7 @@ function SettingsButton() {
 function StatsButton() {
     return (
         <Link href="/statsPage">
-            <Foundation name="book-bookmark" size={30} color="black" marginLeft="20" marginTop="10" />
+            <Foundation name="book-bookmark" size={30} color={colors.darkest} />
         </Link>
 
     );
@@ -63,7 +64,22 @@ export default function ProfileScreen() {
         if (fontsLoaded) SplashScreen.hideAsync();
     }, [fontsLoaded]);
 
+useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
 
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
 
     const [user, setUser] = useState<User | null>(null)
     const { litClubs, loading, error } = useLitClubs();
@@ -92,22 +108,7 @@ export default function ProfileScreen() {
         );
     }
 
-    useEffect(() => { //chat-gpt is a quadrillion dollar idea
-        // Define an async function inside useEffect
-        const loadSession = async () => {
-            try {
-                const sessionString = await AsyncStorage.getItem('session');
-                if (!sessionString) return; // no session stored
-
-                const session: User = JSON.parse(sessionString);
-                setUser(session); // update state
-            } catch (error) {
-                console.error('Error loading session:', error);
-            }
-        };
-
-        loadSession(); // call the async function
-    }, []);
+    
 
     const userId = user?.id ?? '';
     const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
@@ -118,30 +119,40 @@ export default function ProfileScreen() {
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
-                <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
-                <View style={profStyles.profileHeader}>
-                    {/* profile icon TODO change to PFP */}
-                    <EvilIcons name="user" size={75} color="black" />
-                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
-                        <Text style={globalStyles.subheading}>
-                            {user ? `@${user.userName}` : 'Loading...'}
-                        </Text>
-
-                        <Text
-                            style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
-                            numberOfLines={0}
-                        >
-                            {user ? user.bio : 'Loading...'}
-                        </Text>
-                    </View>
-
-                    {/*be able to edit the bio */}
-                    <View style={profStyles.userBio}>
-                        <SettingsButton />
-                        <EditButton />
-                    </View>
-                    <StatsButton />
+            <View style={profStyles.nameRow}>
+                <View style={profStyles.nameSection}>
+                    <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
+                    {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
+                    </Text>
+                    <Text style={globalStyles.body}>he/him</Text>
                 </View>
+
+                <View style={profStyles.iconRow}>
+                    <SettingsButton />
+                    <StatsButton />
+                    <EditButton />
+                </View>
+            </View>
+                
+            <View style={profStyles.profileHeader}>
+                {/* profile icon TODO change to PFP */}
+                <EvilIcons name="user" size={75} color={colors.darkest} />
+                <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
+                    <Text style={globalStyles.subheading}>
+                        {user ? `@${user.userName}` : 'Loading...'}
+                    </Text>
+
+                    <Text
+                        style={[globalStyles.body, { flexShrink: 1, flexWrap: 'wrap' }]}
+                        numberOfLines={0}
+                    >
+                        {user ? user.bio : 'Loading...'}
+                    </Text>
+                </View>
+
+                {/*be able to edit the bio */}
+
+            </View>
 
                 {/*this is the part where we show the lists of the books*/}
                 <View>
@@ -228,7 +239,7 @@ export default function ProfileScreen() {
 
                         ))
                     ) : (
-                        <Text>No archived clubs.</Text>
+                        <Text style={[globalStyles.body, {paddingLeft: 15}]}>No archived clubs.</Text>
                     )
                     }
                 </View>
@@ -329,5 +340,24 @@ const profStyles = StyleSheet.create({
         borderColor: colors.midBlue,
         textAlign: "center",
         textAlignVertical: "center",
-    }
+    },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
+        paddingTop: 15,
+    },
+    nameSection: {
+        flexShrink: 1,
+        flexWrap: 'wrap',
+        maxWidth: '70%',
+    },
+    iconRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10, 
+        flexShrink: 0,
+    },
+
 });
