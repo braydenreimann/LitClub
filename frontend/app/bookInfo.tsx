@@ -173,9 +173,9 @@ export default function BookInfoScreen() {
 
                 <Pressable
                     onPress={() => {
-                        router.push("/threads/35e18343-1b6e-4c5c-bb3a-c84ac0da6414");
+                        router.push("/threads/thread-1");
                     }} >
-                    <Text>This is some text.</Text>
+                    <Text>View the chapter 1 thread.</Text>
                 </Pressable>
                 <Pressable
                     style={infoStyle.forumBox}
