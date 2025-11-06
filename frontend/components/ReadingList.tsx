@@ -5,13 +5,14 @@
 // https://www.codedaily.io/tutorials/The-Shapes-of-React-Native
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, Pressable, Image } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { colors, fonts } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, DisplayBook } from '../domain/models';
-import { getUser, getBookshelf } from '../services/usersService';
+import { getUser, getBookshelfByStatus } from '../services/usersService';
+import { getBookCoverUri } from '@/services/imagesService';
 
 //eventually will fetch data from backend
 interface ReadingListProps {
@@ -21,6 +22,7 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
     const [user, setUser] = useState<User | null>(null);
     const [shelf, setShelf] = useState<DisplayBook[]>([]);
     const [loading, setLoading] = useState(true);
+    const [coverUris, setCoverUris] = useState<{ [id: string]: string }>({}); // For Loading cover images
 
     useEffect(() => {
         const loadSession = async () => { //Load user id from session.
@@ -36,13 +38,13 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
         loadSession();
     }, []);
 
-    useEffect(() => { //load bookshelf
+    useEffect(() => { //load bookshelf by status
         if (!user) return;
 
         const loadBookshelf = async () => {
             setLoading(true);
             try {
-                const books = await getBookshelf(user.id, status);
+                const books = await getBookshelfByStatus(user.id, status);
                 setShelf(books ?? []);
             } catch (err) {
                 console.error('Error loading bookshelf:', err);
@@ -53,6 +55,24 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
 
         loadBookshelf();
     }, [user, status]);
+
+    useEffect(() => { //Load all images for shelf here
+        let alive = true; //prevent memory leaks. 
+
+        (async () => {
+            const newUris: { [id: string]: string } = {}; //explicit typing needed
+            await Promise.all( //ensure resolution of all cover images
+                shelf.map(async (book) => {
+                    const uri = await getBookCoverUri(book.coverImageUrl);
+                    newUris[book.id] = uri || "";
+                })
+            );
+            if (alive) setCoverUris(newUris); //Cancel when component unmounted
+        })();
+
+        return () => { alive = false; };
+    }, [shelf]);
+
 
     return (
         <View style={styles.scrollingWrapper}>
@@ -73,7 +93,20 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
                                 params: { id: book.id }
                             }}
                             >
-                                <Text style={globalStyles.subheading}>{book.title}</Text>
+                                <Image //<Text style={globalStyles.subheading}>{book.title}</Text> was originally here if reversion necessary
+                                    source={
+                                        coverUris[book.id]
+                                            ? { uri: coverUris[book.id] }
+                                            : require("../assets/images/turkstra.jpg") // fallback image
+                                    }
+                                    style={{
+                                        width: 120,
+                                        height: 180,
+                                        borderRadius: 8,
+                                        marginBottom: 6,
+                                    }}
+                                    resizeMode="cover"
+                                />
                             </Link>
                         </Pressable>
                     ))}

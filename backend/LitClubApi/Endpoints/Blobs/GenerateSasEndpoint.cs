@@ -4,6 +4,7 @@ using Azure.Storage.Sas;
 using LitClubApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Net;
 
 namespace LitClubApi.Endpoints.Blobs.GenerateSas;
 
@@ -45,6 +46,20 @@ public class Get(BlobServiceClient blobServiceClient, IOptions<BlobOptions> blob
         }
 
         var sasUri = blobClient.GenerateSasUri(sasBuilder);
-        return Ok(new SasResponse { SasUri = sasUri.ToString() });
+        var uriString = sasUri.ToString();
+
+        // Replace localhost or 127.0.0.1 with LAN IP dynamically. Otherwise, blob storage accessible only to localhost, and not mobile devices for testing.
+        var host = Dns.GetHostAddresses(Dns.GetHostName())
+            .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?
+            .ToString();
+
+        if (!string.IsNullOrEmpty(host))
+        {
+            uriString = uriString
+                .Replace("127.0.0.1", host)
+                .Replace("localhost", host);
+        }
+
+        return Ok(new SasResponse { SasUri = uriString });
     }
 }
