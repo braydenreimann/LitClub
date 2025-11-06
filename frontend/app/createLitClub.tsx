@@ -4,7 +4,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 import { InteractionManager, Platform, Pressable, TextInput} from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '@/components/SearchBar';
 import Header from '@/components/headerWithSearch';
@@ -24,9 +24,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '@/styles/globalStyles';
 import { useLitClubs } from '@/LitClubImport/LitClubContext';
 import Constants from 'expo-constants';
-import { User } from '@/domain/models';
+import { Book, User } from '@/domain/models';
 import { useSession } from '@/auth/authContext';
 import { GenresSelector } from '@/components/genresSelector';
+import { getBook, getBooks } from '@/services/booksService';
+import { isPromise } from 'formik';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 const LAN_IP = hostFromExpo ?? '10.0.0.252'
@@ -44,9 +46,6 @@ function BackButton() {
     );
 }
 
-const GENRES = [
-    'Fantasy', 'Romance', 'Fiction', 'Science-Fiction', 'Drama', 'Mystery', 'Non-Fiction', 'Thriller', 'Horror', 'Historical', 'Poetry', 'Biography', 'Memoir', 'Young Adult', 'True Crime', 'Science', 'Western Fiction', 'Philopshical', 'Action Fiction'
-];
 // Define user state
 export default function CreateLitClub() {
     const [fontsLoaded] = useFonts({
@@ -59,15 +58,17 @@ export default function CreateLitClub() {
         }, [fontsLoaded]);
 
     const router = useRouter();
+    const params = useLocalSearchParams();
+    const selectedBooks = params?.selectedBooks ? JSON.parse(params.selectedBooks as string) : [];
     const { addLitClub, fetchLitClubs } = useLitClubs();
     const { session } = useSession();
     const [user, setUser] = useState<User | null>(null);
 
     // club form inputs
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [preferredGenres, setPreferredGenres] = useState<string[]>([]);
-    const [privateClub, setPrivateClub] = useState(false);
+    const [name, setName] = useState(params.name ?? '');
+    const [description, setDescription] = useState(params.description ?? '');
+    const [preferredGenres, setPreferredGenres] = useState(params.genres ?? '');
+    const [privateClub, setPrivateClub] = useState(params.isPrivate === 'true');
     const [loading, setLoading] = useState(false);
 
     //load user session
@@ -86,21 +87,51 @@ export default function CreateLitClub() {
         loadSession();
     }, []);
 
+    useEffect(() => {
+        const loadFormData = async () => {
+            const saved = await AsyncStorage.getItem('createLitClubForm');
+            if (saved) {
+                const data = JSON.parse(saved);
+                setName(data.name || '');
+                setDescription(data.description || '');
+                setPreferredGenres(data.preferredGenres || '');
+                setPrivateClub(data.privateClub || false);
+            }
+        };
+        loadFormData();
+    }, []);
 
+    const handleFindBooks = async () => {
+        const formData = {
+            name,
+            description,
+            preferredGenres,
+            privateClub: privateClub.toString(),
+            selectedBooks
+        };
+        await AsyncStorage.setItem('createLitClubForm', JSON.stringify(formData))
+
+        router.push({
+            pathname: '/bookPicksForClub',
+            params: {preselected: JSON.stringify(selectedBooks) }
+        })
+    };
+
+    //handle create club
     const handleCreateClub = async () => {
-        if (!name.trim()) {
+        if (!(typeof name === 'string' ? name.trim() : String(name).trim())) {
             Alert.alert('Validation Error', 'Club name cannot be empty.');
-            return;
         }
+        if (selectedBooks.length === 0 ) return Alert.alert('Error', 'Please select at least one book')
         if (!user?.id) {
             Alert.alert('Error', 'User not logged in.');
             return;
         }
 
         const payload = {
-            name: name.trim(),
+            name,
             ownerUserId: user.id,
-            description: description.trim(),
+            description,
             preferredGenres: preferredGenres,
             privateClub,
             memberUserIds: [user.id],
@@ -125,7 +156,7 @@ export default function CreateLitClub() {
             const createdClub = await response.json();
             addLitClub(createdClub);
             //await fetchLitClubs(); //refresh list
-            
+            await AsyncStorage.removeItem('createLitClubForm');
             Alert.alert('Success', `${name} club created successfully!`);
             router.push('/bookclubs');
         } catch (error: any) {
@@ -150,7 +181,7 @@ export default function CreateLitClub() {
                     style={styles.input}
                     placeholder="Club Name"
                     placeholderTextColor={'grey'}
-                    value={name}
+                    value={Array.isArray(name) ? name.join(', ') : name}
                     onChangeText={setName}
                 />
 
@@ -162,13 +193,32 @@ export default function CreateLitClub() {
                     placeholderTextColor={'grey'}
                     multiline={true}
                     textAlignVertical="top"
-                    value={description}
+                    value={Array.isArray(description) ? description.join(', ') : description}
                     onChangeText={setDescription}
                 />
 
                 {/* Genres */}
                 <Text style={[globalStyles.subheading, { paddingTop: 30, fontSize: 18, color: colors.darkest, paddingBottom: 10 }]}>Preferred Genres</Text>
-                <GenresSelector selected={preferredGenres} onChange={setPreferredGenres} />
+                <GenresSelector
+                    selected={typeof preferredGenres === 'string' ? (preferredGenres ? preferredGenres.split(',').map(g => g.trim()) : []) : preferredGenres}
+                    onChange={setPreferredGenres}
+                />
+
+                {/* Book Selection */}
+                <Text style={[globalStyles.subheading, { paddingTop: 30, fontSize: 18, color: colors.darkest, paddingBottom: 10 }]}>Book List</Text>
+                <Pressable
+                    style={[styles.booksButton, loading && { opacity: 0.6 }, { marginTop: 10 }]}
+                    onPress={handleFindBooks}
+                >
+                    <Text style={styles.bookButtonText}>
+                        {selectedBooks.length > 0
+                         ? `Selected Books: ${selectedBooks.length}`
+                         : 'Select Books for Your Club'}
+                    </Text>
+                </Pressable>
+
+                <Text style={[globalStyles.subheading, { paddingTop: 30, fontSize: 18, color: colors.darkest, paddingBottom: 10 }]}>_____________________________________</Text>
+
 
                 {/* Privacy toggle */}
                 <Pressable
@@ -182,7 +232,7 @@ export default function CreateLitClub() {
                 
                 {/* Create Button */}
                 <Pressable
-                    style={[styles.createButton, loading && { opacity: 0.6 }, { marginTop: 20 }]}
+                    style={[styles.createButton, loading && { opacity: 0.6 }, { marginTop: 20, marginBottom: 40 }]}
                     onPress={handleCreateClub}
                     disabled={loading}
                 >
@@ -249,9 +299,21 @@ const styles = StyleSheet.create({
         textAlignVertical: 'top',
         paddingTop: 12,
     },
-});
+    booksButton: {
+        marginTop: 20,
+        backgroundColor: colors.yellow,
+        padding: 15,
+        width: '100%',
+        borderRadius: 100,
+        margin: 'auto',
+        textAlign: 'center',
+    },
+    bookButtonText: {
+        textAlign: 'center',
+        color: colors.darkest,
+        fontFamily: fonts.body,
+        fontSize: 16,
+    }, 
     
-function setShouldNavigate(arg0: boolean) {
-    throw new Error('Function not implemented.');
-}
+});
 

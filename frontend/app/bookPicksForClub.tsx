@@ -1,7 +1,7 @@
 import { View, ScrollView, Text, Pressable, Alert, ActivityIndicator, Dimensions } from 'react-native';
 import Header from '../components/headerWithSearch';
 import { globalStyles } from '@/styles/globalStyles';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import {colors} from '../theme'
 import { StyleSheet } from 'react-native';
 
@@ -12,14 +12,20 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { Book } from '@/domain/models';
 import { getBooks } from '@/services/booksService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 10;
 const NUM_COLUMNS = 3;
 const CARD_WIDTH = (width - CARD_MARGIN * (NUM_COLUMNS + 1)) / NUM_COLUMNS; // 3 cards per row with margins
 
-export default function BookRecs() {
+export default function bookPicksForClubs() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const preselected = params?.preselected ? JSON.parse(params.preselected as string) : []; //match same formate
+
   const [books, setBooks] = useState<Book[]>([]);
+  const [selectedBooks, setSelectedBooks] = useState<Book[]>(preselected);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,6 +52,32 @@ export default function BookRecs() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
+// Toggle book selection handler  
+    const toggleSelect = (book: Book) => {
+        if (selectedBooks.find(b => b.id === book.id)) {
+            setSelectedBooks(selectedBooks.filter(b => b.id !== book.id));
+            }
+        else {
+            if (selectedBooks.length >= 10) {
+                Alert.alert('Selection Limit', 'You can select up to 10 books only.');
+                return;
+            }
+            setSelectedBooks([...selectedBooks, book]);
+        }   
+    };
+
+  const handleConfirmSelection = async () => {
+    if (selectedBooks.length < 1) {
+        Alert.alert('No Books Selected', 'Please select at least one book for your club.');
+        return;
+    }
+    const saved = await AsyncStorage.getItem('createLitClubForm');
+    const data = saved ? JSON.parse(saved) : {};
+    data.selectedBooks = selectedBooks;
+    await AsyncStorage.setItem('createLitClubForm', JSON.stringify(data))
+    router.back();  
+  };
+  
   if (loading) {
     return (
       <View style={[globalStyles.container, {justifyContent: 'center', alignItems: 'center'}]}>
@@ -55,23 +87,39 @@ export default function BookRecs() {
   }
   return (
     <View style={globalStyles.container}>
-      <Text style={[globalStyles.heading, {alignContent: 'center', justifyContent: 'center'}]}>Book Recommendations</Text>
-      {books.length === 0 ? (
-        <Text style={globalStyles.body}>No book recommendations available at the moment.</Text>
-      ) : (
+      <Text style={[globalStyles.heading, {textAlign:'center', alignContent: 'center', justifyContent: 'center'}]}>Select Books for Your Club to Read</Text>
+      <Text style={[globalStyles.body, {textAlign: 'center', marginBottom: 20}]}> Pick between 1 and 10 books </Text>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.gridContainer}>
-              {books.map(book => (
-                <Pressable key={book.id} style={styles.card}>
+            {books.map(book => {
+              const isSelected = selectedBooks.some(b => b.id === book.id);
+              return (
+                <Pressable
+                  key={book.id}
+                  style={[
+                    styles.card,
+                    isSelected && styles.cardSelected
+                  ]}
+                  onPress={() => toggleSelect(book)}
+                >
                   <Link href={{ pathname: "/bookInfo", params: { id: book.id } }}>
                     <Text style={globalStyles.subheading}>{book.title}</Text>
                   </Link>
-                </Pressable> 
-              ))}
+                </Pressable>
+              );
+            })}
             </View>
         </ScrollView>
-        )
-      }
+
+        <Pressable
+            style={globalStyles.button}
+            onPress={handleConfirmSelection}
+        >
+            <Text style={[globalStyles.buttonText]}> 
+                Confirm Selection ({selectedBooks.length})
+            </Text>
+
+        </Pressable>
     </View>
   );
 }
@@ -82,6 +130,17 @@ const styles = StyleSheet.create({
     height: 180,
     margin: CARD_MARGIN/2,
     backgroundColor: colors.yellow,
+    borderColor: colors.darkest,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  cardSelected: {
+    width: 120,
+    height: 180,
+    margin: CARD_MARGIN/2,
+    backgroundColor: colors.teal,
     borderColor: colors.darkest,
     borderRadius: 12,
     alignItems: 'center',

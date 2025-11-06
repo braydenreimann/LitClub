@@ -13,7 +13,8 @@
       "policy": "sdkVersion"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vrmad.LitClub"
     },
     "android": {
       "adaptiveIcon": {

@@ -64,5 +64,17 @@ export const globalStyles = StyleSheet.create({
       textAlign: 'center',
       fontWeight: 'bold',
       flexWrap: 'wrap',
-    }
+    }, 
+    button: {
+        marginTop: 20,
+        backgroundColor: colors.sage,
+        padding: 15,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: colors.darkest,
+        fontFamily: fonts.body,
+        fontSize: 18,
+    }, 
 });
