@@ -1319,6 +1319,7 @@ export interface components {
             genre: string | null;
             description?: string | null;
             coverImageUrl?: string | null;
+            chapterThreadIds?: string[] | null;
         };
         AddCommentBody: {
             author: components["schemas"]["Author"];
@@ -1392,6 +1393,7 @@ export interface components {
             description?: string | null;
             coverImageUrl?: string | null;
             editions?: components["schemas"]["EditionResponse"][] | null;
+            chapterThreadIds?: string[] | null;
         };
         CommentResponse: {
             id: string | null;
@@ -1431,6 +1433,7 @@ export interface components {
             genre?: string | null;
             description?: string | null;
             coverImageUrl?: string | null;
+            chapterThreadIds?: string[] | null;
         };
         EditCommentBody: {
             body?: string | null;
