@@ -1,1 +1,1 @@
-npx openapi-typescript /Users/braydenreimann/Programming/repos/LitClub/backend/LitClubApi/schema/openapi.v1.json -o /Users/braydenreimann/Programming/repos/LitClub/frontend/schema/openapi-types.ts
+npx openapi-typescript schema/openapi.v1.json -o ../../frontend/schema/openapi-types.ts
