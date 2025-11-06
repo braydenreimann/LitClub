@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import * as yup from 'yup';
-import { useSession } from '../../auth/authContext';
+import { useSession } from '@/auth/authContext';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
 

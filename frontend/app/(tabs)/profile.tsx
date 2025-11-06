@@ -64,7 +64,22 @@ export default function ProfileScreen() {
         if (fontsLoaded) SplashScreen.hideAsync();
     }, [fontsLoaded]);
 
+useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
 
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
 
     const [user, setUser] = useState<User | null>(null)
     const { litClubs, loading, error } = useLitClubs();
@@ -93,22 +108,7 @@ export default function ProfileScreen() {
         );
     }
 
-    useEffect(() => { //chat-gpt is a quadrillion dollar idea
-        // Define an async function inside useEffect
-        const loadSession = async () => {
-            try {
-                const sessionString = await AsyncStorage.getItem('session');
-                if (!sessionString) return; // no session stored
-
-                const session: User = JSON.parse(sessionString);
-                setUser(session); // update state
-            } catch (error) {
-                console.error('Error loading session:', error);
-            }
-        };
-
-        loadSession(); // call the async function
-    }, []);
+    
 
     const userId = user?.id ?? '';
     const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
@@ -124,7 +124,7 @@ export default function ProfileScreen() {
                     <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
                     {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
                     </Text>
-                    <Text style={globalStyles.body}>she/he/they</Text>
+                    <Text style={globalStyles.body}>he/him</Text>
                 </View>
 
                 <View style={profStyles.iconRow}>

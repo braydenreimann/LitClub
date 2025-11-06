@@ -24,8 +24,6 @@ import { EditUserInput } from '../api-mappers/users/users-mappers';
 import { verifyPassword } from '@/services/authService';
 import { bool, boolean } from 'yup';
 
-const { signIn } = useSession();
-
 const pronounOptions = [
   'he', 'him', 'his',
   'she', 'her', 'hers',
@@ -36,6 +34,7 @@ const pronounOptions = [
 
 export default function EditProfileScreen() {
   const router = useRouter();
+  const { signIn } = useSession();
 
   const [user, setUser] = useState<User | null>(null);
 
