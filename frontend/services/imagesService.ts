@@ -1,24 +1,24 @@
 import { client } from 'client';
 
-export async function getBookCoverUri(coverPath: string | undefined): Promise<string> {
-    if (coverPath === undefined) {
+export async function getUri(Path: string | undefined): Promise<string> {
+    if (Path === undefined) {
         return "";
     }
 
     try {
         const { data } = await client.GET("/generate-sas/{blobName}", {
-            params: { path: { blobName: coverPath } }
+            params: { path: { blobName: Path } }
         });
 
         if (!data || data.sasUri == null) {
-            // No book cover available
+            // No image available
             return "";
         }
 
         return data.sasUri;
 
     } catch (err) {
-        console.error('Error retrieving book cover:', err);
+        console.error('Error retrieving image:', err);
         throw err;
     }
 }

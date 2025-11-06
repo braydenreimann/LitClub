@@ -20,6 +20,26 @@ export async function getUser(): Promise<User | null> {
     }
 }
 
+export async function getUserFromId(userId: string): Promise<User | null> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+
+        if (!response.ok) {
+            console.warn('Failed to fetch user', response.status);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const user: User = data as User;
+
+        return user;
+    } catch (error) {
+        console.error('Error fetching user from id:', error);
+        throw error;
+    }
+}
+
 export async function getBookFromLibraryBook(bookId: string): Promise<Book> {
     try {
         const response = await fetch(`${API_BASE_URL}/books/${bookId}`);

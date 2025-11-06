@@ -23,6 +23,8 @@ import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
 import { useLitClubs } from '../../LitClubImport/LitClubContext';
+import { getUri } from '../../services/imagesService';
+import { getUserFromId } from '../../services/usersService'
 
 
 function EditButton() {
@@ -67,6 +69,48 @@ export default function ProfileScreen() {
 
     const [user, setUser] = useState<User | null>(null)
     const { litClubs, loading, error } = useLitClubs();
+    const [profileUri, setProfileUri] = useState<string>("");
+
+    useEffect(() => {
+        let alive = true; // to prevent state updates after unmount
+
+        const loadUser = async () => {
+            try {
+                // Load session from AsyncStorage
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return;
+
+                const session: User = JSON.parse(sessionString);
+
+                // Fetch fresh user from backend using ID
+                const freshUser = await getUserFromId(session.id);
+                if (!freshUser) return;
+
+                if (!alive) return;
+
+                setUser(freshUser);
+
+                // Fetch profile photo URI if available
+                if (freshUser.profilePhotoUrl) {
+                    const uri = await getUri(freshUser.profilePhotoUrl);
+                    if (alive) setProfileUri(uri || "");
+                }
+            } catch (err) {
+                console.error('Failed to load user:', err);
+            }
+        };
+
+        loadUser();
+
+        return () => {
+            alive = false;
+        };
+    }, []);
+
+    const userId = user?.id ?? '';
+    const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
+    const leaderClubs = litClubs.filter(c => c.ownerUserId === userId);
+    const archivedClubs = litClubs.filter(c => c.privateClub); // example filter
 
     if (loading) {
         return (
@@ -92,36 +136,19 @@ export default function ProfileScreen() {
         );
     }
 
-    useEffect(() => { //chat-gpt is a quadrillion dollar idea
-        // Define an async function inside useEffect
-        const loadSession = async () => {
-            try {
-                const sessionString = await AsyncStorage.getItem('session');
-                if (!sessionString) return; // no session stored
-
-                const session: User = JSON.parse(sessionString);
-                setUser(session); // update state
-            } catch (error) {
-                console.error('Error loading session:', error);
-            }
-        };
-
-        loadSession(); // call the async function
-    }, []);
-
-    const userId = user?.id ?? '';
-    const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId));
-    const leaderClubs = litClubs.filter(c => c.ownerUserId === userId);
-    const archivedClubs = litClubs.filter(c => c.privateClub); // example filter
-
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
                 <Text style={globalStyles.heading}> {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"} </Text>
                 <View style={profStyles.profileHeader}>
-                    {/* profile icon TODO change to PFP */}
-                    <EvilIcons name="user" size={75} color="black" />
+                    <Image
+                        source={profileUri
+                            ? { uri: profileUri } 
+                            : require('../../assets/images/turkstra.jpg')}
+                        style={profStyles.profileImage}
+                    />
+
                     <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
                         <Text style={globalStyles.subheading}>
                             {user ? `@${user.userName}` : 'Loading...'}
@@ -133,7 +160,7 @@ export default function ProfileScreen() {
                         >
                             {user ? user.bio : 'Loading...'}
                         </Text>
-                    </View>
+                    Image</View>
 
                     {/*be able to edit the bio */}
                     <View style={profStyles.userBio}>
@@ -200,7 +227,7 @@ export default function ProfileScreen() {
                             </Pressable>
 
                         ))
-                    ) : (<Text>You're not leading any clubs yet.</Text>)
+                    ) : (<Text>You&apos;re not leading any clubs yet.</Text>) //types apostrophe as literal
                     }
                 </View>
                 <Text style={globalStyles.subheading}> Archived LitClubs </Text>
@@ -274,6 +301,15 @@ const profStyles = StyleSheet.create({
     userBio: {
         flexDirection: "column",
         alignItems: "stretch",
+    },
+    profileImage: {
+        width: 100, 
+        height: 100,
+        backgroundColor: colors.teal,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
     },
     subheading: {
         fontFamily: fonts.subheading,
