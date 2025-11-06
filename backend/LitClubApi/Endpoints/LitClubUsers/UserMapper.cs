@@ -14,6 +14,7 @@ public static class UserMapper
         PasswordHash = request.Password,
         Bio = request.Bio,
         ProfilePhotoUrl = request.ProfilePhotoUrl,
+        Pronouns = request.Pronouns?.ToList() ?? [],
         PreferredGenres = request.PreferredGenres?.ToList() ?? [],
         PrivateAccount = request.PrivateAccount,
         PublicInteractionRestricted = request.PublicInteractionRestricted
@@ -27,6 +28,7 @@ public static class UserMapper
         if (request.Body.Email is not null) user.Email = request.Body.Email;
         if (request.Body.Password is not null) user.PasswordHash = request.Body.Password;
         if (request.Body.Bio is not null) user.Bio = request.Body.Bio;
+        if (request.Body.Pronouns is not null) user.Pronouns = request.Body.Pronouns;
         if (request.Body.ProfilePhotoUrl is not null) user.ProfilePhotoUrl = request.Body.ProfilePhotoUrl;
         if (request.Body.PreferredGenres is not null) user.PreferredGenres = request.Body.PreferredGenres.ToList();
         if (request.Body.PrivateAccount is not null) user.PrivateAccount = request.Body.PrivateAccount.Value;
@@ -45,6 +47,7 @@ public static class UserMapper
         UserName = user.UserName,
         Email = user.Email,
         Bio = user.Bio,
+        Pronouns = user.Pronouns,
         ProfilePhotoUrl = user.ProfilePhotoUrl,
         PreferredGenres = [.. user.PreferredGenres],
         PrivateAccount = user.PrivateAccount,

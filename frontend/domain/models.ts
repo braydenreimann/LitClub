@@ -10,6 +10,7 @@ export type User = {
     userName: string;
     email: string;
     bio: string;
+    pronouns: string[];
     profilePhotoUrl: string;
     preferredGenres: string[];
     privateAccount: boolean;
