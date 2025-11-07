@@ -163,7 +163,7 @@ export default function BookInfoScreen() {
                                 <Text style={globalStyles.subheading}>{book.author}</Text>
 
                                 {(() => {
-                                    const desc = book.description ?? "";
+                                    const desc = (book.description ?? "") + " Sample Text Sample Text Sample Text";
                                     const isLong = desc.length > 50;
                                     return (
                                         <>
