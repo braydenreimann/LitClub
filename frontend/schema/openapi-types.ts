@@ -1057,7 +1057,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/generate-sas/{blobName}": {
+    "/generate-sas-write/{blobName}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1081,7 +1081,53 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SasResponse"];
+                        "application/json": components["schemas"]["SasWriteResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/generate-sas-read/{blobName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    blobName: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SasReadResponse"];
                     };
                 };
                 /** @description Not Found */
@@ -1373,6 +1419,7 @@ export interface components {
             email: string | null;
             password: string | null;
             bio?: string | null;
+            pronouns?: string[] | null;
             profilePhotoUrl?: string | null;
             preferredGenres?: string[] | null;
             privateAccount?: boolean;
@@ -1420,6 +1467,7 @@ export interface components {
             email: string | null;
             password: string | null;
             bio?: string | null;
+            pronouns?: string[] | null;
             profilePhotoUrl?: string | null;
             preferredGenres?: string[] | null;
             privateAccount?: boolean;
@@ -1479,6 +1527,7 @@ export interface components {
             email?: string | null;
             password?: string | null;
             bio?: string | null;
+            pronouns?: string[] | null;
             profilePhotoUrl?: string | null;
             preferredGenres?: string[] | null;
             privateAccount?: boolean | null;
@@ -1580,7 +1629,10 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
-        SasResponse: {
+        SasReadResponse: {
+            sasUri: string | null;
+        };
+        SasWriteResponse: {
             sasUri: string | null;
         };
         /**
@@ -1614,6 +1666,7 @@ export interface components {
             userName: string | null;
             email: string | null;
             bio?: string | null;
+            pronouns?: string[] | null;
             profilePhotoUrl?: string | null;
             preferredGenres?: string[] | null;
             privateAccount?: boolean;

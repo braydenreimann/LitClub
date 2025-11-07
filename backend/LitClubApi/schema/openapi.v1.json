@@ -1610,7 +1610,7 @@
         }
       }
     },
-    "/generate-sas/{blobName}": {
+    "/generate-sas-write/{blobName}": {
       "get": {
         "tags": [
           "Get"
@@ -1631,7 +1631,46 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SasResponse"
+                  "$ref": "#/components/schemas/SasWriteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate-sas-read/{blobName}": {
+      "get": {
+        "tags": [
+          "Get"
+        ],
+        "parameters": [
+          {
+            "name": "blobName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SasReadResponse"
                 }
               }
             }
@@ -2137,6 +2176,13 @@
             "type": "string",
             "nullable": true
           },
+          "pronouns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
           "profilePhotoUrl": {
             "type": "string",
             "nullable": true
@@ -2322,6 +2368,13 @@
           },
           "bio": {
             "type": "string",
+            "nullable": true
+          },
+          "pronouns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           },
           "profilePhotoUrl": {
@@ -2534,6 +2587,13 @@
           },
           "bio": {
             "type": "string",
+            "nullable": true
+          },
+          "pronouns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           },
           "profilePhotoUrl": {
@@ -2962,7 +3022,20 @@
         },
         "additionalProperties": { }
       },
-      "SasResponse": {
+      "SasReadResponse": {
+        "required": [
+          "sasUri"
+        ],
+        "type": "object",
+        "properties": {
+          "sasUri": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SasWriteResponse": {
         "required": [
           "sasUri"
         ],
@@ -3076,6 +3149,13 @@
           },
           "bio": {
             "type": "string",
+            "nullable": true
+          },
+          "pronouns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           },
           "profilePhotoUrl": {
