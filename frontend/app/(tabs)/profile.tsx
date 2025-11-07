@@ -211,14 +211,12 @@ export default function ProfileScreen() {
                 {/* Books Section */}
                 <View>
                     <TopThreeBooks />
-                    <Text style={globalStyles.subheading}>Currently Reading</Text>
+                    <Text style={[globalStyles.subheading, {marginLeft: 10}]}>Currently Reading</Text>
                     <ReadingList status={1} />
-                    <Text style={globalStyles.subheading}>Past Reads</Text>
-                    <ReadingList status={0} />
-                    <Text style={globalStyles.subheading}>Saved for Later</Text>
+                    <Text style={[globalStyles.subheading, {marginLeft: 10}]}>Future Reads</Text>
                     <ReadingList status={2} />
-                    <Text style={globalStyles.subheading}>Want to Read</Text>
-                    <ReadingList status={3} />
+                    <Text style={[globalStyles.subheading, {marginLeft: 10}]}>Past Reads</Text>
+                    <ReadingList status={0} />
                 </View>
 
                 {/* Memberships */}
