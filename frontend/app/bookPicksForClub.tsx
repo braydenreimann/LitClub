@@ -1,4 +1,4 @@
-import { View, ScrollView, Text, Pressable, Alert, ActivityIndicator, Dimensions } from 'react-native';
+import { View, ScrollView, Text, Pressable, Alert, ActivityIndicator, Dimensions, Image } from 'react-native';
 import Header from '../components/headerWithSearch';
 import { globalStyles } from '@/styles/globalStyles';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
@@ -13,13 +13,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Book } from '@/domain/models';
 import { getBooks } from '@/services/booksService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUriRead } from '@/services/imagesService';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 10;
 const NUM_COLUMNS = 3;
 const CARD_WIDTH = (width - CARD_MARGIN * (NUM_COLUMNS + 1)) / NUM_COLUMNS; // 3 cards per row with margins
 
-export default function bookPicksForClubs() {
+export default function BookPicksForClubs() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const preselected: Book[] = params?.preselected ? JSON.parse(params.preselected as string) : []; //match same formate
@@ -27,6 +28,7 @@ export default function bookPicksForClubs() {
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBooks, setSelectedBooks] = useState<Book[]>(preselected);
   const [loading, setLoading] = useState(true);
+  const [coverUris, setCoverUris] = useState<string[]>([]);
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -42,6 +44,34 @@ export default function bookPicksForClubs() {
 
     loadBooks();
   }, []);
+
+    useEffect(() => {
+        let alive = true;
+
+        const loadBooksWithCovers = async () => {
+            try {
+                const { books: fetchedBooks } = await getBooks();
+
+                // Fetch all cover URIs
+                const uris = await Promise.all(
+                    fetchedBooks.map(book => getUriRead(book.coverImageUrl))
+                );
+
+                if (alive) {
+                    setBooks(fetchedBooks);
+                    setCoverUris(uris.map(uri => uri || "")); // store in array
+                }
+            } catch (err) {
+                console.error("Error loading books:", err);
+            } finally {
+                if (alive) setLoading(false);
+            }
+        };
+
+        loadBooksWithCovers();
+
+        return () => { alive = false; };
+    }, []);
 
   const [fontsLoaded] = useFonts({
     Fraunces_700Bold,
@@ -85,7 +115,7 @@ export default function bookPicksForClubs() {
       <Text style={[globalStyles.body, {textAlign: 'center', marginBottom: 20}]}> Pick between 1 and 10 books </Text>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.gridContainer}>
-            {books.map(book => {
+            {books.map((book, index) => {
               const isSelected = selectedBooks.some(b => b.id === book.id);
               return (
                 <Pressable
@@ -96,9 +126,16 @@ export default function bookPicksForClubs() {
                   ]}
                   onPress={() => toggleSelect(book)}
                 >
-                  <Link href={{ pathname: "/bookInfo", params: { id: book.id } }}>
-                    <Text style={globalStyles.subheading}>{book.title}</Text>
-                  </Link>
+                  
+                    {coverUris[index] ? (
+                              <Image
+                                  source={{ uri: coverUris[index] }}
+                                  style={styles.bookImage}
+                              />
+                          ) : (
+                              <Text style={globalStyles.subheading}>{book.title}</Text>
+                          )}
+                  
                 </Pressable>
               );
             })}
@@ -129,7 +166,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-  },
+    },
+    bookImage: {
+        width: 120,
+        height: 160,
+        backgroundColor: colors.teal,
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+    },
   cardSelected: {
     width: 120,
     height: 180,

@@ -1,4 +1,4 @@
-import { View, ScrollView, Text, Pressable, Alert, ActivityIndicator, Dimensions } from 'react-native';
+import { View, ScrollView, Text, Pressable, Alert, ActivityIndicator, Dimensions, Image } from 'react-native';
 import Header from '../components/headerWithSearch';
 import { globalStyles } from '@/styles/globalStyles';
 import { Link } from 'expo-router';
@@ -12,6 +12,7 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { Book } from '@/domain/models';
 import { getBooks } from '@/services/booksService';
+import { getUriRead } from '@/services/imagesService';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 10;
@@ -21,6 +22,7 @@ const CARD_WIDTH = (width - CARD_MARGIN * (NUM_COLUMNS + 1)) / NUM_COLUMNS; // 3
 export default function BookRecs() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
+  const [coverUris, setCoverUris] = useState<string[]>([]);
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -36,6 +38,34 @@ export default function BookRecs() {
 
     loadBooks();
   }, []);
+
+    useEffect(() => {
+        let alive = true;
+
+        const loadBooksWithCovers = async () => {
+            try {
+                const { books: fetchedBooks } = await getBooks();
+
+                // Fetch all cover URIs
+                const uris = await Promise.all(
+                    fetchedBooks.map(book => getUriRead(book.coverImageUrl))
+                );
+
+                if (alive) {
+                    setBooks(fetchedBooks);
+                    setCoverUris(uris.map(uri => uri || "")); // store in array
+                }
+            } catch (err) {
+                console.error("Error loading books:", err);
+            } finally {
+                if (alive) setLoading(false);
+            }
+        };
+
+        loadBooksWithCovers();
+
+        return () => { alive = false; };
+    }, []);
 
   const [fontsLoaded] = useFonts({
     Fraunces_700Bold,
@@ -61,10 +91,17 @@ export default function BookRecs() {
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.gridContainer}>
-              {books.map(book => (
+              {books.map((book, index) => (
                 <Pressable key={book.id} style={styles.card}>
                   <Link href={{ pathname: "/bookInfo", params: { id: book.id } }}>
-                    <Text style={globalStyles.subheading}>{book.title}</Text>
+                          {coverUris[index] ? (
+                              <Image
+                                  source={{ uri: coverUris[index] }}
+                                  style={styles.bookImage}
+                              />
+                          ) : (
+                              <Text style={globalStyles.subheading}>{book.title}</Text>
+                          )}
                   </Link>
                 </Pressable> 
               ))}
@@ -87,7 +124,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-  },
+    },
+    bookImage: {
+        width: 120,
+        height: 160,
+        backgroundColor: colors.teal,
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+    },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
