@@ -13,15 +13,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, DisplayBook } from '../domain/models';
 import { getUser, getBookshelfByStatus } from '../services/usersService';
 import { getUriRead } from '@/services/imagesService';
+import { Book } from '@/domain/models';
 
 //eventually will fetch data from backend
 interface ReadingListProps {
     status: number;
+    books?: DisplayBook[];
 }
-export default function ReadingList({ status }: ReadingListProps) { //AI assist with the loading functionality
+export default function ReadingList({ books, status }: ReadingListProps) { //AI assist with the loading functionality
     const [user, setUser] = useState<User | null>(null);
-    const [shelf, setShelf] = useState<DisplayBook[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [shelf, setShelf] = useState<DisplayBook[]>(books ?? []); //initialize from props
+    const [loading, setLoading] = useState(!books); //loading if only no books
     const [coverUris, setCoverUris] = useState<{ [id: string]: string }>({}); // For Loading cover images
 
     useEffect(() => {
@@ -39,22 +41,21 @@ export default function ReadingList({ status }: ReadingListProps) { //AI assist 
     }, []);
 
     useEffect(() => { //load bookshelf by status
-        if (!user) return;
+            if (books || !user) return;
 
-        const loadBookshelf = async () => {
-            setLoading(true);
-            try {
-                const books = await getBookshelfByStatus(user.id, status);
-                setShelf(books ?? []);
-            } catch (err) {
-                console.error('Error loading bookshelf:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadBookshelf();
-    }, [user, status]);
+            const loadBookshelf = async () => {
+                setLoading(true);
+                try {
+                    const books = await getBookshelfByStatus(user.id, status);
+                    setShelf(books ?? []);
+                } catch (err) {
+                    console.error('Error loading bookshelf:', err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            loadBookshelf();
+    }, [books, user, status]);
 
     useEffect(() => { //Load all images for shelf here
         let alive = true; //prevent memory leaks. 

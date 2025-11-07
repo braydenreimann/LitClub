@@ -19,15 +19,22 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useLitClubs } from '@/LitClubImport/LitClubContext';
 import { useLocalSearchParams } from 'expo-router';
 import Constants from 'expo-constants';
-import { User } from '@/domain/models';
+import { Book, User } from '@/domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GenresSelector } from '@/components/genresSelector';
+
+type ReadingListProps = {
+    status: number;
+    books?: Book[];
+};
 
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 const LAN_IP = hostFromExpo ?? '10.0.0.252'
 const API_BASE_URL = `http://${LAN_IP}:5112`
 const apiUrl = `${API_BASE_URL}/litclubs`;
+
+
 
 function Jump2discButton() {
     return (
@@ -71,6 +78,10 @@ export default function LitClubScreen() {
     const [actionLoading, setActionLoading] = useState(false);
     const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
     const [user, setUser] = useState<{ id: string } | null>(null);
+    const [selectedBooks, setSelectedBooks] = useState<Book[]>([]);
+    const [currentBook, setCurrentBook] = useState<Book | null>(null);
+    const [upcomingBooks, setUpcomingBooks] = useState<Book[]>([]);
+    
 
     useEffect(() => {
     const loadArchivedClubs = async () => {
@@ -102,6 +113,21 @@ export default function LitClubScreen() {
         };
 
         loadSession(); // call the async function
+    }, []);
+
+    useEffect(() => {
+        const loadSelectedBooks = async () => {
+            const saved = await AsyncStorage.getItem('selectedBooksForClub');
+            if (saved) {
+                const books: Book[] = JSON.parse(saved);
+
+                if (books.length > 0) {
+                    setCurrentBook(books[0] ?? null);
+                    setUpcomingBooks(books.slice(1));
+                }
+            }
+        };
+        loadSelectedBooks();
     }, []);
 
     const club = litClubs.find(c => c.id === id);
@@ -232,14 +258,21 @@ export default function LitClubScreen() {
                         <Text style={globalStyles.subheading}>@{club.ownerUserId}</Text>
                         <Foundation name="crown" size={30} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }} />
                     </View>
+
                     {/*currently reading section*/}
                     <View style={litStyles.currentRead}>
                         <View style={litStyles.sideRead}>
                             
                             <View style={globalStyles.card}>  
-                                <Text style={[globalStyles.heading, { textAlign: 'center', textAlignVertical: 'center' , paddingTop: 50, fontSize: 28}]}>
-                                    Current Book
-                                </Text>
+                                {currentBook ? (
+                                    <Text style={[globalStyles.subheading, {textAlign: 'center', paddingTop: 50, fontSize: 18}]}>
+                                        {currentBook.title}
+                                    </Text>
+                                ) : (
+                                    <Text style={[globalStyles.subheading, {textAlign: 'center', paddingTop: 50, fontSize: 18}]}>
+                                        Current Book Not Found
+                                    </Text>
+                                )}
                             </View>
                         </View>
                         <View style={litStyles.sideRead}>
@@ -263,7 +296,7 @@ export default function LitClubScreen() {
 
                     <Text style={globalStyles.subheading}>Upcoming Reads</Text>
                     {/* reading list for the club's upcoming reads*/}
-                    <ReadingList status={0} /> 
+                    <ReadingList books={upcomingBooks} status={0} /> 
                     <Text style={globalStyles.subheading}>Past Reads</Text>
                     {/* reading list for the Past Reads*/}   
                     <ReadingList status={0} />    

@@ -22,7 +22,7 @@ const CARD_WIDTH = (width - CARD_MARGIN * (NUM_COLUMNS + 1)) / NUM_COLUMNS; // 3
 export default function bookPicksForClubs() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const preselected = params?.preselected ? JSON.parse(params.preselected as string) : []; //match same formate
+  const preselected: Book[] = params?.preselected ? JSON.parse(params.preselected as string) : []; //match same formate
 
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBooks, setSelectedBooks] = useState<Book[]>(preselected);
@@ -56,8 +56,7 @@ export default function bookPicksForClubs() {
     const toggleSelect = (book: Book) => {
         if (selectedBooks.find(b => b.id === book.id)) {
             setSelectedBooks(selectedBooks.filter(b => b.id !== book.id));
-            }
-        else {
+        } else {
             if (selectedBooks.length >= 10) {
                 Alert.alert('Selection Limit', 'You can select up to 10 books only.');
                 return;
@@ -67,14 +66,6 @@ export default function bookPicksForClubs() {
     };
 
   const handleConfirmSelection = async () => {
-    if (selectedBooks.length < 1) {
-        Alert.alert('No Books Selected', 'Please select at least one book for your club.');
-        return;
-    }
-    const saved = await AsyncStorage.getItem('createLitClubForm');
-    const data = saved ? JSON.parse(saved) : {};
-    data.selectedBooks = selectedBooks;
-    await AsyncStorage.setItem('createLitClubForm', JSON.stringify(data))
     router.push({
       pathname: '/createLitClub',
       params: { selectedBooks: JSON.stringify(selectedBooks)}

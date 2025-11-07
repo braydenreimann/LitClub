@@ -61,16 +61,27 @@ export default function CreateLitClub() {
 
     const router = useRouter();
     const params = useLocalSearchParams();
-    const selectedBooks = params?.selectedBooks ? JSON.parse(params.selectedBooks as string) : [];
-    const { addLitClub, fetchLitClubs } = useLitClubs();
+    //const preselectedBooks = params?.selectedBooks ? JSON.parse(params.selectedBooks as string) : [];
+    const { addLitClub } = useLitClubs();
     const { session } = useSession();
     const [user, setUser] = useState<User | null>(null);
 
     // club form inputs
-    const [name, setName] = useState(params.name ?? '');
-    const [description, setDescription] = useState(params.description ?? '');
+    const [name, setName] = useState<string>(
+        Array.isArray(params.name) 
+        ? params.name[0] ?? '' 
+        : params.name ?? ''
+    );
+    const [description, setDescription] = useState<string>(
+        Array.isArray(params.description)
+            ? params.description[0] ?? ''
+            : params.description ?? ''
+    );
+    //const [name, setName] = useState(params.name ?? '');
+    //const [description, setDescription] = useState(params.description ?? '');
     const [preferredGenres, setPreferredGenres] = useState(params.genres ?? '');
     const [privateClub, setPrivateClub] = useState(params.isPrivate === 'true');
+    const [selectedBooks, setSelectedBooks ] = useState<Book[]>([]);
     const [loading, setLoading] = useState(false);
 
     //load user session
@@ -90,31 +101,19 @@ export default function CreateLitClub() {
     }, []);
 
     useEffect(() => {
-        const loadFormData = async () => {
-            const saved = await AsyncStorage.getItem('createLitClubForm');
-            if (saved) {
-                const data = JSON.parse(saved);
-                setName(data.name || '');
-                setDescription(data.description || '');
-                setPreferredGenres(data.preferredGenres || '');
-                setPrivateClub(data.privateClub || false);
+        if (params.selectedBooks) {
+            try {
+                const books: Book[] = JSON.parse(params.selectedBooks as string);
+                setSelectedBooks(books);
+            } catch (err) {
+                console.error('Error parsing selectedBooks:', err);
             }
-        };
-        loadFormData();
-    }, []);
+        }
+    }, [params.selectedBooks]);
 
     const handleFindBooks = async () => {
-        const formData = {
-            name,
-            description,
-            preferredGenres,
-            privateClub: privateClub.toString(),
-            selectedBooks
-        };
-        await AsyncStorage.setItem('createLitClubForm', JSON.stringify(formData))
-
         router.push({
-            pathname: '/bookPicksForClub',
+            pathname: '/BookPicksForClub',
             params: {preselected: JSON.stringify(selectedBooks) }
         })
     };
@@ -135,19 +134,17 @@ export default function CreateLitClub() {
             return;
         }
 
-        const isPrivate = String(privateClub) === 'true';
+        //const isPrivate = String(privateClub) === 'true';
 
         const payload = {
-            request: {
-                name,
+                name: name.trim(),
                 ownerUserId: user.id,
-                description,
+                description: description.trim(),
                 preferredGenres,
-                privateClub: isPrivate,
+                privateClub,
                 memberUserIds: [user.id],
                 libraryId: '',
-                selectedBooks,
-            }
+                selectedBooks: selectedBooks.map((b) => b.id),
         };
 
         try {
@@ -160,17 +157,27 @@ export default function CreateLitClub() {
                 body: JSON.stringify(payload),
             });
 
+            //here you want to create library books with those book IDs you collected 
+
+            const createdClub = await response.json();
+
+            //get the ID of the created club
+            //with each selected book, the first book should be the 'up next'
+            //create library books with the 
+            //
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Server Error (${response.status}): ${errorText}`);
             }
 
-            const createdClub = await response.json();
             addLitClub(createdClub);
             //await fetchLitClubs(); //refresh list
             await AsyncStorage.removeItem('createLitClubForm');
+
             Alert.alert('Success', `${name} club created successfully!`);
             router.push('/bookclubs');
+            //setTimeout(() => router.push('/bookclubs'), 300);
         } catch (error: any) {
             console.error('Error creating club:', error);
             Alert.alert('Error', `Failed to create club: ${error.message}`);
