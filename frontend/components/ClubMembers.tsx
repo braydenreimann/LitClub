@@ -66,7 +66,7 @@ export default function ClubMembers({ memberUserIds, ownerUserId }: ClubMembersP
   return (
     <ScrollView horizontal contentContainerStyle={[styles.scrollContainer]}>
         {members.map((member) => {
-          const displayName = member.name || member.id || (member as any).displayName || 'Unknown';
+          const displayName = member.userName || member.username || member.name || (member as any).displayName || 'Unknown';
           return (
           <View key={member.id} style={styles.memberContainer}>
             <View style={
