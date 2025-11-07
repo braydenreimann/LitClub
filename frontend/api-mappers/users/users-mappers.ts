@@ -14,6 +14,7 @@ export type EditUserInput = {
   preferredGenres?: string[];
   privateAccount?: boolean;
   publicInteractionRestricted?: boolean;
+  pronouns?: string[];
 };
 
 export function toEditUserBody(input: EditUserInput): EditUserBody {
@@ -27,6 +28,7 @@ export function toEditUserBody(input: EditUserInput): EditUserBody {
     profilePhotoUrl: input.profilePhotoUrl ?? null,
     preferredGenres: input.preferredGenres ?? null,
     privateAccount: input.privateAccount ?? null,
+    /*pronouns: input.pronouns ?? null,*/
     publicInteractionRestricted: input.publicInteractionRestricted ?? null,
   };
 }

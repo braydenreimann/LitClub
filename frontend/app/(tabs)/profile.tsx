@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
-import { Platform, Pressable } from 'react-native';
-import { ThemedText } from '../../components/themed-text';
-import { ThemedView } from '../../components/themed-view';
+import { Pressable } from 'react-native';
 import { Link, router } from 'expo-router';
 import { Image } from 'expo-image';
-import SearchBar from '../../components/SearchBar';
 import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
 import ReadingList from '../../components/ReadingList';
 import TopThreeBooks from '../../components/TopThreeBooks';
-import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
-import { Fonts } from '../../constants/theme';
 
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
@@ -24,7 +20,6 @@ import { globalStyles } from '../../styles/globalStyles';
 import { useLitClubs } from '../../LitClubImport/LitClubContext';
 import { getUriRead } from '../../services/imagesService';
 import { getUserFromId } from '../../services/usersService'
-import BodyText from '@/components/BodyText';
 
 function EditButton() {
     return (
@@ -78,7 +73,11 @@ export default function ProfileScreen() {
         loadSession(); // call the async function
     }, []);
 
-    const [user, setUser] = useState<User | null>(null)
+    const [user, setUser] = useState<User | null>(null);
+    const pronouns =
+        user?.pronouns && user.pronouns.length > 0
+        ? user.pronouns.join('/')
+        : '';
     const { litClubs, loading, error } = useLitClubs();
     const [profileUri, setProfileUri] = useState<string>("");
 
@@ -153,9 +152,22 @@ export default function ProfileScreen() {
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <Header />
             <ScrollView>
-                <Text style={globalStyles.heading}>
-                    {user ? `${user.firstName} ${user.lastName}` : 'Loading...'} {"\n"}
-                </Text>
+
+                {/* Name + action icons row */}
+                <View style={profStyles.nameRow}>
+                    <View style={profStyles.nameSection}>
+                        <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
+                            {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
+                        </Text>
+                        {/*<Text style={globalStyles.body}>he/him</Text>*/}
+                    </View>
+
+                    <View style={profStyles.iconRow}>
+                        <SettingsButton />
+                        <StatsButton />
+                        <EditButton />
+                    </View>
+                </View>
 
                 {/* Header row: photo + bio + quick actions */}
                 <View style={profStyles.profileHeader}>
@@ -169,6 +181,7 @@ export default function ProfileScreen() {
                     <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
                         <Text style={globalStyles.subheading}>
                             {user ? `@${user.userName}` : 'Loading...'}
+                            {pronouns ? <Text style={globalStyles.body}>{`  ${pronouns}`}</Text> : null}
                         </Text>
 
                         <Text
@@ -179,29 +192,9 @@ export default function ProfileScreen() {
                         </Text>
                     </View>
 
-                    {/* quick actions */}
-                    <View style={profStyles.userBio}>
-                        <SettingsButton />
-                        <EditButton />
-                    </View>
                 </View>
                 {/* ⬆️ close the header row here so the rest stacks vertically */}
 
-                {/* Name + action icons row */}
-                <View style={profStyles.nameRow}>
-                    <View style={profStyles.nameSection}>
-                        <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
-                            {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
-                        </Text>
-                        <Text style={globalStyles.body}>he/him</Text>
-                    </View>
-
-                    <View style={profStyles.iconRow}>
-                        <SettingsButton />
-                        <StatsButton />
-                        <EditButton />
-                    </View>
-                </View>
 
                 {/* Books Section */}
                 <View>
