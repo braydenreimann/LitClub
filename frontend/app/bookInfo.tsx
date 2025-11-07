@@ -1,8 +1,7 @@
 import React, { useEffect, useState, type PropsWithChildren } from 'react';
-import { Platform, Pressable, ActivityIndicator } from 'react-native';
+import { Pressable, ActivityIndicator } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
-import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
@@ -35,7 +34,7 @@ function ToCButton() {
         <Pressable
             style={infoStyle.ToCButton}
             onPress={() => { Alert.alert('Displaying TOC...') }}>
-            <Text style={[globalStyles.subheading, { fontSize: 16, color: colors.nextDarkest, fontFamily: fonts.subheading, paddingTop: 5, paddingLeft: 5 }]}>
+            <Text style={[globalStyles.subheading, { fontSize: 22, color: colors.darkest}]}>
                 Table of Contents
             </Text>
         </Pressable>
@@ -168,45 +167,66 @@ export default function BookInfoScreen() {
                         ) : (
                             <Text style={globalStyles.body}>Book information not available.</Text>
                         )}
-                        <ToCButton />
+                        
                     </View>
                 </View>
+                
+                {/*
+                right now: you can see cover, name, and author
+                take out summary
+                page count
+                chapter count
+                summary (no summary available rn)
+                genre
+                all in csv
+                 */}
+                <View style={{ height: 4, backgroundColor: colors.darkest}} />
+                 {book && (
+                    <View style={infoStyle.bookStatsContainer}>
+                        <View style={infoStyle.bookStat}>
+                        <Text style={infoStyle.bookStatLabel}>Pages</Text>
+                        <Text style={infoStyle.bookStatValue}>{"313"}</Text>
+                        </View>
 
-                <Pressable
+                        <View style={infoStyle.bookStat}>
+                        <Text style={infoStyle.bookStatLabel}>Chapters</Text>
+                        <Text style={infoStyle.bookStatValue}>{book.totalChapters ?? "N/A"}</Text>
+                        </View>
+
+                        <View style={infoStyle.bookStat}>
+                        <Text style={infoStyle.bookStatLabel}>Genre</Text>
+                        <Text style={infoStyle.bookStatValue}>{book.genre ?? "N/A"}</Text>
+                        </View>
+                    </View>
+                )}
+                <View style={{ height: 4, backgroundColor: colors.darkest}} />
+
+
+
+                <ToCButton />
+                <Pressable style={infoStyle.forumBox}
                     onPress={() => {
                         router.push("/threads/thread-1");
                     }} >
-                    <Text>View the chapter 1 thread.</Text>
+                    <Text
+                        style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest, textAlign: "center"}]}
+                    >- View the chapter 1 thread- </Text>
                 </Pressable>
-                <Pressable
-                    style={infoStyle.forumBox}
-                    onPress={() => {
-                        Alert.alert('Forums to be implemented later...');
-                    }} >
-                    <Text style={[globalStyles.body, { fontSize: 14, color: colors.midBlue }]}>
-                        This is our most recent discussion!
-                    </Text>
-                </Pressable>
+                
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
-                    {/* Library Status */}
-                    <View style={{ flex: 1 }}>
-                        <Text style={globalStyles.subheading}>Library Status</Text>
-                        <View style={infoStyle.dropdownWrapper}>
+                    <View style={infoStyle.dropdownRow}>
+                        {/* Library Status */}
+                        <View style={infoStyle.column}>
+                            <Text style={[globalStyles.subheading, {fontSize: 18}]}>Library Status</Text>
                             <BookStatusDropdown onStatusChange={handleStatusChange} />
-                            <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
                         </View>
-                    </View>
 
-                    {/* Visibility */}
-                    <View style={{ flex: 1 }}>
-                        <Text style={globalStyles.subheading}>Visibility</Text>
-                        <View style={infoStyle.dropdownWrapper}>
+                        {/* Visibility */}
+                        <View style={infoStyle.column}>
+                            <Text style={[globalStyles.subheading, {fontSize: 18}]}>Visibility</Text>
                             <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
-                            <Entypo name="chevron-down" size={20} color="#224B6F" style={infoStyle.dropdownIcon} />
                         </View>
                     </View>
-                </View>
 
             </ScrollView>
         </View>
@@ -216,21 +236,17 @@ export default function BookInfoScreen() {
 const infoStyle = StyleSheet.create({
     bookContainer: {
         width: 150,
-        height: 220,
-        backgroundColor: colors.cream,
-        borderRadius: 12,
-        borderWidth: 2,
-        borderColor: colors.midBlue,
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
-        marginBottom: 20,
+    height: 220,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
     },
     bookImage: {
-        width: 120,
-        height: 160,
+        width: 150,
+        height: 220,
         backgroundColor: colors.teal,
-        borderRadius: 8,
+        borderRadius: 12,
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
@@ -253,16 +269,16 @@ const infoStyle = StyleSheet.create({
     },
     currentRead: {
         flexDirection: "row",
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
         padding: 15,
+        gap: 20,
     },
     sideSect: {
-        flexDirection: "column",
-        width: 120,
-        marginHorizontal: 20,
+        flex: 1,
+        alignItems: "flex-start",
     },
     discBox: {
-        backgroundColor: "#E4D7C8",
+        backgroundColor: colors.cream,
         borderColor: "#193350",
         borderWidth: 4,
         borderRadius: 12,
@@ -273,15 +289,16 @@ const infoStyle = StyleSheet.create({
     },
     ToCButton: {
         backgroundColor: colors.teal,
-        borderColor: "black",
+        borderColor: colors.darkest,
+        borderLeftWidth: 30,
         borderWidth: 4,
         borderRadius: 12,
-        alignContent: "center",
+        alignItems: "center",
         justifyContent: "center",
-        textAlign: "center",
-        margin: 5,
-        height: 45,
-        width: "120%",
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        marginVertical: 10,
+        marginHorizontal: 10
     },
     scrollContainer: {
         overflowX: 'scroll',
@@ -299,9 +316,15 @@ const infoStyle = StyleSheet.create({
         margin: 5,
     },
     forumBox: {
-        backgroundColor: colors.cream,
-        borderWidth: 2,
-        borderColor: colors.nextDarkest,
+        backgroundColor: colors.sage,
+        borderWidth: 4,
+        borderRightWidth: 20,
+        borderColor: colors.darkest,
+        borderRadius: 12,
+        padding: 12,
+        textAlign: "center",
+        marginVertical: 10,
+        marginHorizontal: 10,
     },
     rowContainer: {
         flexDirection: 'row',
@@ -309,21 +332,61 @@ const infoStyle = StyleSheet.create({
         gap: 20,
         marginVertical: 10,
     },
-    column: {
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        flex: 0,
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginVertical: 15,
     },
+
+    column: {
+        flex: 1,
+        marginHorizontal: 5,
+    },
+
     dropdownWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 2,
+        borderWidth: 1.5,
         borderColor: colors.midBlue,
-        borderRadius: 8,
+        borderRadius: 10,
+        backgroundColor: colors.cream 
+    },
+    dropdownRow: {
+        flexDirection: 'row',           // horizontal layout
+        justifyContent: 'center',       // center horizontally
+        alignItems: 'flex-start',       // align items to top
+        gap: 20,                        // space between the two dropdowns
+        marginVertical: 15,
+        paddingHorizontal: 10,          // optional, so it doesn’t hit screen edges
+    },
+    bookStatsContainer: {
+        flexDirection: "row",
+        justifyContent: "flex-start", // evenly space items
+        alignItems: "center",
         paddingHorizontal: 10,
-        paddingVertical: 5,
+        backgroundColor: colors.sage, // matches background
+        paddingVertical: 4,
     },
-    dropdownIcon: {
-        marginLeft: 5,
+
+    bookStat: {
+        width: 100,
+        alignItems: "center",
+        flex: 1, // optional: lets each stat take equal space
     },
+
+    bookStatLabel: {
+        fontFamily: fonts.heading, // same font as header
+        fontSize: 18,              // smaller size
+        color: colors.midBlue,
+        marginBottom: 4,
+        
+    },
+
+    bookStatValue: {
+        fontFamily: fonts.subheading,
+        fontSize: 16,
+        color: colors.darkest,
+        textAlign: "center",
+    },
+
 });
