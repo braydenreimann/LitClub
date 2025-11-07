@@ -4,8 +4,8 @@
 */
 
 export type User = {
-    name: ReactNode;
-    username: ReactNode;
+    name: string;
+    username: string;
     id: string;
     firstName: string;
     lastName: string;
@@ -43,6 +43,7 @@ export type Book = {
     description: string;
     coverImageUrl: string;
     editions: Edition[];
+    chapterThreadIds: string[];
 }
 
 export type LibraryBook = {

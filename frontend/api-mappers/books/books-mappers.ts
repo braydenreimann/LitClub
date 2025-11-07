@@ -25,5 +25,6 @@ export function toDomainBook(dto: BookResponse): Book {
         description: dto.description ?? "",
         coverImageUrl: dto.coverImageUrl!,
         editions: (dto.editions ?? []).map(toDomainEdition),
+        chapterThreadIds: dto.chapterThreadIds ?? []
     }
 }
