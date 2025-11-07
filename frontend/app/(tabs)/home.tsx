@@ -56,7 +56,7 @@ export default function HomeScreen() {
 
         { /*Shelf Two*/}
         <Text style={[globalStyles.subheading, { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 }]}>
-          Dog-Eared Books
+          Future Reads
         </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
           <ReadingList status = {2}/>
@@ -70,13 +70,6 @@ export default function HomeScreen() {
           <ReadingList status = {0}/>
         </View>
 
-        { /*Shelf Four*/}
-        <Text style={[globalStyles.subheading, { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 }]}>
-          Want to Read
-        </Text>
-        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status = {3} />
-        </View>
 
       </ScrollView>
     </View>

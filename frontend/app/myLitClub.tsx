@@ -1,15 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { ActivityIndicator, Platform, Pressable } from 'react-native';
-import { ThemedText } from '../components/themed-text';
-import { ThemedView } from '../components/themed-view';
-import { Link, Stack } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import SearchBar from '../components/SearchBar';
 import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
 import ReadingList from '../components/ReadingList';
-import TopThreeBooks from '../components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import ClubMembers from '@/components/ClubMembers';
@@ -21,9 +18,16 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { useLitClubs } from '@/LitClubImport/LitClubContext';
 import { useLocalSearchParams } from 'expo-router';
+import Constants from 'expo-constants';
+import { User } from '@/domain/models';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GenresSelector } from '@/components/genresSelector';
 
 
-
+const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
+const LAN_IP = hostFromExpo ?? '10.0.0.252'
+const API_BASE_URL = `http://${LAN_IP}:5112`
+const apiUrl = `${API_BASE_URL}/litclubs`;
 
 function Jump2discButton() {
     return (
@@ -39,9 +43,10 @@ function Jump2discButton() {
     );
 }
 function BackButton() {
+    const router = useRouter();
     return (
         <Pressable>
-            <Link href="/profile">
+            <Link href="/bookclubs" onPress={() => router.back()}>
                 <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}/>
             </Link>
         </Pressable>
@@ -60,7 +65,44 @@ export default function LitClubScreen() {
     }, [fontsLoaded]);
 
     const { id } = useLocalSearchParams();
-    const { litClubs, loading, error } = useLitClubs();
+    const router = useRouter();
+    const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
+
+    const [actionLoading, setActionLoading] = useState(false);
+    const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
+    const [user, setUser] = useState<{ id: string } | null>(null);
+
+    useEffect(() => {
+    const loadArchivedClubs = async () => {
+      const saved = await AsyncStorage.getItem('archivedClubs');
+      if (saved) {
+        setArchivedClubIds(JSON.parse(saved));
+      }
+    };
+    loadArchivedClubs();
+  }, []);
+
+  //save when changed
+  useEffect(() => {
+    AsyncStorage.setItem('archivedClubs', JSON.stringify(archivedClubIds));
+  }, [archivedClubIds]);
+
+    useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
+
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
 
     const club = litClubs.find(c => c.id === id);
 
@@ -81,6 +123,97 @@ export default function LitClubScreen() {
     if (!club) {
         return <Text style={{ padding: 20 }}>Club not found.</Text>
     }
+
+    const currentUserId = user?.id ?? ''; //pull from async storage session
+    const isOwner = club.ownerUserId === currentUserId;
+
+    //leave a club if you dont own the club
+    async function handleLeaveClub() {
+        Alert.alert(
+            "Leave Club",
+            "Are you sure you want to leave this club?",
+            [
+                {text: "Cancel", style: "cancel"},
+                {text: "Leave", style: "destructive", onPress: async () => {
+                        if (!club) {
+                            Alert.alert('Club not found.');
+                            return;
+                        }
+                        try {
+                            setActionLoading(true);
+                            const res = await fetch(`http://{LAN_IP}:5112/litclubs/${club.id}/leave`, {
+                                method: 'POST',
+                            });
+                            if (!res.ok) {
+                                Alert.alert('Failed to leave club.');
+                            } else {
+                                await fetchLitClubs(); // Refresh club list after leaving
+                                router.replace('/bookclubs'); // Navigate back after leaving
+                            }
+                        } catch (error) {
+                            Alert.alert('Error leaving club:', (error as Error).message);
+                        } finally {
+                            setActionLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
+    }
+    
+    //delete club if you own the club
+    async function handleDeleteClub() {
+        Alert.alert(
+            "Delete Club",
+            "Are you sure you want to delete this club? It will delete for all users in this club.",
+            [
+                {text: "Cancel", style: "cancel"},
+                {text: "Delete", style: "destructive", onPress: async () => {
+                        if (!club) {
+                            Alert.alert('Club not found.');
+                            return;
+                        }
+                        try {
+                            setActionLoading(true);
+                            const res = await fetch(`http://${LAN_IP}:5112/litclubs/${club.id}`, {
+                                method: 'DELETE',
+                            });
+                            if (!res.ok) {
+                                Alert.alert('Failed to delete club.');
+                            } else {
+                                await fetchLitClubs(); // Refresh club list after leaving
+                                router.replace('/bookclubs'); // Navigate back after leaving
+                            }
+                        } catch (error) {
+                            Alert.alert('Error deleting club:', (error as Error).message);
+                        } finally {
+                            setActionLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
+    }
+
+    const isArchived = archivedClubIds.includes(club.id);
+
+    const handleArchiveToggle = async () => {
+        if (isArchived) { // unarchive
+            setArchivedClubIds(prev => prev.filter(id => id !== club.id));
+            Alert.alert('Club unarchived.');
+        } else { // archive
+            setArchivedClubIds(prev => [...prev, club.id]);
+            Alert.alert('Club archived.');
+        }
+
+        await AsyncStorage.setItem('archivedClubs', JSON.stringify(
+            isArchived
+                ? archivedClubIds.filter(id => id !== club.id)
+                : [...archivedClubIds, club.id]
+        ));
+
+        router.replace('/bookclubs');
+    }; // help from AI to make archiving function
 
     return (
             <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}> 
@@ -137,7 +270,33 @@ export default function LitClubScreen() {
                     <Text style={globalStyles.subheading}>Current Members</Text>
                     {/* TODO: INSERT CLUB MEMBERS HERE*/}
                     <ClubMembers />
-                </View>        
+                </View> 
+
+                <Pressable
+                    disabled={actionLoading}
+                    onPress={isOwner ? handleDeleteClub : handleLeaveClub}
+                    style={[litStyles.deleteButton, { backgroundColor: colors.midBlue}]}
+                >
+                    <Text style={[globalStyles.body, { color: 'white', textAlign: 'center', textAlignVertical: 'center' }]}>
+                        {actionLoading 
+                            ? "Processing..."
+                            : isOwner 
+                                ? "Delete Club" 
+                                : "Leave Club"
+                        }
+                    </Text>
+                </Pressable>    
+
+                <Pressable
+                    disabled={actionLoading}
+                    onPress={handleArchiveToggle}
+                    style={[litStyles.archiveButton, { backgroundColor: colors.yellow}]}
+                >
+                    <Text style={[globalStyles.body, { color: colors.darkest, textAlign: 'center', textAlignVertical: 'center' }]}>
+                        {isArchived ? "Unarchive Club" : "Archive Club"
+                        }
+                    </Text>
+                </Pressable> 
                 
         </ScrollView>
     );
@@ -233,5 +392,19 @@ const litStyles = StyleSheet.create({
         textAlign: "center",
         textAlignVertical: "center",
 
+    },
+    deleteButton: {
+        marginTop: 40,
+        marginHorizontal: 30,
+        padding: 15,
+        borderRadius: 12,
+
+    },
+    archiveButton: {
+        marginTop: 25,
+        marginHorizontal: 30,
+        padding: 15,
+        borderRadius: 12,
+        marginBottom: 40,
     },
 });

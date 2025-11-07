@@ -104,7 +104,10 @@ export default function BookInfoScreen() {
         console.log("Book status changed to:", newStatus);
         // TODO: Implement function
     };
-
+    
+   
+    {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
+    {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
     return (
                 
 
@@ -113,6 +116,7 @@ export default function BookInfoScreen() {
                 <View style={{ flexDirection: 'row' }} >
                     <BackButton />
                     <Text style={[globalStyles.heading, {marginTop: 15}]}> Book Information </Text>
+                
                 </View>
 
                 <View style={infoStyle.currentRead}>

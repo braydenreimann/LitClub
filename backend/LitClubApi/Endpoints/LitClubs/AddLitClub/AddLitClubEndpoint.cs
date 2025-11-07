@@ -37,7 +37,7 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
             };
 
             // Add the library to the libraries container
-            await cosmosContext.LitClubs.CreateItemAsync(
+            await cosmosContext.Libraries.CreateItemAsync(
                 item: library,
                 partitionKey: new PartitionKey(library.OwnerId),
                 cancellationToken: cancellationToken);
