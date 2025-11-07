@@ -18,11 +18,9 @@ import BookStatusDropdown from "../components/BookStatusDropdown";
     </View>
 
 */
-
 import React, { useState } from "react";
-import { View, Text, Pressable, StyleSheet, FlatList } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { colors, fonts } from "../theme";
-import { globalStyles } from "../styles/globalStyles";
 
 const STATUS_OPTIONS = [
   "Not in your library",
@@ -66,28 +64,25 @@ export default function BookStatusDropdown({
       {/* Dropdown List */}
       {dropdownVisible && (
         <View style={styles.dropdown}>
-          <FlatList
-            data={STATUS_OPTIONS}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <Pressable
-                style={({ pressed }) => [
-                  styles.dropdownItem,
-                  pressed && { backgroundColor: colors.sage },
+          {STATUS_OPTIONS.map((item) => (
+            <Pressable
+              key={item}
+              style={({ pressed }) => [
+                styles.dropdownItem,
+                pressed && { backgroundColor: colors.sage },
+              ]}
+              onPress={() => handleSelect(item)}
+            >
+              <Text
+                style={[
+                  styles.dropdownText,
+                  item === status && { fontWeight: "bold", color: colors.midBlue },
                 ]}
-                onPress={() => handleSelect(item)}
               >
-                <Text
-                  style={[
-                    styles.dropdownText,
-                    item === status && { fontWeight: "bold", color: colors.midBlue },
-                  ]}
-                >
-                  {item}
-                </Text>
-              </Pressable>
-            )}
-          />
+                {item}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       )}
     </View>
@@ -96,18 +91,18 @@ export default function BookStatusDropdown({
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
+    width: "100%",        // makes the dropdown responsive
+    maxWidth: 300,        // optional: limit max width
     alignItems: "center",
     marginVertical: 10,
   },
   button: {
     backgroundColor: colors.teal,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    minWidth: 240,
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: colors.darkest,
   },
   buttonText: {
@@ -122,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.darkest,
-    width: 240,
+    width: "100%",        // match parent width
     maxHeight: 220,
     overflow: "hidden",
     elevation: 3,
