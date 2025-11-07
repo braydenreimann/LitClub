@@ -29,6 +29,8 @@ import { useSession } from '@/auth/authContext';
 import { GenresSelector } from '@/components/genresSelector';
 import { getBook, getBooks } from '@/services/booksService';
 import { isPromise } from 'formik';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 const LAN_IP = hostFromExpo ?? '10.0.0.252'
@@ -121,21 +123,31 @@ export default function CreateLitClub() {
     const handleCreateClub = async () => {
         if (!(typeof name === 'string' ? name.trim() : String(name).trim())) {
             Alert.alert('Validation Error', 'Club name cannot be empty.');
+            return;
         }
-        if (selectedBooks.length === 0 ) return Alert.alert('Error', 'Please select at least one book')
+        if (selectedBooks.length === 0 ) {
+            Alert.alert('Error', 'Please select at least one book');
+            return;
+        }
+
         if (!user?.id) {
             Alert.alert('Error', 'User not logged in.');
             return;
         }
 
+        const isPrivate = String(privateClub) === 'true';
+
         const payload = {
-            name,
-            ownerUserId: user.id,
-            description,
-            preferredGenres: preferredGenres,
-            privateClub,
-            memberUserIds: [user.id],
-            libraryId: '',
+            request: {
+                name,
+                ownerUserId: user.id,
+                description,
+                preferredGenres,
+                privateClub: isPrivate,
+                memberUserIds: [user.id],
+                libraryId: '',
+                selectedBooks,
+            }
         };
 
         try {

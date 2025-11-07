@@ -75,7 +75,10 @@ export default function bookPicksForClubs() {
     const data = saved ? JSON.parse(saved) : {};
     data.selectedBooks = selectedBooks;
     await AsyncStorage.setItem('createLitClubForm', JSON.stringify(data))
-    router.back();  
+    router.push({
+      pathname: '/createLitClub',
+      params: { selectedBooks: JSON.stringify(selectedBooks)}
+    })
   };
   
   if (loading) {
