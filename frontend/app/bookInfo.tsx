@@ -29,12 +29,17 @@ export interface bookImport {
 }
 
 // buttons for the book info screen
-function ToCButton() {
+function ToCButton({ bookId }: { bookId: string }) {
     return (
+        
         <Pressable
             style={infoStyle.ToCButton}
-            onPress={() => { Alert.alert('Displaying TOC...') }}>
-            <Text style={[globalStyles.subheading, { fontSize: 22, color: colors.darkest}]}>
+            onPress={() => {
+                // Navigate to Table of Contents page with bookId
+                router.push(`/tableOfContents?bookId=${bookId}`);
+            }}
+        >
+            <Text style={[globalStyles.subheading, { fontSize: 22, color: colors.darkest }]}>
                 Table of Contents
             </Text>
         </Pressable>
@@ -101,12 +106,13 @@ export default function BookInfoScreen() {
     };
 
     return (
+                
+
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
-            <Header />
             <ScrollView>
                 <View style={{ flexDirection: 'row' }} >
                     <BackButton />
-                    <Text style={globalStyles.heading}> Book Information </Text>
+                    <Text style={[globalStyles.heading, {marginTop: 15}]}> Book Information </Text>
                 </View>
 
                 <View style={infoStyle.currentRead}>
@@ -202,10 +208,10 @@ export default function BookInfoScreen() {
 
 
 
-                <ToCButton />
+                {book && <ToCButton bookId={id} />}
                 <Pressable style={infoStyle.forumBox}
                     onPress={() => {
-                        router.push("/threads/thread-1");
+                        router.push("/threads/thread-1"); //needs to change later to be dynamic
                     }} >
                     <Text
                         style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest, textAlign: "center"}]}
