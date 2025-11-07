@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Pressable } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link, router, useFocusEffect } from 'expo-router';
 import { Image } from 'expo-image';
 import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
@@ -46,7 +46,7 @@ function StatsButton() {
 export default function ProfileScreen() {
     /*for the sake of the litclubs
       WITH BACKEND: implement this as a linked list of a users' joined book clubs */
-
+        
     const [fontsLoaded] = useFonts({
         Fraunces_700Bold,
         ChivoMono_500Medium,
@@ -57,6 +57,16 @@ export default function ProfileScreen() {
     }, [fontsLoaded]);
 
     useEffect(() => {
+    const loadArchivedClubs = async () => {
+      const saved = await AsyncStorage.getItem('archivedClubs');
+      if (saved) {
+        setArchivedClubIds(JSON.parse(saved));
+      }
+    };
+    loadArchivedClubs();
+  }, []);
+
+   useEffect(() => {
         // Define an async function inside useEffect
         const loadSession = async () => {
             try {
@@ -79,6 +89,8 @@ export default function ProfileScreen() {
         ? user.pronouns.join('/')
         : '';
     const { litClubs, loading, error } = useLitClubs();
+    const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
+    
     const [profileUri, setProfileUri] = useState<string>("");
 
     useEffect(() => {
@@ -120,9 +132,9 @@ export default function ProfileScreen() {
     const userId = user?.id ?? '';
     const safeClubs = Array.isArray(litClubs) ? litClubs : [];
 
-    const userClubs = safeClubs.filter(c => c.memberUserIds?.includes(userId));
-    const leaderClubs = safeClubs.filter(c => c.ownerUserId === userId);
-    const archivedClubs = safeClubs.filter(c => !!c.privateClub);
+    const userClubs = safeClubs.filter(c => c.memberUserIds?.includes(userId) && !archivedClubIds.includes(c.id));
+    const leaderClubs = safeClubs.filter(c => c.ownerUserId === userId && !archivedClubIds.includes(c.id));
+    const archivedClubs = safeClubs.filter(c => archivedClubIds.includes(c.id)); // example filter
 
     if (loading) {
         return (
@@ -221,7 +233,6 @@ export default function ProfileScreen() {
                             <Pressable
                                 key={club.id}
                                 style={profStyles.litclubCard}
-                                onPress={() => Alert.alert(`Opening ${club.name}`)}
                             >
                                 <Link
                                     href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name } }}
@@ -259,7 +270,7 @@ export default function ProfileScreen() {
                             </Pressable>
                         ))
                     ) : (
-                        <Text>You&apos;re not leading any clubs yet.</Text>
+                        <Text>You're not leading any clubs yet.</Text>
                     )}
                 </View>
 

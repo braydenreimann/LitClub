@@ -113,7 +113,7 @@ export default function CreateLitClub() {
 
     const handleFindBooks = async () => {
         router.push({
-            pathname: '/BookPicksForClub',
+            pathname: '/bookPicksForClub',
             params: {preselected: JSON.stringify(selectedBooks) }
         })
     };

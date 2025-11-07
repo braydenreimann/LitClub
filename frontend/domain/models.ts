@@ -4,6 +4,8 @@
 */
 
 export type User = {
+    name: ReactNode;
+    username: ReactNode;
     id: string;
     firstName: string;
     lastName: string;

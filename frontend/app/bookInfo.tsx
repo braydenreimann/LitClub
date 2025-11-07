@@ -1,6 +1,6 @@
 import React, { useEffect, useState, type PropsWithChildren } from 'react';
 import { Pressable, ActivityIndicator } from 'react-native';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
@@ -47,11 +47,20 @@ function ToCButton({ bookId }: { bookId: string }) {
 }
 
 function BackButton() {
+    const router = useRouter(); // Initialize the router hook
+
+    const handlePress = () => {
+        router.back(); // Call the back function
+    };
+
     return (
-        <Pressable>
-            <Link href="/profile">
-                <EvilIcons name="chevron-left" size={50} color="#193350" marginLeft="20" marginBottom="10" />
-            </Link>
+        <Pressable onPress={handlePress}>
+        <EvilIcons
+            name="chevron-left"
+            size={50}
+            color="#193350"
+            style={{ marginLeft: 20, marginBottom: 10, marginTop: 15 }} // Use style object for multiple styles
+        />
         </Pressable>
     );
 }
@@ -213,14 +222,15 @@ export default function BookInfoScreen() {
 
 
                 {book && <ToCButton bookId={id} />}
-                <Pressable style={infoStyle.forumBox}
+                
+                {/*<Pressable style={infoStyle.forumBox}
                     onPress={() => {
                         router.push("/threads/thread-1"); //needs to change later to be dynamic
                     }} >
                     <Text
                         style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest, textAlign: "center"}]}
                     >- View the chapter 1 thread- </Text>
-                </Pressable>
+                </Pressable>*/}
                 
 
                     <View style={infoStyle.dropdownRow}>

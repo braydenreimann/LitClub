@@ -248,7 +248,7 @@ export default function LitClubScreen() {
                         <Text style={[globalStyles.heading, { paddingTop: 0 }]}>{club.name}</Text>
                     </View>
 
-                    <Text style={globalStyles.body}> 
+                    <Text style={[globalStyles.body, {margin: 20}]}> 
                         {club.description}
                     </Text>
 
@@ -287,22 +287,25 @@ export default function LitClubScreen() {
                 <View> 
 
                     {/* AI help for integrating this */}
-                    <Text style={globalStyles.subheading}>Preferred Genres</Text> 
+                    <Text style={[globalStyles.subheading, {margin: 20}]}>Preferred Genres</Text> 
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 20 }}>
                         {(club.preferredGenres || []).map((genre, idx) => (
                         <Text key={idx} style={[globalStyles.body, { marginRight: 10 }]}>#{genre}</Text>
                         ))}
                     </View>
 
-                    <Text style={globalStyles.subheading}>Upcoming Reads</Text>
+                    <Text style={[globalStyles.subheading, {margin: 20}]}>Upcoming Reads</Text>
                     {/* reading list for the club's upcoming reads*/}
-                    <ReadingList books={upcomingBooks} status={0} /> 
-                    <Text style={globalStyles.subheading}>Past Reads</Text>
+                    <ReadingList status={0} /> 
+                    <Text style={[globalStyles.subheading, {margin: 20}]}>Past Reads</Text>
                     {/* reading list for the Past Reads*/}   
-                    <ReadingList status={0} />    
-                    <Text style={globalStyles.subheading}>Current Members</Text>
+                    <ReadingList status={1} />    
+                    <Text style={[globalStyles.subheading, {margin: 20}]}>Current Members</Text>
                     {/* TODO: INSERT CLUB MEMBERS HERE*/}
-                    <ClubMembers />
+                    <ClubMembers 
+                        memberUserIds={club.memberUserIds ?? []} 
+                        ownerUserId={club.ownerUserId} 
+                    />
                 </View> 
 
                 <Pressable
