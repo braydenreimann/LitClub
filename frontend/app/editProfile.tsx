@@ -69,7 +69,7 @@ export default function EditProfileScreen() {
         setEmail(userData.email || '');
         setBiography(userData.bio || '');
         setPrivateAccount(userData.privateAccount || false);
-        {/*setSelectedPronouns(userData.pronouns || []);*/}
+        {setSelectedPronouns(userData.pronouns || []);}
       } catch (error) {
         console.error('Error loading user data:', error);
       }
@@ -127,7 +127,7 @@ export default function EditProfileScreen() {
     email,
     bio: biography,
     privateAccount,
-    // optionally include pronouns or other fields
+    pronouns: selectedPronouns,
   };
 
 
