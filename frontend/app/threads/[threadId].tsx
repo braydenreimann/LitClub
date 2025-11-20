@@ -11,6 +11,7 @@ import HiddenToggle from "@/components/threads/HiddenToggle";
 import { useCommentsList } from "@/hooks/useCommentsList";
 import { MessageCircle } from "lucide-react-native"; //npm install lucide-react-native
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
+import { isHiddenByScore } from "@/constants/threadVisibility";
 
 const PAGE_SIZE = 20;
 
@@ -23,6 +24,15 @@ export default function ThreadScreen() {
     const [thread, setThread] = useState<ThreadResponse | null>(null);
     const [loadingThread, setLoadingThread] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const adjustThreadCommentCount = useCallback((delta: number) => {
+        setThread((prev) => {
+            if (!prev) return prev;
+            const base = typeof prev.commentCount === "number" ? prev.commentCount : 0;
+            const next = Math.max(0, base + delta);
+            if (next === base) return prev;
+            return { ...prev, commentCount: next };
+        });
+    }, []);
 
     const {
         comments,
@@ -107,7 +117,7 @@ export default function ThreadScreen() {
                 threadId={threadId!}
                 currentAuthor={CURRENT_AUTHOR}
                 showHiddenComments={showHiddenComments}
-                onHiddenBelowZeroChange={markHiddenLocal}
+                onHiddenScoreChange={markHiddenLocal}
                 currentUserId={CURRENT_USER_ID}
             />
         ),
@@ -150,7 +160,11 @@ export default function ThreadScreen() {
         <View style={globalStyles.container}>
             <FlatList
                 ref={listRef}
-                data={showHiddenComments ? comments : comments.filter((c) => !c.isDeleted && c.score >= 0)}
+                data={
+                    showHiddenComments
+                        ? comments
+                        : comments.filter((c) => !c.isDeleted && !isHiddenByScore(c.score))
+                }
                 keyExtractor={(item) => item.id}
                 ListHeaderComponent={header}
                 renderItem={renderItem}
@@ -179,12 +193,16 @@ export default function ThreadScreen() {
                     author={CURRENT_AUTHOR}
                     onOptimisticCreate={(temp) => {
                         onOptimisticCreate(temp);
+                        adjustThreadCommentCount(1);
                         requestAnimationFrame(() =>
                             listRef.current?.scrollToOffset({ offset: 0, animated: true })
                         );
                     }}
                     onServerConfirm={onServerConfirm}
-                    onServerError={onServerError}
+                    onServerError={(tempId, err) => {
+                        onServerError(tempId);
+                        adjustThreadCommentCount(-1);
+                    }}
                     onFocusChange={setCommentBarFocused}   // keep lifting only for main composer
                 />
             </View>

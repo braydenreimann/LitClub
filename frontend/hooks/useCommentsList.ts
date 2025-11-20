@@ -2,13 +2,14 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { CommentResponse } from "@/domain/models/thread-types";
 import { getTopLevelComments } from "@/services/commentsService";
+import { isHiddenByScore } from "@/constants/threadVisibility";
 
 export function useCommentsList(threadId: string, userId?: string, pageSize = 20) {
     const [comments, setComments] = useState<CommentResponse[]>([]);
     const [token, setToken] = useState<string | null>(null);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    // track comments that became hidden locally due to voting below zero
+    // track comments that became hidden locally due to voting below the threshold
     const [locallyHiddenIds, setLocallyHiddenIds] = useState<Set<string>>(new Set());
 
     const fetchIdRef = useRef(0);
@@ -42,7 +43,7 @@ export function useCommentsList(threadId: string, userId?: string, pageSize = 20
         let localHiddenOnly = 0;
         for (const c of comments) {
             if (c.isDeleted) continue;
-            if (c.score < 0) serverHidden++;
+            if (isHiddenByScore(c.score)) serverHidden++;
             else if (locallyHiddenIds.has(c.id)) localHiddenOnly++;
         }
         return serverHidden + localHiddenOnly;
@@ -60,7 +61,7 @@ export function useCommentsList(threadId: string, userId?: string, pageSize = 20
         setComments((prev) => prev.filter((c) => c.id !== tempId));
     }, []);
 
-    // child reports when its local score crosses below/above zero
+    // child reports when its local score crosses below/above the hidden threshold
     const markHiddenLocal = useCallback((commentId: string, hidden: boolean) => {
         setLocallyHiddenIds((prev) => {
             const next = new Set(prev);
