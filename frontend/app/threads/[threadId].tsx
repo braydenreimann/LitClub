@@ -24,6 +24,15 @@ export default function ThreadScreen() {
     const [thread, setThread] = useState<ThreadResponse | null>(null);
     const [loadingThread, setLoadingThread] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const adjustThreadCommentCount = useCallback((delta: number) => {
+        setThread((prev) => {
+            if (!prev) return prev;
+            const base = typeof prev.commentCount === "number" ? prev.commentCount : 0;
+            const next = Math.max(0, base + delta);
+            if (next === base) return prev;
+            return { ...prev, commentCount: next };
+        });
+    }, []);
 
     const {
         comments,
@@ -184,12 +193,16 @@ export default function ThreadScreen() {
                     author={CURRENT_AUTHOR}
                     onOptimisticCreate={(temp) => {
                         onOptimisticCreate(temp);
+                        adjustThreadCommentCount(1);
                         requestAnimationFrame(() =>
                             listRef.current?.scrollToOffset({ offset: 0, animated: true })
                         );
                     }}
                     onServerConfirm={onServerConfirm}
-                    onServerError={onServerError}
+                    onServerError={(tempId, err) => {
+                        onServerError(tempId);
+                        adjustThreadCommentCount(-1);
+                    }}
                     onFocusChange={setCommentBarFocused}   // keep lifting only for main composer
                 />
             </View>
