@@ -11,6 +11,7 @@ import HiddenToggle from "@/components/threads/HiddenToggle";
 import { useCommentsList } from "@/hooks/useCommentsList";
 import { MessageCircle } from "lucide-react-native"; //npm install lucide-react-native
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
+import { isHiddenByScore } from "@/constants/threadVisibility";
 
 const PAGE_SIZE = 20;
 
@@ -107,7 +108,7 @@ export default function ThreadScreen() {
                 threadId={threadId!}
                 currentAuthor={CURRENT_AUTHOR}
                 showHiddenComments={showHiddenComments}
-                onHiddenBelowZeroChange={markHiddenLocal}
+                onHiddenScoreChange={markHiddenLocal}
                 currentUserId={CURRENT_USER_ID}
             />
         ),
@@ -150,7 +151,11 @@ export default function ThreadScreen() {
         <View style={globalStyles.container}>
             <FlatList
                 ref={listRef}
-                data={showHiddenComments ? comments : comments.filter((c) => !c.isDeleted && c.score >= 0)}
+                data={
+                    showHiddenComments
+                        ? comments
+                        : comments.filter((c) => !c.isDeleted && !isHiddenByScore(c.score))
+                }
                 keyExtractor={(item) => item.id}
                 ListHeaderComponent={header}
                 renderItem={renderItem}

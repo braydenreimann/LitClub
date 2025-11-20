@@ -7,6 +7,7 @@ import VoteButtons from "@/components/threads/VoteButtons";
 import HiddenToggle from "@/components/threads/HiddenToggle";
 import ReplyComposer from "@/components/threads/ReplyComposer";
 import { useReplies } from "@/hooks/useReplies";
+import { isHiddenByScore } from "@/constants/threadVisibility";
 
 type Props = {
     comment: CommentResponse;
@@ -14,7 +15,7 @@ type Props = {
     currentAuthor: Author;
     currentUserId: string;
     showHiddenComments?: boolean;
-    onHiddenBelowZeroChange?: (commentId: string, hidden: boolean) => void;
+    onHiddenScoreChange?: (commentId: string, hidden: boolean) => void;
 };
 
 export default function CommentItem({
@@ -23,7 +24,7 @@ export default function CommentItem({
     currentAuthor,
     currentUserId,
     showHiddenComments = false,
-    onHiddenBelowZeroChange,
+    onHiddenScoreChange,
 }: Props) {
     const [expanded, setExpanded] = useState(false);
     const [showReplyBox, setShowReplyBox] = useState(false);
@@ -32,14 +33,14 @@ export default function CommentItem({
     const [localScore, setLocalScore] = useState(comment.score);
     const [localUserVote, setLocalUserVote] = useState<-1 | 0 | 1>((comment.userVote ?? 0) as -1 | 0 | 1);
 
-    const wasHiddenRef = useRef<boolean>(localScore < 0);
+    const wasHiddenRef = useRef<boolean>(isHiddenByScore(localScore));
     useEffect(() => {
-        const isHidden = localScore < 0;
+        const isHidden = isHiddenByScore(localScore);
         if (isHidden !== wasHiddenRef.current) {
             wasHiddenRef.current = isHidden;
-            onHiddenBelowZeroChange?.(comment.id, isHidden);
+            onHiddenScoreChange?.(comment.id, isHidden);
         }
-    }, [localScore, comment.id, onHiddenBelowZeroChange]);
+    }, [localScore, comment.id, onHiddenScoreChange]);
 
     const {
         replies,
@@ -54,12 +55,12 @@ export default function CommentItem({
     } = useReplies(threadId, comment.id, currentUserId);
 
     const hiddenRepliesCount = useMemo(
-        () => replies.filter((r) => r.score < 0 && !r.isDeleted).length,
+        () => replies.filter((r) => !r.isDeleted && isHiddenByScore(r.score)).length,
         [replies]
     );
 
     const visibleReplies = useMemo(
-        () => replies.filter((r) => !r.isDeleted && (showHiddenReplies || r.score >= 0)),
+        () => replies.filter((r) => !r.isDeleted && (showHiddenReplies || !isHiddenByScore(r.score))),
         [replies, showHiddenReplies]
     );
 
@@ -140,9 +141,9 @@ export default function CommentItem({
         [expanded, threadId, currentAuthor, comment.id, optimisticAdd, confirmReplace, rollbackRemove]
     );
 
-    // Hide top-level if score < 0 and hidden-not-shown
+    // Hide top-level if score <= threshold and hidden-not-shown
     if (comment.isDeleted) return null;
-    if (!showHiddenComments && localScore < 0) return null;
+    if (!showHiddenComments && isHiddenByScore(localScore)) return null;
 
     return (
         <View style={styles.wrap}>

@@ -14,7 +14,7 @@ export default function HiddenToggle({ count, shown, onToggle, kind }: HiddenTog
     return (
         <Pressable onPress={onToggle} style={styles.wrap}>
             <Text style={styles.text}>
-                {shown ? `Hide hidden ${kind}` : `Show hidden ${kind} (${count})…`}
+                {shown ? `Hide hidden ${kind}` : `View hidden ${kind} (${count})…`}
             </Text>
         </Pressable>
     );
