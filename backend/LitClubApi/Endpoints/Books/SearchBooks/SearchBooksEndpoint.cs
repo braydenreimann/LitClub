@@ -26,7 +26,7 @@ public class Search(ICosmosContext cosmosContext) : EndpointBaseAsync
             string sql = @"
                 SELECT c.id AS Id, c.Title AS Title, c.Author AS Author, c.CoverImageUrl AS CoverImageUrl
                 FROM c
-                WHERE CONTAINS(LOWER(c.Title), LOWER(@query))
+                WHERE CONTAINS(LOWER(c.Title), LOWER(@query)) OR CONTAINS(LOWER(c.Author), LOWER(@query))
             "; //Simple substring matching, currently inefficient for large datasets due to partition key.
 
             var query = new QueryDefinition(sql)
