@@ -289,7 +289,7 @@ public static class SeedThreads
             new Comment { Id = "reply-22", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "RIP john green's wife i bet she hates her life cuz it sounds like john is just like hazel lmao. hank is the better one.", ParentCommentId = "comment-15", Score = -101, Created = now.AddDays(-7).AddHours(-2) },
             new Comment { Id = "reply-23", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "i really dont fw the haters of this book cuz this shit is fire, also totally agree", ParentCommentId = "comment-5", Score = 114, Created = now.AddDays(-1).AddHours(-6) },
             new Comment { Id = "reply-24", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "This comment is so downvoted because its author is an idiot with bad opinions.", ParentCommentId = "comment-12", Score = -1234, Created = now.AddDays(-2).AddHours(-5) },
-            new Comment { Id = "reply-25", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "anyone wanna play mfk with the characters in this book?", ParentCommentId = "comment-12", Score = 9993, Created = now.AddHours(-30) }
+            new Comment { Id = "reply-25", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "augustus lowkey bad?", ParentCommentId = "comment-12", Score = 9993, Created = now.AddHours(-30) }
         ];
 
         chapterThreads[0].CommentCount = comments.Count + replies.Count;
