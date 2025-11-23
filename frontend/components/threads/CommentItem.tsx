@@ -231,7 +231,7 @@ export default function CommentItem({
 }
 
 const styles = StyleSheet.create({
-    wrap: { paddingVertical: 10, borderBottomWidth: 1, borderColor: "#e6e2da" },
+    wrap: { paddingVertical: 10, borderBottomWidth: 0.8, borderColor: colors.midBlue },
     headerRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
     username: { fontWeight: "700", color: colors.midBlue },
     body: { color: colors.darkest, marginTop: 2 },

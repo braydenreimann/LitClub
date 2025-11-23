@@ -94,7 +94,7 @@ export default function ThreadScreen() {
                     <Text style={styles.meta}>
                         by {thread?.author?.username ?? "unknown"} • {new Date(thread?.created ?? Date.now()).toLocaleString()}
                     </Text>
-                    <Text style={[globalStyles.body, { marginTop: 8 }]}>{thread?.body}</Text>
+                    <Text style={[globalStyles.body, styles.description]}>{thread?.body}</Text>
 
                     <View style={styles.actions}>
                         <View style={[styles.pill, styles.pillRow]}>
@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
     title: { fontSize: 22, fontWeight: "700", color: colors.midBlue },
     meta: { marginTop: 4, fontSize: 12, color: colors.nextDarkest },
     actions: { marginTop: 10, flexDirection: "row", gap: 8 },
+    description: { marginTop: 8 },
     pill: {
         borderWidth: 1,
         borderColor: colors.midBlue,

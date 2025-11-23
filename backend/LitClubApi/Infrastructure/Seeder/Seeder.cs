@@ -248,14 +248,15 @@ public static class SeedThreads
             new Comment { Id = "comment-8",  ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "the way hazel describes cancer like it’s an annoying roommate instead of life-ruining is kinda iconic tbh", Score = 19 },
             new Comment { Id = "comment-9",  ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "ok but if I was forced to go to a support group in a church basement I would also be acting up", Score = 14 },
             new Comment { Id = "comment-10", ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "chapter 1 is like the calm before a tornado. it’s cute. it’s funny. it’s light. and then BAM. john green Pain™", Score = 63 },
-            new Comment { Id = "comment-11", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "I FUCKING HATE THIS BOOK.", Score = -1112 },
+            new Comment { Id = "comment-11", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "I FUCKING HATE THIS BOOK.", Score = -112 },
+            new Comment { Id = "comment-12", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "This comment has many upvotes for the simple reason that it is good.", Score = 1234 },
 
             // Negative scores
-            new Comment { Id = "comment-12", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "i don’t get the hype. it’s literally just kids complaining for 20 pages.", Score = -3 },
-            new Comment { Id = "comment-13", ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "unpopular opinion: hazel is lowkey kinda annoying in this chapter sry", Score = -49},
-            new Comment { Id = "comment-14", ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "this book is overrated. read a real classic instead.", Score = -6 },
-            new Comment { Id = "comment-15", ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "john green fans always act like he invented emotions lol", Score = -32 },
-            new Comment { Id = "comment-16", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "the jokes about cancer in this chapter are kinda insensitive ngl.", Score = -10 }
+            new Comment { Id = "comment-13", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "i don’t get the hype. it’s literally just kids complaining for 20 pages.", Score = -3 },
+            new Comment { Id = "comment-14", ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "unpopular opinion: hazel is lowkey kinda annoying in this chapter sry", Score = -49},
+            new Comment { Id = "comment-15", ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "this book is overrated. read a real classic instead.", Score = -6 },
+            new Comment { Id = "comment-16", ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "john green fans always act like he invented emotions lol", Score = -32 },
+            new Comment { Id = "comment-17", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "the jokes about cancer in this chapter are kinda insensitive ngl.", Score = -10 }
         ];
 
         // 20 replies referencing the top-level comments
@@ -277,11 +278,15 @@ public static class SeedThreads
             new Comment { Id = "reply-14", ThreadId = chapterThreads[0].Id, Author = authors[6], Body = "i get where you’re coming from, but ‘real classic’ is a weird gate.",          ParentCommentId = "comment-13", Score = 4  },
             new Comment { Id = "reply-15", ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "the chapter’s restraint is why later chapters crush me every reread.",         ParentCommentId = "comment-10", Score = -14 },
             new Comment { Id = "reply-16", ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "same—the humor is disarming but not dismissive, which is hard to pull off.",   ParentCommentId = "comment-3",  Score = 9  },
-            new Comment { Id = "reply-17", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "john green fans == stupid dumb iditios == true.",                     ParentCommentId = "comment-4",  Score = -4112 },
+            new Comment { Id = "reply-17", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "john green fans == stupid dumb iditios == true.",                     ParentCommentId = "comment-4",  Score = -412 },
             new Comment { Id = "reply-18", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "ngl the ‘heart of jesus’ line made me snort in public 😬",                     ParentCommentId = "comment-4",  Score = 15 },
-            new Comment { Id = "reply-19", ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "fair, but let people vibe with modern books too. both/and!",                   ParentCommentId = "comment-13", Score = 3  },
+            new Comment { Id = "reply-19", ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "fair, but let people vibe with modern books too. both/and!",                   ParentCommentId = "comment-13", Score = -101  },
             new Comment { Id = "reply-20", ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "i read it as hazel being prickly because everything is exhausting.",            ParentCommentId = "comment-12", Score = 7  },
-            new Comment { Id = "reply-21", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "agree—chapter 1 is the feint. later is the punch.",                           ParentCommentId = "comment-10", Score = 18 }
+            new Comment { Id = "reply-21", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "agree—chapter 1 is the feint. later is the punch.",                           ParentCommentId = "comment-10", Score = 18 },
+            new Comment { Id = "reply-22", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "RIP john green's wife i bet she hates her life cuz it sounds like john is just like hazel lmao. hank is the better one.", ParentCommentId = "comment-15", Score = -101 },
+            new Comment { Id = "reply-23", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "i really dont fw the haters of this book cuz this shit is fire, also totally agree", ParentCommentId = "comment-5", Score = 114 },
+            new Comment { Id = "reply-24", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "This comment is so downvoted because its author is an idiot with bad opinions.", ParentCommentId = "comment-12", Score = -1234},
+            new Comment { Id = "reply-25", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "anyone wanna play mfk with the characters in this book?", ParentCommentId = "comment-12", Score = 9993 }
         ];
 
         chapterThreads[0].CommentCount = comments.Count + replies.Count;
