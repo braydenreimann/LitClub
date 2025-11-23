@@ -1,3 +1,5 @@
+/* begin thread-types.ts */
+
 export type Author = {
     authorId: string;
     username: string;
@@ -39,3 +41,5 @@ export type CommentListResponse = {
 };
 
 export type VoteDirection = -1 | 0 | 1;
+
+/* end thread-types.ts */

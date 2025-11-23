@@ -1,9 +1,12 @@
+/* begin [threadId].tsx */
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, FlatList, RefreshControl, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { colors } from "@/theme";
 import { globalStyles } from "@/styles/globalStyles";
 import type { ThreadResponse, CommentResponse, Author } from "@/domain/models/thread-types";
+import type { User } from "@/domain/models";
 import { getThread } from "@/services/threadsService";
 import CommentItem from "@/components/threads/CommentItem";
 import AddCommentBar from "@/components/threads/AddCommentBar";
@@ -12,11 +15,9 @@ import { useCommentsList } from "@/hooks/useCommentsList";
 import { MessageCircle } from "lucide-react-native"; //npm install lucide-react-native
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { isHiddenByScore } from "@/constants/threadVisibility";
+import { getUser } from "@/services/usersService";
 
 const PAGE_SIZE = 20;
-
-const CURRENT_AUTHOR: Author = { authorId: "me", username: "You", profilePhotoUrl: null };
-const CURRENT_USER_ID = CURRENT_AUTHOR.username;
 
 export default function ThreadScreen() {
     const { threadId } = useLocalSearchParams<{ threadId: string }>();
@@ -24,6 +25,8 @@ export default function ThreadScreen() {
     const [thread, setThread] = useState<ThreadResponse | null>(null);
     const [loadingThread, setLoadingThread] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [loadingUser, setLoadingUser] = useState(true);
     const adjustThreadCommentCount = useCallback((delta: number) => {
         setThread((prev) => {
             if (!prev) return prev;
@@ -33,6 +36,27 @@ export default function ThreadScreen() {
             return { ...prev, commentCount: next };
         });
     }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        const load = async () => {
+            const user = await getUser();
+            if (!cancelled) setCurrentUser(user);
+            if (!cancelled) setLoadingUser(false);
+        };
+        load();
+        return () => { cancelled = true; };
+    }, []);
+
+    const CURRENT_AUTHOR = useMemo<Author | null>(() => {
+        if (!currentUser) return null;
+        return {
+            authorId: currentUser.id,
+            username: currentUser.userName ?? currentUser.username,
+            profilePhotoUrl: currentUser.profilePhotoUrl || null,
+        };
+    }, [currentUser]);
+    const CURRENT_USER_ID = currentUser?.id ?? "";
 
     const {
         comments,
@@ -58,7 +82,10 @@ export default function ThreadScreen() {
     useEffect(() => {
         let mounted = true;
         const run = async () => {
-            if (!threadId) return;
+            if (!threadId || !currentUser) {
+                setLoadingThread(false);
+                return;
+            }
             setLoadingThread(true);
             setError(null);
             try {
@@ -75,7 +102,7 @@ export default function ThreadScreen() {
         };
         run();
         return () => { mounted = false; };
-    }, [threadId, loadInitial]);
+    }, [threadId, loadInitial, currentUser]);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -94,7 +121,7 @@ export default function ThreadScreen() {
                     <Text style={styles.meta}>
                         by {thread?.author?.username ?? "unknown"} • {new Date(thread?.created ?? Date.now()).toLocaleString()}
                     </Text>
-                    <Text style={[globalStyles.body, { marginTop: 8 }]}>{thread?.body}</Text>
+                    <Text style={[styles.body]}>{thread?.body}</Text>
 
                     <View style={styles.actions}>
                         <View style={[styles.pill, styles.pillRow]}>
@@ -115,20 +142,28 @@ export default function ThreadScreen() {
             <CommentItem
                 comment={item}
                 threadId={threadId!}
-                currentAuthor={CURRENT_AUTHOR}
+                currentAuthor={CURRENT_AUTHOR!}
                 showHiddenComments={showHiddenComments}
                 onHiddenScoreChange={markHiddenLocal}
                 currentUserId={CURRENT_USER_ID}
             />
         ),
-        [threadId, showHiddenComments, markHiddenLocal]
+        [threadId, showHiddenComments, markHiddenLocal, CURRENT_AUTHOR, CURRENT_USER_ID]
     );
 
-    if (loadingThread) {
+    if (loadingThread || loadingUser) {
         return (
             <View style={[globalStyles.container, styles.center]}>
                 <ActivityIndicator size="large" color={colors.midBlue} />
                 {error ? <Text style={{ marginTop: 12, color: colors.darkest }}>{error}</Text> : null}
+            </View>
+        );
+    }
+
+    if (!currentUser) {
+        return (
+            <View style={[globalStyles.container, styles.center]}>
+                <Text style={{ color: colors.darkest }}>You must be logged in to view this thread.</Text>
             </View>
         );
     }
@@ -190,7 +225,7 @@ export default function ThreadScreen() {
             >
                 <AddCommentBar
                     threadId={threadId!}
-                    author={CURRENT_AUTHOR}
+                    author={CURRENT_AUTHOR!}
                     onOptimisticCreate={(temp) => {
                         onOptimisticCreate(temp);
                         adjustThreadCommentCount(1);
@@ -223,6 +258,12 @@ const styles = StyleSheet.create({
     title: { fontSize: 22, fontWeight: "700", color: colors.midBlue },
     meta: { marginTop: 4, fontSize: 12, color: colors.nextDarkest },
     actions: { marginTop: 10, flexDirection: "row", gap: 8 },
+    description: {
+        marginTop: 8,
+        fontSize: 12,
+        lineHeight: 18,
+    },
+    body: { color: colors.darkest, marginTop: 12, marginBottom: 8 },
     pill: {
         borderWidth: 1,
         borderColor: colors.midBlue,
@@ -251,3 +292,5 @@ const styles = StyleSheet.create({
     addBarWrap: { position: "absolute", left: 0, right: 0, bottom: 0 },
     pillRow: { flexDirection: "row", alignItems: "center", gap: 6 },
 });
+
+/* end [threadId].tsx */

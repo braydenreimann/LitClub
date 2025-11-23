@@ -1,3 +1,5 @@
+/* begin HiddenToggle.tsx */
+
 import React from "react";
 import { Pressable, Text, StyleSheet } from "react-native";
 import { colors } from "@/theme";
@@ -24,3 +26,5 @@ const styles = StyleSheet.create({
     wrap: { alignSelf: "flex-start", marginTop: 8 },
     text: { color: colors.nextDarkest, fontStyle: "italic" },
 });
+
+/* end HiddenToggle.tsx */

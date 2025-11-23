@@ -1,5 +1,7 @@
+/* begin CommentItem.tsx */
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, StyleSheet, ActivityIndicator, Image } from "react-native";
 import { colors } from "@/theme";
 import type { CommentResponse, Author } from "@/domain/models/thread-types";
 import { addReply, voteComment } from "@/services/commentsService";
@@ -8,6 +10,20 @@ import HiddenToggle from "@/components/threads/HiddenToggle";
 import ReplyComposer from "@/components/threads/ReplyComposer";
 import { useReplies } from "@/hooks/useReplies";
 import { isHiddenByScore } from "@/constants/threadVisibility";
+
+const formatCreated = (created: string) => {
+    const createdMs = new Date(created).getTime();
+    const diffMs = Math.max(0, Date.now() - createdMs);
+    const minutes = Math.floor(diffMs / 60000);
+    if (minutes < 1) return "1m";
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+    const weeks = Math.max(1, Math.floor(days / 7));
+    return `${weeks}w`;
+};
 
 type Props = {
     comment: CommentResponse;
@@ -29,6 +45,7 @@ export default function CommentItem({
     const [expanded, setExpanded] = useState(false);
     const [showReplyBox, setShowReplyBox] = useState(false);
     const [showHiddenReplies, setShowHiddenReplies] = useState(false);
+    const [replyPrefill, setReplyPrefill] = useState<string | null>(null);
 
     const [localScore, setLocalScore] = useState(comment.score);
     const [localUserVote, setLocalUserVote] = useState<-1 | 0 | 1>((comment.userVote ?? 0) as -1 | 0 | 1);
@@ -132,13 +149,31 @@ export default function CommentItem({
                     profilePhotoUrl: currentAuthor.profilePhotoUrl ?? undefined,
                 };
                 const saved = await addReply(threadId, comment.id, cleanedAuthor, body);
-                confirmReplace(temp.id, saved);
+
+                const voteResult = await voteComment(threadId, saved.id, currentAuthor.authorId, 1);
+                const savedWithVote = {
+                    ...saved,
+                    score: voteResult.score,
+                    userVote: voteResult.userVote,
+                };
+
+                confirmReplace(temp.id, savedWithVote);
                 setShowReplyBox(false);
             } catch {
                 rollbackRemove(temp.id);
             }
         },
         [expanded, threadId, currentAuthor, comment.id, optimisticAdd, confirmReplace, rollbackRemove]
+    );
+
+    const handleReplyToChild = useCallback(
+        (username: string) => {
+            setExpanded(true);
+            ensureLoaded();
+            setShowReplyBox(true);
+            setReplyPrefill(`@${username} `);
+        },
+        [ensureLoaded]
     );
 
     // Hide top-level if score <= threshold and hidden-not-shown
@@ -148,7 +183,16 @@ export default function CommentItem({
     return (
         <View style={styles.wrap}>
             <View style={styles.headerRow}>
+                <Image
+                    source={
+                        comment.author.profilePhotoUrl
+                            ? { uri: comment.author.profilePhotoUrl }
+                            : require("@/assets/images/userprofile_icon.png")
+                    }
+                    style={styles.avatar}
+                />
                 <Text style={styles.username}>{comment.author.username}</Text>
+                <Text style={styles.time}>{formatCreated(comment.created)}</Text>
             </View>
 
             <Text style={styles.body}>{comment.body}</Text>
@@ -162,7 +206,8 @@ export default function CommentItem({
 
                 <Pressable
                     onPress={() => {
-                        setShowReplyBox((s) => !s);
+                        setReplyPrefill(`@${comment.author.username} `);
+                        setShowReplyBox(true);
                         if (!expanded) setExpanded(true);
                         ensureLoaded();
                         // ⛔️ removed any auto-scroll on reply open
@@ -186,6 +231,8 @@ export default function CommentItem({
                     onSubmit={submitReply}
                     // ⛔️ no onFocus scroll; keep composer in place
                     refocusAfterSubmit={false}
+                    initialText={replyPrefill ?? undefined}
+                    onSubmitted={() => setReplyPrefill(null)}
                 />
             )}
 
@@ -196,7 +243,19 @@ export default function CommentItem({
                     ) : (
                         visibleReplies.map((r) => (
                             <View key={r.id} style={styles.replyRow}>
-                                <Text style={styles.username}>{r.author.username}</Text>
+                                <View style={styles.replyHeaderRow}>
+                                    <Image
+                                        source={
+                                            r.author.profilePhotoUrl
+                                                ? { uri: r.author.profilePhotoUrl }
+                                                : require("@/assets/images/userprofile_icon.png")
+                                        }
+                                        style={styles.replyAvatar}
+                                    />
+                                    <Text style={styles.username}>{r.author.username}</Text>
+                                    <Text style={styles.time}>{formatCreated(r.created)}</Text>
+                                </View>
+
                                 <Text style={styles.body}>{r.body}</Text>
 
                                 <View style={styles.replyMetaRow}>
@@ -206,6 +265,12 @@ export default function CommentItem({
                                         score={r.score}
                                         onChange={(next) => onChangeReplyVote(r.id, next)}
                                     />
+                                    <Pressable
+                                        onPress={() => handleReplyToChild(r.author.username)}
+                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                    >
+                                        <Text style={styles.replyAction}>Reply</Text>
+                                    </Pressable>
                                 </View>
                             </View>
                         ))
@@ -231,16 +296,23 @@ export default function CommentItem({
 }
 
 const styles = StyleSheet.create({
-    wrap: { paddingVertical: 10, borderBottomWidth: 1, borderColor: "#e6e2da" },
+    wrap: { paddingVertical: 10, borderBottomWidth: 0.8, borderColor: colors.midBlue },
     headerRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
+    avatar: { width: 32, height: 32, borderRadius: 16 },
     username: { fontWeight: "700", color: colors.midBlue },
-    body: { color: colors.darkest, marginTop: 2 },
+    body: { color: colors.darkest, marginTop: 6 },
+    time: { marginLeft: 8, fontSize: 11, color: colors.nextDarkest },
     actionsRow: { marginTop: 8, flexDirection: "row", alignItems: "center", gap: 16, flexWrap: "wrap" },
     action: { color: colors.midBlue, fontSize: 12, fontWeight: "600" },
     viewReplies: { color: colors.midBlue, fontSize: 12, fontWeight: "700" },
 
     replies: { marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: colors.midBlue },
     replyRow: { marginTop: 10 },
+    replyAvatar: { width: 24, height: 24, borderRadius: 12 },
+    replyHeaderRow: { flexDirection: "row", alignItems: "center", gap: 8 },
     replyMetaRow: { marginTop: 6, flexDirection: "row", alignItems: "center", gap: 12 },
+    replyAction: { color: colors.midBlue, fontSize: 12, fontWeight: "600" },
     moreReplies: { color: colors.midBlue, marginTop: 6, fontWeight: "600" },
 });
+
+/* end CommentItem.tsx */

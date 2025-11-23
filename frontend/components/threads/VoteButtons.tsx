@@ -1,8 +1,10 @@
-// components/threads/VoteButtons.tsx
+/* begin VoteButtons.tsx */
+
 import React, { useCallback, useEffect, useRef } from "react";
 import { View, Pressable, Text, StyleSheet, Animated } from "react-native";
 import { colors } from "@/theme";
 import { ChevronUp, ChevronDown } from "lucide-react-native";
+import { formatScore } from "@/utils/formatScore";
 
 type Props = {
     currentVote: -1 | 0 | 1;
@@ -91,10 +93,14 @@ export default function VoteButtons({
                 </Animated.View>
             </Pressable>
 
-            {/* Fixed width score box so changing digits won't shift siblings */}
-            <View style={[styles.scoreBox, compact ? { width: 24 } : { width: 30 }]}>
-                <Text style={[styles.scoreText, compact && { fontSize: 12 }]} numberOfLines={1}>
-                    {score}
+            {/* Score box grows to fit content, keeps spacing via padding */}
+            <View style={styles.scoreBox}>
+                <Text
+                    style={[styles.scoreText, compact && { fontSize: 12 }]}
+                    numberOfLines={1}
+                    ellipsizeMode="clip"
+                >
+                    {formatScore(score)}
                 </Text>
             </View>
 
@@ -112,17 +118,17 @@ export default function VoteButtons({
 }
 
 const styles = StyleSheet.create({
-    // Fixed total width to avoid any row nudge
+    // Even spacing between icons and score
     row: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
     },
     rowRegular: {
-        width: 24 + 30 + 24 + 4, // icon + scoreBox + icon + slight slack
+        columnGap: 4,
     },
     rowCompact: {
-        width: 24 + 24 + 24 + 4,
+        columnGap: 4,
     },
 
     // Fixed icon boxes; animation happens inside via transforms
@@ -137,9 +143,14 @@ const styles = StyleSheet.create({
     scoreBox: {
         alignItems: "center",
         justifyContent: "center",
+        paddingHorizontal: 6,
+        minWidth: 24,
+        flexShrink: 0,
     },
     scoreText: {
         color: colors.nextDarkest,
         fontWeight: "600",
     }
 });
+
+/* end VoteButtons.tsx */
