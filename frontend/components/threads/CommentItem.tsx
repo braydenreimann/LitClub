@@ -11,6 +11,20 @@ import ReplyComposer from "@/components/threads/ReplyComposer";
 import { useReplies } from "@/hooks/useReplies";
 import { isHiddenByScore } from "@/constants/threadVisibility";
 
+const formatCreated = (created: string) => {
+    const createdMs = new Date(created).getTime();
+    const diffMs = Math.max(0, Date.now() - createdMs);
+    const minutes = Math.floor(diffMs / 60000);
+    if (minutes < 1) return "1m";
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+    const weeks = Math.max(1, Math.floor(days / 7));
+    return `${weeks}w`;
+};
+
 type Props = {
     comment: CommentResponse;
     threadId: string;
@@ -135,7 +149,15 @@ export default function CommentItem({
                     profilePhotoUrl: currentAuthor.profilePhotoUrl ?? undefined,
                 };
                 const saved = await addReply(threadId, comment.id, cleanedAuthor, body);
-                confirmReplace(temp.id, saved);
+
+                const voteResult = await voteComment(threadId, saved.id, currentAuthor.authorId, 1);
+                const savedWithVote = {
+                    ...saved,
+                    score: voteResult.score,
+                    userVote: voteResult.userVote,
+                };
+
+                confirmReplace(temp.id, savedWithVote);
                 setShowReplyBox(false);
             } catch {
                 rollbackRemove(temp.id);
@@ -170,6 +192,7 @@ export default function CommentItem({
                     style={styles.avatar}
                 />
                 <Text style={styles.username}>{comment.author.username}</Text>
+                <Text style={styles.time}>{formatCreated(comment.created)}</Text>
             </View>
 
             <Text style={styles.body}>{comment.body}</Text>
@@ -229,7 +252,10 @@ export default function CommentItem({
                                     style={styles.replyAvatar}
                                 />
                                 <View style={styles.replyContent}>
-                                    <Text style={styles.username}>{r.author.username}</Text>
+                                    <View style={styles.replyHeaderRow}>
+                                        <Text style={styles.username}>{r.author.username}</Text>
+                                        <Text style={styles.time}>{formatCreated(r.created)}</Text>
+                                    </View>
                                     <Text style={styles.body}>{r.body}</Text>
 
                                     <View style={styles.replyMetaRow}>
@@ -276,6 +302,7 @@ const styles = StyleSheet.create({
     avatar: { width: 32, height: 32, borderRadius: 16 },
     username: { fontWeight: "700", color: colors.midBlue },
     body: { color: colors.darkest, marginTop: 6 },
+    time: { marginLeft: 8, fontSize: 11, color: colors.nextDarkest },
     actionsRow: { marginTop: 8, flexDirection: "row", alignItems: "center", gap: 16, flexWrap: "wrap" },
     action: { color: colors.midBlue, fontSize: 12, fontWeight: "600" },
     viewReplies: { color: colors.midBlue, fontSize: 12, fontWeight: "700" },
@@ -284,6 +311,7 @@ const styles = StyleSheet.create({
     replyRow: { marginTop: 10, flexDirection: "row", alignItems: "center", gap: 8 },
     replyAvatar: { width: 24, height: 24, borderRadius: 12 },
     replyContent: { flex: 1 },
+    replyHeaderRow: { flexDirection: "row", alignItems: "center" },
     replyMetaRow: { marginTop: 6, flexDirection: "row", alignItems: "center", gap: 12 },
     replyAction: { color: colors.midBlue, fontSize: 12, fontWeight: "600" },
     moreReplies: { color: colors.midBlue, marginTop: 6, fontWeight: "600" },
