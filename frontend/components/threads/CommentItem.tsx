@@ -243,35 +243,34 @@ export default function CommentItem({
                     ) : (
                         visibleReplies.map((r) => (
                             <View key={r.id} style={styles.replyRow}>
-                                <Image
-                                    source={
-                                        r.author.profilePhotoUrl
-                                            ? { uri: r.author.profilePhotoUrl }
-                                            : require("@/assets/images/userprofile_icon.png")
-                                    }
-                                    style={styles.replyAvatar}
-                                />
-                                <View style={styles.replyContent}>
-                                    <View style={styles.replyHeaderRow}>
-                                        <Text style={styles.username}>{r.author.username}</Text>
-                                        <Text style={styles.time}>{formatCreated(r.created)}</Text>
-                                    </View>
-                                    <Text style={styles.body}>{r.body}</Text>
+                                <View style={styles.replyHeaderRow}>
+                                    <Image
+                                        source={
+                                            r.author.profilePhotoUrl
+                                                ? { uri: r.author.profilePhotoUrl }
+                                                : require("@/assets/images/userprofile_icon.png")
+                                        }
+                                        style={styles.replyAvatar}
+                                    />
+                                    <Text style={styles.username}>{r.author.username}</Text>
+                                    <Text style={styles.time}>{formatCreated(r.created)}</Text>
+                                </View>
 
-                                    <View style={styles.replyMetaRow}>
-                                        <VoteButtons
-                                            compact
-                                            currentVote={(r.userVote ?? 0) as -1 | 0 | 1}
-                                            score={r.score}
-                                            onChange={(next) => onChangeReplyVote(r.id, next)}
-                                        />
-                                        <Pressable
-                                            onPress={() => handleReplyToChild(r.author.username)}
-                                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                        >
-                                            <Text style={styles.replyAction}>Reply</Text>
-                                        </Pressable>
-                                    </View>
+                                <Text style={styles.body}>{r.body}</Text>
+
+                                <View style={styles.replyMetaRow}>
+                                    <VoteButtons
+                                        compact
+                                        currentVote={(r.userVote ?? 0) as -1 | 0 | 1}
+                                        score={r.score}
+                                        onChange={(next) => onChangeReplyVote(r.id, next)}
+                                    />
+                                    <Pressable
+                                        onPress={() => handleReplyToChild(r.author.username)}
+                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                    >
+                                        <Text style={styles.replyAction}>Reply</Text>
+                                    </Pressable>
                                 </View>
                             </View>
                         ))
@@ -308,10 +307,9 @@ const styles = StyleSheet.create({
     viewReplies: { color: colors.midBlue, fontSize: 12, fontWeight: "700" },
 
     replies: { marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: colors.midBlue },
-    replyRow: { marginTop: 10, flexDirection: "row", alignItems: "center", gap: 8 },
+    replyRow: { marginTop: 10 },
     replyAvatar: { width: 24, height: 24, borderRadius: 12 },
-    replyContent: { flex: 1 },
-    replyHeaderRow: { flexDirection: "row", alignItems: "center" },
+    replyHeaderRow: { flexDirection: "row", alignItems: "center", gap: 8 },
     replyMetaRow: { marginTop: 6, flexDirection: "row", alignItems: "center", gap: 12 },
     replyAction: { color: colors.midBlue, fontSize: 12, fontWeight: "600" },
     moreReplies: { color: colors.midBlue, marginTop: 6, fontWeight: "600" },
