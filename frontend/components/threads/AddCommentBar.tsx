@@ -1,3 +1,5 @@
+/* begin AddCommentBar.tsx */
+
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
     View,
@@ -154,3 +156,5 @@ const styles = StyleSheet.create({
         fontWeight: "700",
     },
 });
+
+/* end AddCommentBar.tsx */

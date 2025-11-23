@@ -1,4 +1,6 @@
-import React, { useCallback, useRef, useState } from "react";
+/* begin ReplyComposer.tsx */
+
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, TextInput, Pressable, Text, ActivityIndicator, StyleSheet, Keyboard } from "react-native";
 import { colors } from "@/theme";
 
@@ -9,6 +11,7 @@ type Props = {
     refocusAfterSubmit?: boolean;
     onFocus?: () => void;
     autoFocus?: boolean;               // ⬅️ NEW
+    initialText?: string;
 };
 
 export default function ReplyComposer({
@@ -18,6 +21,7 @@ export default function ReplyComposer({
     refocusAfterSubmit = true,
     onFocus,
     autoFocus = true,                  // ⬅️ default: open keyboard when shown
+    initialText,
 }: Props) {
     const [text, setText] = useState("");
     const [busy, setBusy] = useState(false);
@@ -42,6 +46,12 @@ export default function ReplyComposer({
             setBusy(false);
         }
     }, [text, busy, onSubmit, onSubmitted, refocusAfterSubmit]);
+
+    useEffect(() => {
+        if (initialText && text.length === 0) {
+            setText(initialText);
+        }
+    }, [initialText, text]);
 
     return (
         <View style={styles.wrap}>
@@ -75,3 +85,5 @@ const styles = StyleSheet.create({
     btn: { alignSelf: "flex-start", backgroundColor: colors.midBlue, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
     btnText: { color: "#fff", fontWeight: "700" },
 });
+
+/* end ReplyComposer.tsx */
