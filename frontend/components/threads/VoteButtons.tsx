@@ -1,4 +1,5 @@
-// components/threads/VoteButtons.tsx
+/* begin VoteButtons.tsx */
+
 import React, { useCallback, useEffect, useRef } from "react";
 import { View, Pressable, Text, StyleSheet, Animated } from "react-native";
 import { colors } from "@/theme";
@@ -151,3 +152,5 @@ const styles = StyleSheet.create({
         fontWeight: "600",
     }
 });
+
+/* end VoteButtons.tsx */

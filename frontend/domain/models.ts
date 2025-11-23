@@ -1,3 +1,5 @@
+/* begin models.ts */
+
 /*
     Note: Domain models exist to represent the core business concepts of your
     application, cleanly and indpendent from the backend shapes.
@@ -22,7 +24,7 @@ export type User = {
     blockedUserIds: string[];
     litClubIds: string[];
     created: string;
-    password: string; //Sofia put this here
+    password: string;
 }
 
 export type Edition = {
@@ -71,3 +73,5 @@ export type LitClub = {
     privateClub: boolean,
     memberUserIds: string[]
 }
+
+/* end models.ts */
