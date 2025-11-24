@@ -1411,6 +1411,8 @@ export interface components {
             /** Format: int32 */
             chapterNumber?: number | null;
             litClubId?: string | null;
+            /** Format: int32 */
+            afterChapter?: number | null;
         };
         AddUserRequest: {
             firstName: string | null;
@@ -1648,6 +1650,8 @@ export interface components {
             bookId?: string | null;
             /** Format: int32 */
             chapterNumber?: number | null;
+            /** Format: int32 */
+            afterChapter?: number | null;
             litClubId?: string | null;
             /** Format: date-time */
             created?: string;
