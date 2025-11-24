@@ -113,19 +113,7 @@ export default function AllLitClubs() {
         {/* New Club Button */}
         <Pressable
             onPress={toggleMenu}
-            style={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              zIndex: 100, 
-              borderRadius: 30,
-              width: 50,
-              height: 50,
-              justifyContent: 'center',
-              alignContent: 'center',
-              alignItems: 'center',
-              marginBottom: 16,
-            }}>
+            style={styles.toggle}>
               <EvilIcons name="plus" size={50} color={colors.midBlue} />
         </Pressable>
 
@@ -231,4 +219,17 @@ const styles = StyleSheet.create({
       paddingVertical: 12,
       paddingHorizontal: 16,
     },
+    toggle: {
+      position: 'absolute',
+      top: 16,
+      right: 16,
+      zIndex: 100, 
+      borderRadius: 30,
+      width: 50,
+      height: 50,
+      justifyContent: 'center',
+      alignContent: 'center',
+      alignItems: 'center',
+      marginBottom: 16,
+    }
 });
