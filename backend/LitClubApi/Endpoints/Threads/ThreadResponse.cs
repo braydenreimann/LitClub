@@ -10,6 +10,7 @@ public sealed class ThreadResponse
     public required string Body { get; init; }
     public string? BookId { get; init; }
     public int? ChapterNumber { get; init; }
+    public int? AfterChapter { get; init; }
     public string? LitClubId { get; init; }
     public DateTime Created { get; init; }
     public DateTime? Updated { get; init; }

@@ -27,7 +27,8 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
             Body = request.Body,
             BookId = request.BookId,
             ChapterNumber = request.ChapterNumber,
-            LitClubId = request.LitClubId
+            LitClubId = request.LitClubId,
+            AfterChapter = request.AfterChapter
         };
 
         var pk = new PartitionKey(thread.ThreadId);
