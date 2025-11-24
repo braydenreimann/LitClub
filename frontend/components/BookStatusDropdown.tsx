@@ -18,32 +18,38 @@ import BookStatusDropdown from "../components/BookStatusDropdown";
     </View>
 
 */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { colors, fonts } from "../theme";
 
 const STATUS_OPTIONS = [
-  "Not in your library",
-  "Dog-eared for later",
+  "Not in Your Library",
   "Currently Reading",
-  "On Hiatus",
-  "Finished",
+  "Future Reads",
+  "Past Reads",
 ];
 
 type BookStatusDropdownProps = {
-  initialStatus?: string;
+  status: string;
   onStatusChange?: (newStatus: string) => void;
 };
 
 export default function BookStatusDropdown({
-  initialStatus = "Not in your library",
+  //initialStatus = "Not in Your Library",
+  status,
   onStatusChange,
 }: BookStatusDropdownProps) {
-  const [status, setStatus] = useState(initialStatus);
+  const [selectedStatus, setSelectedStatus] = useState(status);
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
+  useEffect(() => {
+    if (status != selectedStatus) {
+      setSelectedStatus(status);
+    }
+  }, [status]);
+
   const handleSelect = (newStatus: string) => {
-    setStatus(newStatus);
+    setSelectedStatus(newStatus);
     setDropdownVisible(false);
     if (onStatusChange) onStatusChange(newStatus);
   };
@@ -58,7 +64,7 @@ export default function BookStatusDropdown({
         ]}
         onPress={() => setDropdownVisible(!dropdownVisible)}
       >
-        <Text style={styles.buttonText}>{status}</Text>
+        <Text style={styles.buttonText}>{selectedStatus}</Text>
       </Pressable>
 
       {/* Dropdown List */}
@@ -76,7 +82,7 @@ export default function BookStatusDropdown({
               <Text
                 style={[
                   styles.dropdownText,
-                  item === status && { fontWeight: "bold", color: colors.midBlue },
+                  item === selectedStatus && { fontWeight: "bold", color: colors.midBlue },
                 ]}
               >
                 {item}

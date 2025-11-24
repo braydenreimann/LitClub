@@ -1,9 +1,9 @@
-import { View, ScrollView, Text, Pressable, Alert, useColorScheme } from 'react-native';
+import { StyleSheet, View, ScrollView, Text, Pressable, Alert, useColorScheme, Animated } from 'react-native';
 import Header from '../../components/headerWithSearch';
 import { globalStyles } from '@/styles/globalStyles';
 import { Link, useFocusEffect } from 'expo-router';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
@@ -12,6 +12,7 @@ import { useLitClubs } from '@/LitClubImport/LitClubContext';
 import { colors } from '@/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '@/domain/models';
+import { useRouter } from "expo-router";
 
 
 export default function AllLitClubs() {
@@ -22,6 +23,8 @@ export default function AllLitClubs() {
     NotoSansMono_400Regular,
   });
 
+  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false); //create/join club
   const [user, setUser] = useState<User | null>(null)
   const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
   const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
@@ -31,6 +34,10 @@ export default function AllLitClubs() {
       fetchLitClubs();
     }, [fetchLitClubs])
   )
+
+  const toggleMenu = () => {
+      setMenuOpen((prev) => !prev);
+  };
 
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
@@ -104,8 +111,8 @@ export default function AllLitClubs() {
       <ScrollView contentContainerStyle={{ padding: 16}}>
 
         {/* New Club Button */}
-        <Link href="/createLitClub" asChild>
-          <Pressable
+        <Pressable
+            onPress={toggleMenu}
             style={{
               position: 'absolute',
               top: 16,
@@ -120,8 +127,27 @@ export default function AllLitClubs() {
               marginBottom: 16,
             }}>
               <EvilIcons name="plus" size={50} color={colors.midBlue} />
-            </Pressable>
-        </Link>
+        </Pressable>
+
+        {menuOpen && (
+          <View style={[styles.dropdown]}>
+              <Pressable
+                style={styles.dropdownItem}
+                onPress={() => router.push("/createLitClub")}
+              >
+                <Text style = {globalStyles.body}>Create New LitClub</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.dropdownItem}
+                onPress={() => router.push("/JoinLitClub")}
+              >
+                <Text style = {globalStyles.body}>Join New LitClub</Text>
+              </Pressable>
+
+            </View>
+        )}
+       
 
         {/* MAIN HEADING */}
         <Text style={globalStyles.heading}>My LitClubs</Text>
@@ -187,3 +213,22 @@ export default function AllLitClubs() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+    dropdown: {
+        position: "absolute",
+        top: 60,
+        right: 25,
+        backgroundColor: colors.cream,
+        borderRadius: 16,
+        paddingVertical: 10,
+        width: 200,
+        borderWidth: 2,
+        borderColor: colors.midBlue,
+        elevation: 4,
+    },
+    dropdownItem: {
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+    },
+});

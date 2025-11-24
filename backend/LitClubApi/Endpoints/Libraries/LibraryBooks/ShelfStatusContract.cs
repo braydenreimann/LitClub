@@ -6,8 +6,8 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks;
 [JsonConverter(typeof(StringEnumConverter))]
 public enum ShelfStatusContract
 {
-    hasRead,
+    notInYourLibrary,
     currentlyReading,
-    Hiatus,
-    WantToRead
+    futureReads,
+    pastReads
 }

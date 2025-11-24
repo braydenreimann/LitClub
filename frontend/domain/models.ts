@@ -71,3 +71,9 @@ export type LitClub = {
     privateClub: boolean,
     memberUserIds: string[]
 }
+export enum ShelfStatus {
+    notInYourLibrary = 0,
+    currentlyReading = 1,
+    futureReads = 2, 
+    pastReads = 3
+}

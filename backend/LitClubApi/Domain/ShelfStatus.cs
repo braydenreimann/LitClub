@@ -2,9 +2,10 @@
 {
     public enum ShelfStatus
     {
-        hasRead,
+        notInYourLibrary,
         currentlyReading,
-        Hiatus,
-        WantToRead
+        futureReads,
+        pastReads
     }
+
 }

@@ -1,4 +1,4 @@
-import { LibraryBook } from '../domain/models'
+import { LibraryBook, ShelfStatus } from '../domain/models'
 import { client } from 'client';
 import { toDomainLibraryBook } from '@/api-mappers/libraries/libraries-mappers';
 import Constants from 'expo-constants';
@@ -35,15 +35,20 @@ export async function getLibraryBook(ownerId: string, libraryBookId: string): Pr
 }
 
 //statuses 0:hasRead 1:currentlyReading 2: hiatus, 3:Want to Read
-export async function editLibraryBookStatus(id: string, libraryBookIdInput: string, status: number): Promise<LibraryBook | null> {
+export async function editLibraryBookStatus(id: string, libraryBookIdInput: string, status: ShelfStatus): Promise<LibraryBook | null> {
     //Format body as payload for edit request. userId and libraryBookId always required
     const body = {
-        OwnerId: id, libraryBookId: libraryBookIdInput,
-        Body: { Status: status }
+        status: status
     };
 
+    //debugging
+    console.log('=== EDIT LIBRARY BOOK STATUS ===');
+    console.log('URL:', `${API_BASE_URL}/libraries/${id}/libraryBooks/${libraryBookIdInput}`);
+    console.log('Status being sent:', status);
+    console.log('Body being sent:', JSON.stringify(body));
+
     try {
-        const response = await fetch(`${API_BASE_URL}/${id}/libraryBooks/${libraryBookIdInput}`,
+        const response = await fetch(`${API_BASE_URL}/libraries/${id}/libraryBooks/${libraryBookIdInput}`,
         {
             method: "PATCH",
             headers: {
@@ -54,11 +59,18 @@ export async function editLibraryBookStatus(id: string, libraryBookIdInput: stri
         }
         );
 
+        //debugging
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server error: ', response.status, errorText);
             throw new Error(`Server retured ${response.status}`);
         }
 
         const data = await response.json()
+        console.log('Successfully updated, recieved:', data);
         return data ? toDomainLibraryBook(data) : null; 
     } catch (err) {
         console.error("Error in Library Status update")

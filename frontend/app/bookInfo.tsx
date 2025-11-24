@@ -13,10 +13,12 @@ import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
 import { Entypo } from '@expo/vector-icons';
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book } from '../domain/models';
+import { Book, LibraryBook, User, ShelfStatus } from '../domain/models';
 import { getBook } from '../services/booksService';
 import { getUriRead } from '@/services/imagesService';
 import { router } from "expo-router";
+import { editLibraryBookStatus, getLibraryBook } from '@/services/librariesService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // playing around with importing the book
 export interface bookImport {
@@ -27,6 +29,20 @@ export interface bookImport {
     description?: string;
     coverImageUrl?: string;
 }
+
+const BACKEND_TO_LABEL: Record<number, string> = {
+    0: "Not in Your Library",
+    1: "Currently Reading",
+    2: "Future Reads",
+    3: "Past Reads",
+};
+
+const LABEL_TO_BACKEND: Record<string, ShelfStatus> = {
+    "Not in Your Library": ShelfStatus.notInYourLibrary,
+    "Currently Reading": ShelfStatus.currentlyReading,
+    "Future Reads": ShelfStatus.futureReads,
+    "Past Reads": ShelfStatus.pastReads,
+};
 
 // buttons for the book info screen
 function ToCButton({ bookId }: { bookId: string }) {
@@ -70,9 +86,11 @@ export default function BookInfoScreen() {
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [book, setBook] = useState<Book | null>(null);
+    const [libraryBook, setLibraryBook] = useState<LibraryBook | null>(null);
     const [loading, setLoading] = useState(true);
+    const [statusLabel, setStatusLabel] = useState("Not in Your Library");
     const [error, setError] = useState<string | null>(null);
-
+    const [user, setUser] = useState<{ id: string } | null>(null);
     const [coverUri, setCoverUri] = useState<string>("");
 
     useEffect(() => {
@@ -91,6 +109,36 @@ export default function BookInfoScreen() {
     }, [id]);
 
     useEffect(() => {
+        if (libraryBook) {
+            setStatusLabel(BACKEND_TO_LABEL[libraryBook.status] || "Not in Your Library");
+        }
+    }, [libraryBook])
+
+    useEffect(() => {
+        //
+        const fetchLibraryBook = async () => {
+            try {
+                const userId = await AsyncStorage.getItem("userId");
+                if (!userId) return;
+
+                const cached = await AsyncStorage.getItem(`libraryBook-${userId}-${id}`);
+                if (cached) {
+                    setLibraryBook(JSON.parse(cached));
+                }
+
+                const libBook = await getLibraryBook(userId, id);
+                if (libBook) {
+                    setLibraryBook(libBook);
+                    await AsyncStorage.setItem(`libraryBook-${userId}-${id}`, JSON.stringify(libBook));
+                }
+            } catch (err) {
+                console.warn("Failed to fetch library book", err);
+            }
+        };
+        fetchLibraryBook();
+    }, [id]);
+//
+    useEffect(() => {
         let alive = true;
 
         (async () => {
@@ -101,6 +149,23 @@ export default function BookInfoScreen() {
         return () => { alive = false; };
     }, [book?.coverImageUrl]);
 
+    useEffect(() => { //chat-gpt is a quadrillion dollar idea
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
+
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
+
     const [isPublic, setIsPublic] = useState(true);
 
     const handlePrivacyChange = (newPrivacyStatus: string) => {
@@ -109,9 +174,34 @@ export default function BookInfoScreen() {
         // TODO: Implement function
     };
 
-    const handleStatusChange = (newStatus: string) => {
-        console.log("Book status changed to:", newStatus);
+    const handleStatusChange = async (newStatus: string) => {
+        //console.log("Book status changed to:", newStatus);
         // TODO: Implement function
+        if (!libraryBook) return;
+
+        const userId = await AsyncStorage.getItem("userId");
+        if (!userId) return;
+
+        const newStatusCode: ShelfStatus = LABEL_TO_BACKEND[newStatus] ?? ShelfStatus.notInYourLibrary;
+
+        setStatusLabel(newStatus);
+
+        try {
+            const updated = await editLibraryBookStatus(
+                userId,
+                libraryBook.id,
+                newStatusCode
+            );
+
+            if (updated) {
+                setLibraryBook(updated);
+                await AsyncStorage.setItem(`libraryBook-${userId}-${id}`, JSON.stringify(updated));
+            }
+        } catch (err) {
+            console.error("Failed to update library book status", err);
+            Alert.alert("Error", "Could not update book status.");
+            setStatusLabel(BACKEND_TO_LABEL[libraryBook.status] ?? "Not in Your Library");
+        }
     };
     
    
@@ -237,7 +327,13 @@ export default function BookInfoScreen() {
                         {/* Library Status */}
                         <View style={infoStyle.column}>
                             <Text style={[globalStyles.subheading, {fontSize: 18}]}>Library Status</Text>
-                            <BookStatusDropdown onStatusChange={handleStatusChange} />
+                            <BookStatusDropdown 
+                                status={statusLabel}
+                                onStatusChange={async (newStatus) => {
+                                    setStatusLabel(newStatus);
+                                    await handleStatusChange(newStatus);
+                                }} 
+                            />
                         </View>
 
                         {/* Visibility */}
