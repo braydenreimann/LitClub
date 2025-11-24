@@ -13,6 +13,7 @@ export type ThreadResponse = {
     body: string;
     bookId?: string | null;
     chapterNumber?: number | null;
+    afterChapter?: number | null;
     litClubId?: string | null;
     created: string;
     updated?: string | null;
