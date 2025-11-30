@@ -118,19 +118,19 @@ export default function AllLitClubs() {
         </Pressable>
 
         {menuOpen && (
-          <View style={[styles.dropdown]}>
+          <View style={[styles.dropdown, { zIndex: 100 }]}>
               <Pressable
-                style={styles.dropdownItem}
+                style={[styles.dropdownItem, { zIndex: 100 }]}
                 onPress={() => router.push("/createLitClub")}
               >
                 <Text style = {globalStyles.body}>Create New LitClub</Text>
               </Pressable>
 
               <Pressable
-                style={styles.dropdownItem}
+                style={[styles.dropdownItem, { zIndex: 100 }]}
                 onPress={() => router.push("/JoinLitClub")}
               >
-                <Text style = {globalStyles.body}>Join New LitClub</Text>
+                <Text style = {globalStyles.body}>Join a LitClub</Text>
               </Pressable>
 
             </View>
