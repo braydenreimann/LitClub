@@ -1,32 +1,33 @@
 // code borrowed from https://plainenglish.io/blog/how-to-implement-a-search-bar-in-react-js
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, StyleSheet, FlatList, Text, TouchableWithoutFeedback } from 'react-native';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { searchBooks } from '@/services/searchservice';
+import { Book } from '@/domain/models';
 
 const SearchBar = () => {
     const [searchInput, setSearchInput] = useState("");
     const [isFocused, setIsFocused] = useState(false);
 
-    const DATA = [
-        { id: "1", title: "Data Structures" },
-        { id: "2", title: "STL" },
-        { id: "3", title: "C++" },
-        { id: "4", title: "Java" },
-        { id: "5", title: "Python" },
-        { id: "6", title: "CP" },
-        { id: "7", title: "ReactJs" },
-        { id: "8", title: "NodeJs" },
-        { id: "9", title: "MongoDb" },
-        { id: "10", title: "ExpressJs" },
-        { id: "11", title: "PHP" },
-        { id: "12", title: "MySql" },
-    ];
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState<Book[]>([]);
 
-    const filteredData = DATA.filter((item) => 
-        item.title.toLowerCase().includes(searchInput.toLowerCase())
-    );
+    useEffect(() => {
+        if (!query.trim()) { //empties results once user deletes their query
+            setResults([]);
+            return;
+        }
 
+        const timeout = setTimeout(async () => {
+            const books = await searchBooks(query);
+            setResults(books ?? []);
+        }, 300); //debounce to give space between query changes. searchBooks isn't called for every keystroke
+
+        return () => clearTimeout(timeout);
+    }, [query]);
+
+    
     return (
         <View style={styles.container}>
             <TextInput
@@ -34,15 +35,18 @@ const SearchBar = () => {
                 placeholder="Search"
                 placeholderTextColor={"#224b6f"}
                 value={searchInput}
-                onChangeText={setSearchInput}
+                onChangeText={(text) => {
+                    setSearchInput(text);
+                    setQuery(text);
+                }}
                 onBlur={() => setIsFocused(false)}
                 onFocus={() => setIsFocused(true)}
             />
 
-            {isFocused && filteredData.length > 0 && (
+            {isFocused && results.length > 0 && (
                 <View style={styles.dropdown}>
                     <FlatList
-                        data={filteredData}
+                        data={results}
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
                             <TouchableWithoutFeedback onPress={() => {

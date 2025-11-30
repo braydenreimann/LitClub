@@ -24,7 +24,7 @@ public class Search(ICosmosContext cosmosContext) : EndpointBaseAsync
                 return Ok(Array.Empty<BookResponse>());
 
             string sql = @"
-                SELECT c
+                SELECT *
                 FROM c
                 WHERE CONTAINS(LOWER(c.Title), LOWER(@query)) OR CONTAINS(LOWER(c.Author), LOWER(@query))
             "; //Simple substring matching, currently inefficient for large datasets due to partition key. 
@@ -33,14 +33,13 @@ public class Search(ICosmosContext cosmosContext) : EndpointBaseAsync
             var query = new QueryDefinition(sql)
                 .WithParameter("@query", request.Query);
 
-            var iterator = cosmosContext.Books.GetItemQueryIterator<BookResponse>(query);
-
+            var iterator = cosmosContext.Books.GetItemQueryIterator<Book>(query);
             var results = new List<BookResponse>();
 
             while (iterator.HasMoreResults)
             {
                 var response = await iterator.ReadNextAsync(cancellationToken);
-                results.AddRange(response);
+                results.AddRange(response.Select(b => b.ToResponse()));
             }
 
             return Ok(results);
