@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Pressable } from 'react-native';
 import { Link, router, useFocusEffect } from 'expo-router';
@@ -28,6 +29,14 @@ function EditButton() {
         </Pressable>
     );
 }
+function SignOutButton() {
+    return (
+        <Pressable onPress={() => router.push('/')}>
+            <FontAwesome name="sign-out" size={20} color={colors.darkest} />
+        </Pressable>
+    );
+}
+
 function SettingsButton() {
     return (
         <Link href="/settingsPage">
@@ -175,9 +184,11 @@ export default function ProfileScreen() {
                     </View>
 
                     <View style={profStyles.iconRow}>
-                        <SettingsButton />
-                        <StatsButton />
+                        {/*<SettingsButton />*/}
                         <EditButton />
+                        <StatsButton />
+                        <SignOutButton />
+                        
                     </View>
                 </View>
 
