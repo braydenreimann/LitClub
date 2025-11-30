@@ -333,6 +333,8 @@ export default function LitClubScreen() {
                         }
                     </Text>
                 </Pressable> 
+
+                <Text style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest, paddingLeft: 30, paddingBottom: 50 }]}>Invite Code: _ _ _ _ _ _</Text>
                 
         </ScrollView>
     );
