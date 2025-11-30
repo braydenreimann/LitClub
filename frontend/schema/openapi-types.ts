@@ -20,6 +20,7 @@ export interface paths {
                     sort?: string;
                     pageSize?: number;
                     continuationToken?: string;
+                    afterChapter?: number;
                 };
                 header?: never;
                 path?: never;

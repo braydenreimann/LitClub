@@ -84,6 +84,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "afterChapter",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         ],
         "responses": {
