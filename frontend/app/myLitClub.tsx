@@ -1,3 +1,5 @@
+/* begin myLitclub.tsx */
+
 import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { ActivityIndicator, Platform, Pressable } from 'react-native';
@@ -42,7 +44,7 @@ function Jump2discButton() {
             style={litStyles.discButton}
             /*TODO make the buttons go to their clubs*/
             onPress={() => { Alert.alert('jumping to discussion...') }} >
-            <Text style={[globalStyles.body, { textAlign: 'center', textAlignVertical: 'center' , fontSize: 12}]}>
+            <Text style={[globalStyles.body, { textAlign: 'center', textAlignVertical: 'center', fontSize: 12 }]}>
                 Jump to Discussion
             </Text>
         </Pressable>
@@ -54,14 +56,14 @@ function BackButton() {
     return (
         <Pressable>
             <Link href="/bookclubs" onPress={() => router.back()}>
-                <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}/>
+                <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }} />
             </Link>
         </Pressable>
 
     );
 }
 //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
-export default function LitClubScreen() { 
+export default function LitClubScreen() {
     const [fontsLoaded] = useFonts({
         Fraunces_700Bold,
         ChivoMono_500Medium,
@@ -81,22 +83,22 @@ export default function LitClubScreen() {
     const [selectedBooks, setSelectedBooks] = useState<Book[]>([]);
     const [currentBook, setCurrentBook] = useState<Book | null>(null);
     const [upcomingBooks, setUpcomingBooks] = useState<Book[]>([]);
-    
+
 
     useEffect(() => {
-    const loadArchivedClubs = async () => {
-      const saved = await AsyncStorage.getItem('archivedClubs');
-      if (saved) {
-        setArchivedClubIds(JSON.parse(saved));
-      }
-    };
-    loadArchivedClubs();
-  }, []);
+        const loadArchivedClubs = async () => {
+            const saved = await AsyncStorage.getItem('archivedClubs');
+            if (saved) {
+                setArchivedClubIds(JSON.parse(saved));
+            }
+        };
+        loadArchivedClubs();
+    }, []);
 
-  //save when changed
-  useEffect(() => {
-    AsyncStorage.setItem('archivedClubs', JSON.stringify(archivedClubIds));
-  }, [archivedClubIds]);
+    //save when changed
+    useEffect(() => {
+        AsyncStorage.setItem('archivedClubs', JSON.stringify(archivedClubIds));
+    }, [archivedClubIds]);
 
     useEffect(() => { //chat-gpt is a quadrillion dollar idea
         // Define an async function inside useEffect
@@ -159,8 +161,9 @@ export default function LitClubScreen() {
             "Leave Club",
             "Are you sure you want to leave this club?",
             [
-                {text: "Cancel", style: "cancel"},
-                {text: "Leave", style: "destructive", onPress: async () => {
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Leave", style: "destructive", onPress: async () => {
                         if (!club) {
                             Alert.alert('Club not found.');
                             return;
@@ -186,15 +189,16 @@ export default function LitClubScreen() {
             ]
         );
     }
-    
+
     //delete club if you own the club
     async function handleDeleteClub() {
         Alert.alert(
             "Delete Club",
             "Are you sure you want to delete this club? It will delete for all users in this club.",
             [
-                {text: "Cancel", style: "cancel"},
-                {text: "Delete", style: "destructive", onPress: async () => {
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete", style: "destructive", onPress: async () => {
                         if (!club) {
                             Alert.alert('Club not found.');
                             return;
@@ -242,98 +246,98 @@ export default function LitClubScreen() {
     }; // help from AI to make archiving function
 
     return (
-            <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}> 
-                    <View style={{flexDirection:'row', paddingTop: 25 } } >
-                        <BackButton /> 
-                        <Text style={[globalStyles.heading, { paddingTop: 0 }]}>{club.name}</Text>
+        <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}>
+            <View style={{ flexDirection: 'row', paddingTop: 25 }} >
+                <BackButton />
+                <Text style={[globalStyles.heading, { paddingTop: 0 }]}>{club.name}</Text>
+            </View>
+
+            <Text style={[globalStyles.body, { margin: 20 }]}>
+                {club.description}
+            </Text>
+
+            <View style={litStyles.leaderBanner}>
+                <Foundation name="crown" size={30} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }} />
+                <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
+                <Text style={globalStyles.subheading}>@{club.ownerUserId}</Text>
+                <Foundation name="crown" size={30} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }} />
+            </View>
+
+            {/*currently reading section*/}
+            <View style={litStyles.currentRead}>
+                <View style={litStyles.sideRead}>
+
+                    <View style={globalStyles.card}>
+                        {currentBook ? (
+                            <Text style={[globalStyles.subheading, { textAlign: 'center', paddingTop: 50, fontSize: 18 }]}>
+                                {currentBook.title}
+                            </Text>
+                        ) : (
+                            <Text style={[globalStyles.subheading, { textAlign: 'center', paddingTop: 50, fontSize: 18 }]}>
+                                Current Book Not Found
+                            </Text>
+                        )}
                     </View>
-
-                    <Text style={[globalStyles.body, {margin: 20}]}> 
-                        {club.description}
-                    </Text>
-
-                    <View style={litStyles.leaderBanner}>
-                        <Foundation name="crown" size={30} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}/>
-                        <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
-                        <Text style={globalStyles.subheading}>@{club.ownerUserId}</Text>
-                        <Foundation name="crown" size={30} color="#193350" style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }} />
+                </View>
+                <View style={litStyles.sideRead}>
+                    <View style={litStyles.discBox}>
+                        <Text style={[globalStyles.subheading, { textAlign: 'left', textAlignVertical: 'center', paddingTop: 20, paddingLeft: 5, fontSize: 18 }]}>
+                            This is our most recent discussion!
+                        </Text>
                     </View>
+                    <Jump2discButton />
+                </View>
+            </View>
+            <View>
 
-                    {/*currently reading section*/}
-                    <View style={litStyles.currentRead}>
-                        <View style={litStyles.sideRead}>
-                            
-                            <View style={globalStyles.card}>  
-                                {currentBook ? (
-                                    <Text style={[globalStyles.subheading, {textAlign: 'center', paddingTop: 50, fontSize: 18}]}>
-                                        {currentBook.title}
-                                    </Text>
-                                ) : (
-                                    <Text style={[globalStyles.subheading, {textAlign: 'center', paddingTop: 50, fontSize: 18}]}>
-                                        Current Book Not Found
-                                    </Text>
-                                )}
-                            </View>
-                        </View>
-                        <View style={litStyles.sideRead}>
-                            <View style={litStyles.discBox}>
-                                <Text style={[globalStyles.subheading, { textAlign: 'left', textAlignVertical: 'center', paddingTop: 20, paddingLeft: 5, fontSize: 18}]}>
-                                    This is our most recent discussion!
-                                </Text>
-                            </View>
-                            <Jump2discButton />
-                        </View>            
-                    </View>
-                <View> 
-
-                    {/* AI help for integrating this */}
-                    <Text style={[globalStyles.subheading, {margin: 20}]}>Preferred Genres</Text> 
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 20 }}>
-                        {(club.preferredGenres || []).map((genre, idx) => (
+                {/* AI help for integrating this */}
+                <Text style={[globalStyles.subheading, { margin: 20 }]}>Preferred Genres</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 20 }}>
+                    {(club.preferredGenres || []).map((genre, idx) => (
                         <Text key={idx} style={[globalStyles.body, { marginRight: 10 }]}>#{genre}</Text>
-                        ))}
-                    </View>
+                    ))}
+                </View>
 
-                    <Text style={[globalStyles.subheading, {margin: 20}]}>Upcoming Reads</Text>
-                    {/* reading list for the club's upcoming reads*/}
-                    <ReadingList status={0} /> 
-                    <Text style={[globalStyles.subheading, {margin: 20}]}>Past Reads</Text>
-                    {/* reading list for the Past Reads*/}   
-                    <ReadingList status={1} />    
-                    <Text style={[globalStyles.subheading, {margin: 20}]}>Current Members</Text>
-                    {/* TODO: INSERT CLUB MEMBERS HERE*/}
-                    <ClubMembers 
-                        memberUserIds={club.memberUserIds ?? []} 
-                        ownerUserId={club.ownerUserId} 
-                    />
-                </View> 
+                <Text style={[globalStyles.subheading, { margin: 20 }]}>Upcoming Reads</Text>
+                {/* reading list for the club's upcoming reads*/}
+                <ReadingList status={0} />
+                <Text style={[globalStyles.subheading, { margin: 20 }]}>Past Reads</Text>
+                {/* reading list for the Past Reads*/}
+                <ReadingList status={1} />
+                <Text style={[globalStyles.subheading, { margin: 20 }]}>Current Members</Text>
+                {/* TODO: INSERT CLUB MEMBERS HERE*/}
+                <ClubMembers
+                    memberUserIds={club.memberUserIds ?? []}
+                    ownerUserId={club.ownerUserId}
+                />
+            </View>
 
-                <Pressable
-                    disabled={actionLoading}
-                    onPress={isOwner ? handleDeleteClub : handleLeaveClub}
-                    style={[litStyles.deleteButton, { backgroundColor: colors.midBlue}]}
-                >
-                    <Text style={[globalStyles.body, { color: 'white', textAlign: 'center', textAlignVertical: 'center' }]}>
-                        {actionLoading 
-                            ? "Processing..."
-                            : isOwner 
-                                ? "Delete Club" 
-                                : "Leave Club"
-                        }
-                    </Text>
-                </Pressable>    
+            <Pressable
+                disabled={actionLoading}
+                onPress={isOwner ? handleDeleteClub : handleLeaveClub}
+                style={[litStyles.deleteButton, { backgroundColor: colors.midBlue }]}
+            >
+                <Text style={[globalStyles.body, { color: 'white', textAlign: 'center', textAlignVertical: 'center' }]}>
+                    {actionLoading
+                        ? "Processing..."
+                        : isOwner
+                            ? "Delete Club"
+                            : "Leave Club"
+                    }
+                </Text>
+            </Pressable>
 
-                <Pressable
-                    disabled={actionLoading}
-                    onPress={handleArchiveToggle}
-                    style={[litStyles.archiveButton, { backgroundColor: colors.yellow}]}
-                >
-                    <Text style={[globalStyles.body, { color: colors.darkest, textAlign: 'center', textAlignVertical: 'center' }]}>
-                        {isArchived ? "Unarchive Club" : "Archive Club"
-                        }
-                    </Text>
-                </Pressable> 
-                
+            <Pressable
+                disabled={actionLoading}
+                onPress={handleArchiveToggle}
+                style={[litStyles.archiveButton, { backgroundColor: colors.yellow }]}
+            >
+                <Text style={[globalStyles.body, { color: colors.darkest, textAlign: 'center', textAlignVertical: 'center' }]}>
+                    {isArchived ? "Unarchive Club" : "Archive Club"
+                    }
+                </Text>
+            </Pressable>
+
         </ScrollView>
     );
 }
@@ -353,16 +357,16 @@ export default function LitClubScreen() {
 
 const litStyles = StyleSheet.create({
     leaderBanner: {
-        flexDirection:"row",
+        flexDirection: "row",
         width: "100%",
         height: 40,
         backgroundColor: colors.yellow,
         fontFamily: fonts.subheading,
         fontSize: 30,
-        justifyContent:"center",
+        justifyContent: "center",
         alignItems: "center",
         marginTop: 15,
-        
+
     },
     currentRead: {
         flexDirection: "row",
@@ -372,7 +376,7 @@ const litStyles = StyleSheet.create({
     sideRead: {
         flexDirection: "column",
         width: 120,
-        marginHorizontal:20,
+        marginHorizontal: 20,
     },
     discBox: {
         backgroundColor: colors.cream,
@@ -387,14 +391,14 @@ const litStyles = StyleSheet.create({
     discButton: {
         backgroundColor: colors.teal,
         borderColor: colors.darkest,
-        borderWidth:4,
+        borderWidth: 4,
         borderRadius: 12,
         alignContent: "center",
-        justifyContent:"center",
+        justifyContent: "center",
         textAlign: "center",
         margin: 5,
         height: 45,
-        width:"120%",
+        width: "120%",
         fontFamily: fonts.body,
 
     },
@@ -444,3 +448,5 @@ const litStyles = StyleSheet.create({
         marginBottom: 40,
     },
 });
+
+/* end myLitClub.tsx */
