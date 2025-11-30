@@ -10,5 +10,6 @@ public static class AddThreadMapper
         BookId = req.BookId,
         ChapterNumber = req.ChapterNumber,
         LitClubId = req.LitClubId,
+        AfterChapter = req.AfterChapter
     };
 }

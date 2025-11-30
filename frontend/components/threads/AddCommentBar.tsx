@@ -1,3 +1,5 @@
+/* begin AddCommentBar.tsx */
+
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
     View,
@@ -12,7 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme";
 import type { Author, CommentResponse } from "@/domain/models/thread-types";
-import { addTopLevelComment } from "@/services/commentsService";
+import { addTopLevelComment, voteComment } from "@/services/commentsService";
 
 type AddCommentBarProps = {
     threadId: string;
@@ -74,7 +76,15 @@ export default function AddCommentBar({
                 },
                 body
             );
-            onServerConfirm?.(temp.id, saved);
+
+            const voteResult = await voteComment(threadId, saved.id, author.authorId, 1);
+            const savedWithVote = {
+                ...saved,
+                score: voteResult.score,
+                userVote: voteResult.userVote,
+            };
+
+            onServerConfirm?.(temp.id, savedWithVote);
         } catch (err) {
             onServerError?.(temp.id, err);
         } finally {
@@ -154,3 +164,5 @@ const styles = StyleSheet.create({
         fontWeight: "700",
     },
 });
+
+/* end AddCommentBar.tsx */

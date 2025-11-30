@@ -235,51 +235,61 @@ public static class SeedThreads
             }
         };
 
+        // Use a "now" reference for relative timestamps
+        var now = DateTime.UtcNow;
+
         // 15 top-level comments (chapter 1 thread)
         List<Comment> comments =
         [
-            new Comment { Id = "comment-1",  ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "i thought this chapter was mid. i mean it just couldve been better. also cancer is kinda lame like u could have given them a better disease.", Score = 22 },
-            new Comment { Id = "comment-2",  ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "hazel is literally the most relatable narrator ever. like the sarcasm?? elite.", Score = 41 },
-            new Comment { Id = "comment-3",  ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "i forgot how funny this book is?? it’s about cancer but i laughed like 3 times in the first chapter help 💀", Score = 35 },
-            new Comment { Id = "comment-4",  ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "the support group in the literal heart of jesus is so unserious SKDFJSDK", Score = 57 },
-            new Comment { Id = "comment-5",  ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "Every time I re-read this chapter I’m reminded that John Green really said ‘I’m gonna be hilarious and then emotionally destroy you later’", Score = 49 },
-            new Comment { Id = "comment-6",  ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "not me reading 6 pages and already questioning my existence😭", Score = 28 },
-            new Comment { Id = "comment-7",  ThreadId = chapterThreads[0].Id, Author = authors[6], Body = "hot take but hazel’s mom is so underrated. like she rlly be trying her best", Score = 31 },
-            new Comment { Id = "comment-8",  ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "the way hazel describes cancer like it’s an annoying roommate instead of life-ruining is kinda iconic tbh", Score = 19 },
-            new Comment { Id = "comment-9",  ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "ok but if I was forced to go to a support group in a church basement I would also be acting up", Score = 14 },
-            new Comment { Id = "comment-10", ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "chapter 1 is like the calm before a tornado. it’s cute. it’s funny. it’s light. and then BAM. john green Pain™", Score = 63 },
+            new Comment { Id = "comment-1",  ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "i thought this chapter was mid. i mean it just couldve been better. also cancer is kinda lame like u could have given them a better disease.", Score = 22, Created = now.AddHours(-2) },
+            new Comment { Id = "comment-2",  ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "hazel is literally the most relatable narrator ever. like the sarcasm?? elite.", Score = -3, Created = now.AddHours(-5) },
+            new Comment { Id = "comment-3",  ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "i forgot how funny this book is?? it’s about cancer but i laughed like 3 times in the first chapter help 💀", Score = 35, Created = now.AddHours(-9) },
+            new Comment { Id = "comment-4",  ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "the support group in the literal heart of jesus is so unserious SKDFJSDK", Score = 57, Created = now.AddHours(-13) },
+            new Comment { Id = "comment-5",  ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "Every time I re-read this chapter I’m reminded that John Green really said ‘I’m gonna be hilarious and then emotionally destroy you later’", Score = 49, Created = now.AddHours(-20) },
+            new Comment { Id = "comment-6",  ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "not me reading 6 pages and already questioning my existence😭", Score = 28, Created = now.AddDays(-1).AddHours(-3) },
+            new Comment { Id = "comment-7",  ThreadId = chapterThreads[0].Id, Author = authors[6], Body = "hot take but hazel’s mom is so underrated. like she rlly be trying her best", Score = 31, Created = now.AddDays(-1).AddHours(-8) },
+            new Comment { Id = "comment-8",  ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "the way hazel describes cancer like it’s an annoying roommate instead of life-ruining is kinda iconic tbh", Score = 19, Created = now.AddDays(-2).AddHours(-2) },
+            new Comment { Id = "comment-9",  ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "ok but if I was forced to go to a support group in a church basement I would also be acting up", Score = 14, Created = now.AddDays(-2).AddHours(-6) },
+            new Comment { Id = "comment-10", ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "chapter 1 is like the calm before a tornado. it’s cute. it’s funny. it’s light. and then BAM. john green Pain™", Score = 63, Created = now.AddDays(-3) },
+            new Comment { Id = "comment-11", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "I FUCKING HATE THIS BOOK.", Score = -112, Created = now.AddDays(-3).AddHours(-5) },
+            new Comment { Id = "comment-12", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "This comment has many upvotes for the simple reason that it is good.", Score = 1234, Created = now.AddDays(-4) },
 
             // Negative scores
-            new Comment { Id = "comment-11", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "i don’t get the hype. it’s literally just kids complaining for 20 pages.", Score = -3 },
-            new Comment { Id = "comment-12", ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "unpopular opinion: hazel is lowkey kinda annoying in this chapter sry", Score = -1 },
-            new Comment { Id = "comment-13", ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "this book is overrated. read a real classic instead.", Score = -6 },
-            new Comment { Id = "comment-14", ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "john green fans always act like he invented emotions lol", Score = -9 },
-            new Comment { Id = "comment-15", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "the jokes about cancer in this chapter are kinda insensitive ngl.", Score = -2 }
+            new Comment { Id = "comment-13", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "i don’t get the hype. it’s literally just kids complaining for 20 pages.", Score = -3, Created = now.AddDays(-4).AddHours(-6) },
+            new Comment { Id = "comment-14", ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "unpopular opinion: hazel is lowkey kinda annoying in this chapter sry", Score = -49, Created = now.AddDays(-5) },
+            new Comment { Id = "comment-15", ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "this book is overrated. read a real classic instead.", Score = -6, Created = now.AddDays(-6) },
+            new Comment { Id = "comment-16", ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "john green fans always act like he invented emotions lol", Score = -32, Created = now.AddDays(-7) },   // ~1 week ago
+            new Comment { Id = "comment-17", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "the jokes about cancer in this chapter are kinda insensitive ngl.", Score = -10, Created = now.AddDays(-7).AddHours(-3) } // ~1 week ago
         ];
 
-        // 20 replies referencing the top-level comments
+        // 20+ replies referencing the top-level comments
         List<Comment> replies =
         [
-            new Comment { Id = "reply-1",  ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "facts. the humor makes the serious parts hit even harder later.",      ParentCommentId = "comment-5",  Score = 18 },
-            new Comment { Id = "reply-2",  ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "the ‘literal heart of jesus’ line is meme-worthy every time 😂",        ParentCommentId = "comment-4",  Score = 25 },
-            new Comment { Id = "reply-3",  ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "i kinda disagree—hazel’s voice feels earned because it’s defensive + honest.", ParentCommentId = "comment-12", Score = 9  },
-            new Comment { Id = "reply-4",  ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "i don’t think it’s overrated, it’s just very specific about grief + humor.",   ParentCommentId = "comment-13", Score = 7  },
-            new Comment { Id = "reply-5",  ThreadId = chapterThreads[0].Id, Author = authors[6], Body = "yeah the mom scenes in later chapters really land. chapter 1 sets it up.",     ParentCommentId = "comment-7",  Score = 14 },
-            new Comment { Id = "reply-6",  ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "same, laughed and then remembered the topic and felt weird about it.",         ParentCommentId = "comment-3",  Score = 11 },
-            new Comment { Id = "reply-7",  ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "this! the basement vibe felt painfully accurate lol",                        ParentCommentId = "comment-9",  Score = 8  },
-            new Comment { Id = "reply-8",  ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "hot take accepted, but the ‘kids complaining’ read feels shallow tbh.",        ParentCommentId = "comment-11", Score = 6  },
-            new Comment { Id = "reply-9",  ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "i think the ‘insensitive’ moments are intentional tension—dark humor coping.", ParentCommentId = "comment-15", Score = 10 },
-            new Comment { Id = "reply-10", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "peak john green: disarm with jokes → destroy with feelings later.",           ParentCommentId = "comment-5",  Score = 21 },
-            new Comment { Id = "reply-11", ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "agreed, the pace is sneaky-fast. breezy now, layered after.",                 ParentCommentId = "comment-10", Score = 12 },
-            new Comment { Id = "reply-12", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "support group leader felt like a real person, not a caricature. nice touch.", ParentCommentId = "comment-4",  Score = 13 },
-            new Comment { Id = "reply-13", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "counterpoint: the voice is sharp because hazel’s rationing energy.",           ParentCommentId = "comment-12", Score = 5  },
-            new Comment { Id = "reply-14", ThreadId = chapterThreads[0].Id, Author = authors[6], Body = "i get where you’re coming from, but ‘real classic’ is a weird gate.",          ParentCommentId = "comment-13", Score = 4  },
-            new Comment { Id = "reply-15", ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "the chapter’s restraint is why later chapters crush me every reread.",         ParentCommentId = "comment-10", Score = 16 },
-            new Comment { Id = "reply-16", ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "same—the humor is disarming but not dismissive, which is hard to pull off.",   ParentCommentId = "comment-3",  Score = 9  },
-            new Comment { Id = "reply-17", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "ngl the ‘heart of jesus’ line made me snort in public 😬",                     ParentCommentId = "comment-4",  Score = 15 },
-            new Comment { Id = "reply-18", ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "fair, but let people vibe with modern books too. both/and!",                   ParentCommentId = "comment-13", Score = 3  },
-            new Comment { Id = "reply-19", ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "i read it as hazel being prickly because everything is exhausting.",            ParentCommentId = "comment-12", Score = 7  },
-            new Comment { Id = "reply-20", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "agree—chapter 1 is the feint. later is the punch.",                           ParentCommentId = "comment-10", Score = 18 }
+            new Comment { Id = "reply-1",  ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "facts. the humor makes the serious parts hit even harder later.",      ParentCommentId = "comment-5",  Score = 18,  Created = now.AddHours(-1) },
+            new Comment { Id = "reply-2",  ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "the ‘literal heart of jesus’ line is meme-worthy every time 😂",        ParentCommentId = "comment-4",  Score = 25,  Created = now.AddHours(-3) },
+            new Comment { Id = "reply-3",  ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "i kinda disagree—hazel’s voice feels earned because it’s defensive + honest.", ParentCommentId = "comment-12", Score = 9,   Created = now.AddHours(-6)  },
+            new Comment { Id = "reply-4",  ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "i don’t think it’s overrated, it’s just very specific about grief + humor.",   ParentCommentId = "comment-13", Score = 7,   Created = now.AddHours(-7)  },
+            new Comment { Id = "reply-5",  ThreadId = chapterThreads[0].Id, Author = authors[6], Body = "yeah the mom scenes in later chapters really land. chapter 1 sets it up.",     ParentCommentId = "comment-7",  Score = -11, Created = now.AddDays(-1)  },
+            new Comment { Id = "reply-6",  ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "same, laughed and then remembered the topic and felt weird about it.",         ParentCommentId = "comment-3",  Score = -5,  Created = now.AddDays(-1).AddHours(-2) },
+            new Comment { Id = "reply-7",  ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "this! the basement vibe felt painfully accurate lol",                        ParentCommentId = "comment-9",  Score = 8,   Created = now.AddDays(-1).AddHours(-4) },
+            new Comment { Id = "reply-8",  ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "hot take accepted, but the ‘kids complaining’ read feels shallow tbh.",        ParentCommentId = "comment-11", Score = 6,   Created = now.AddDays(-2)  },
+            new Comment { Id = "reply-9",  ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "i think the ‘insensitive’ moments are intentional tension—dark humor coping.", ParentCommentId = "comment-15", Score = 10,  Created = now.AddDays(-2).AddHours(-3) },
+            new Comment { Id = "reply-10", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "peak john green: disarm with jokes → destroy with feelings later.",           ParentCommentId = "comment-5",  Score = 21,  Created = now.AddDays(-2).AddHours(-6) },
+            new Comment { Id = "reply-11", ThreadId = chapterThreads[0].Id, Author = authors[7], Body = "agreed, the pace is sneaky-fast. breezy now, layered after.",                 ParentCommentId = "comment-10", Score = -33, Created = now.AddDays(-3) },
+            new Comment { Id = "reply-12", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "support group leader felt like a real person, not a caricature. nice touch.", ParentCommentId = "comment-4",  Score = 13,  Created = now.AddDays(-3).AddHours(-1) },
+            new Comment { Id = "reply-13", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "counterpoint: the voice is sharp because hazel’s rationing energy.",           ParentCommentId = "comment-12", Score = 5,   Created = now.AddDays(-3).AddHours(-5) },
+            new Comment { Id = "reply-14", ThreadId = chapterThreads[0].Id, Author = authors[6], Body = "i get where you’re coming from, but ‘real classic’ is a weird gate.",          ParentCommentId = "comment-13", Score = 4,   Created = now.AddDays(-4) },
+            new Comment { Id = "reply-15", ThreadId = chapterThreads[0].Id, Author = authors[1], Body = "the chapter’s restraint is why later chapters crush me every reread.",         ParentCommentId = "comment-10", Score = -14, Created = now.AddDays(-4).AddHours(-2) },
+            new Comment { Id = "reply-16", ThreadId = chapterThreads[0].Id, Author = authors[8], Body = "same—the humor is disarming but not dismissive, which is hard to pull off.",   ParentCommentId = "comment-3",  Score = 9,   Created = now.AddDays(-4).AddHours(-6) },
+            new Comment { Id = "reply-17", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "john green fans == stupid dumb iditios == true.",                             ParentCommentId = "comment-4",  Score = -412,Created = now.AddDays(-5) },
+            new Comment { Id = "reply-18", ThreadId = chapterThreads[0].Id, Author = authors[4], Body = "ngl the ‘heart of jesus’ line made me snort in public 😬",                     ParentCommentId = "comment-4",  Score = 15,  Created = now.AddDays(-5).AddHours(-3) },
+            new Comment { Id = "reply-19", ThreadId = chapterThreads[0].Id, Author = authors[9], Body = "fair, but let people vibe with modern books too. both/and!",                   ParentCommentId = "comment-13", Score = -101,Created = now.AddDays(-6) },
+            new Comment { Id = "reply-20", ThreadId = chapterThreads[0].Id, Author = authors[5], Body = "i read it as hazel being prickly because everything is exhausting.",            ParentCommentId = "comment-12", Score = 7,   Created = now.AddDays(-6).AddHours(-4) },
+            new Comment { Id = "reply-21", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "agree—chapter 1 is the feint. later is the punch.",                           ParentCommentId = "comment-10", Score = 18,  Created = now.AddDays(-7) },   // ~1 week ago
+            new Comment { Id = "reply-22", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "RIP john green's wife i bet she hates her life cuz it sounds like john is just like hazel lmao. hank is the better one.", ParentCommentId = "comment-15", Score = -101, Created = now.AddDays(-7).AddHours(-2) },
+            new Comment { Id = "reply-23", ThreadId = chapterThreads[0].Id, Author = authors[0], Body = "i really dont fw the haters of this book cuz this shit is fire, also totally agree", ParentCommentId = "comment-5", Score = 114, Created = now.AddDays(-1).AddHours(-6) },
+            new Comment { Id = "reply-24", ThreadId = chapterThreads[0].Id, Author = authors[2], Body = "This comment is so downvoted because its author is an idiot with bad opinions.", ParentCommentId = "comment-12", Score = -1234, Created = now.AddDays(-2).AddHours(-5) },
+            new Comment { Id = "reply-25", ThreadId = chapterThreads[0].Id, Author = authors[3], Body = "augustus lowkey bad?", ParentCommentId = "comment-12", Score = 9993, Created = now.AddHours(-30) }
         ];
 
         chapterThreads[0].CommentCount = comments.Count + replies.Count;

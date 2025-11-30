@@ -10,6 +10,7 @@ public static class ThreadMapper
         Body = thread.Body,
         BookId = thread.BookId,
         ChapterNumber = thread.ChapterNumber,
+        AfterChapter = thread.AfterChapter,
         LitClubId = thread.LitClubId,
         Created = thread.Created,
         Updated = thread.Updated,

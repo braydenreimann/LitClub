@@ -10,4 +10,5 @@ public sealed class AddThreadRequest
     public string? BookId { get; init; }
     public int? ChapterNumber { get; init; }
     public string? LitClubId { get; init; }
+    public int? AfterChapter { get; init; }
 }

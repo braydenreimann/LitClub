@@ -1,3 +1,5 @@
+/* begin thread-types.ts */
+
 export type Author = {
     authorId: string;
     username: string;
@@ -11,6 +13,7 @@ export type ThreadResponse = {
     body: string;
     bookId?: string | null;
     chapterNumber?: number | null;
+    afterChapter?: number | null;
     litClubId?: string | null;
     created: string;
     updated?: string | null;
@@ -39,3 +42,5 @@ export type CommentListResponse = {
 };
 
 export type VoteDirection = -1 | 0 | 1;
+
+/* end thread-types.ts */

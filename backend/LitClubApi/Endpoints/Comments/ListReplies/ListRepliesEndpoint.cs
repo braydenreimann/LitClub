@@ -29,7 +29,6 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
                   AND c.threadId = @t
                   AND c.ParentCommentId = @p
                   AND c.IsDeleted = false
-                  AND c.Score >= 0
                 ORDER BY c.Score DESC, c.Created ASC")
                 .WithParameter("@t", request.ThreadId)
                 .WithParameter("@p", request.CommentId);

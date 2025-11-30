@@ -2138,6 +2138,11 @@
           "litClubId": {
             "type": "string",
             "nullable": true
+          },
+          "afterChapter": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3086,6 +3091,11 @@
             "nullable": true
           },
           "chapterNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "afterChapter": {
             "type": "integer",
             "format": "int32",
             "nullable": true

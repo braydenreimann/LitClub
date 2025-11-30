@@ -20,6 +20,7 @@ public class Thread
     public required string Body { get; set; }
     public string? BookId { get; init; }
     public int? ChapterNumber { get; init; }
+    public int? AfterChapter { get; init; }
     public string? LitClubId { get; init; }
     public DateTime Created { get; init; } = DateTime.UtcNow;
     public DateTime? Updated { get; set; }
