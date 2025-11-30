@@ -1,7 +1,8 @@
 // code borrowed from https://plainenglish.io/blog/how-to-implement-a-search-bar-in-react-js
 
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, FlatList, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, TextInput, StyleSheet, FlatList, Text, TouchableWithoutFeedback, Pressable } from 'react-native';
+import { Link, router } from 'expo-router'
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { searchBooks } from '@/services/searchservice';
 import { Book } from '@/domain/models';
@@ -47,17 +48,21 @@ const SearchBar = () => {
                 <View style={styles.dropdown}>
                     <FlatList
                         data={results}
+                        keyboardShouldPersistTaps= "always"
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
-                            <TouchableWithoutFeedback onPress={() => {
-                                setSearchInput(item.title);
-                                setIsFocused(false);
-                            }}
+                            <Pressable
+                                style={styles.item}
+                                onPress={() => {
+                                    setIsFocused(false);
+                                    router.push({
+                                        pathname: "/bookInfo",
+                                        params: { id: item.id }
+                                    });
+                                }}
                             >
-                            <View style={styles.item}>
                                 <Text style={styles.title}>{item.title}</Text>
-                            </View>
-                            </TouchableWithoutFeedback>
+                            </Pressable>
                         )}
                     />
                     </View>       
@@ -92,15 +97,16 @@ dropdown: {
     borderWidth: 1,
     width: 180,
     maxHeight: 150,
-    zIndex: 10,
+    zIndex: 100,
 },
 title: {
     fontSize: 16,
     color: '#333',
 },
 item: {
-    paddingVertical: 8,
+    paddingVertical: 6,
     paddingHorizontal: 10,
+    width: "100%",
 },
 });
 
