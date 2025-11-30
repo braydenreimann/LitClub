@@ -1,3 +1,5 @@
+/* begin Domain/Thread.cs */
+
 using Newtonsoft.Json;
 
 namespace LitClubApi.Domain;
@@ -30,3 +32,5 @@ public class Thread
 
     public bool IsChapterThread => !string.IsNullOrWhiteSpace(BookId) && ChapterNumber.HasValue;
 }
+
+/* end Domain/Thread.cs */
