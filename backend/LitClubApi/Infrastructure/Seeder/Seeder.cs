@@ -1,3 +1,5 @@
+/* begin SeedThreads.cs */
+
 using Microsoft.Azure.Cosmos;
 using LitClubApi.Domain;
 using LitClubApi.Configuration;
@@ -30,7 +32,8 @@ public static class SeedThreads
             new Author { AuthorId = "u109", Username = "midnight_reader", ProfilePhotoUrl = null },
         ];
 
-        // 25 chapter threads (admin as author)
+        // 25 GLOBAL chapter threads (My Library)
+        // Ensure: BookId = "1", AfterChapter = ChapterNumber, LitClubId = null
         var chapterThreads = new List<LitClubApi.Domain.Thread>
         {
             new LitClubApi.Domain.Thread
@@ -39,7 +42,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 1 Discussion",
                 Body = "Chapter Title: A Support Group and a Boy\n\nChapter Summary: Hazel, a sixteen-year-old cancer patient living on borrowed time, reluctantly attends a church basement support group at her mother’s urging. Expecting the usual monotony, she instead meets the charismatic Augustus Waters — a charming amputee with a mischievous smile. Their immediate connection sparks something Hazel hasn’t felt in a long time: curiosity…and maybe even hope.",
-                ChapterNumber = 1
+                BookId = "1",
+                AfterChapter = 1,
+                ChapterNumber = 1,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -47,7 +53,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 2 Discussion",
                 Body = "Chapter Title: Shared Stories\n\nChapter Summary: Hazel and Augustus begin to learn more about one another, bonding over books, fears, and the brutal honesty of illness. Hazel shares her obsession with *An Imperial Affliction*, a novel that seems to understand her life better than people do — leaving Augustus intrigued.",
-                ChapterNumber = 2
+                BookId = "1",
+                AfterChapter = 2,
+                ChapterNumber = 2,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -55,7 +64,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 3 Discussion",
                 Body = "Chapter Title: A Swap of Favorite Books\n\nChapter Summary: A swap of favorite books deepens Hazel and Augustus’ connection. Augustus promises to read *An Imperial Affliction*, while Hazel reluctantly agrees to read his favorite novel, *The Price of Dawn*. Their budding friendship begins to feel like something more.",
-                ChapterNumber = 3
+                BookId = "1",
+                AfterChapter = 3,
+                ChapterNumber = 3,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -63,7 +75,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 4 Discussion",
                 Body = "Chapter Title: Opening Up\n\nChapter Summary: A small favor turns into a vulnerable moment as Hazel and Augustus spend more time together. Augustus reveals the truth about his past relationship, and Hazel opens up about the pain cancer has carved into her life — emotionally more than physically.",
-                ChapterNumber = 4
+                BookId = "1",
+                AfterChapter = 4,
+                ChapterNumber = 4,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -71,7 +86,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 5 Discussion",
                 Body = "Chapter Title: Literary Differences\n\nChapter Summary: After finishing Augustus’ book, Hazel rants passionately about its absurd, action-packed plot. Their literary exchange brings them closer, revealing how differently they process trauma, loss, and escapism — yet how perfectly they complement each other.",
-                ChapterNumber = 5
+                BookId = "1",
+                AfterChapter = 5,
+                ChapterNumber = 5,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -79,7 +97,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 6 Discussion",
                 Body = "Chapter Title: The Grenade Theory\n\nChapter Summary: Hazel’s health becomes a larger concern, and she grows fearful of getting too close to Augustus — worried she is a 'grenade' waiting to explode. Augustus pushes back, determined to choose their connection, no matter the risk.",
-                ChapterNumber = 6
+                BookId = "1",
+                AfterChapter = 6,
+                ChapterNumber = 6,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -87,7 +108,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 7 Discussion",
                 Body = "Chapter Title: Isaac’s Breakdown\n\nChapter Summary: Isaac faces heartbreak when his girlfriend breaks up with him before his surgery, leaving Hazel and Augustus to comfort him — with some chaotic, dark-humor-filled therapy along the way. Their trio dynamic strengthens.",
-                ChapterNumber = 7
+                BookId = "1",
+                AfterChapter = 7,
+                ChapterNumber = 7,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -95,7 +119,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 8 Discussion",
                 Body = "Chapter Title: The Wish\n\nChapter Summary: Augustus surprises Hazel big-time: he uses his one remaining Wish to take her to Amsterdam so she can meet the mysterious author of *An Imperial Affliction*. Hazel is stunned — and her feelings for him grow harder to deny.",
-                ChapterNumber = 8
+                BookId = "1",
+                AfterChapter = 8,
+                ChapterNumber = 8,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -103,7 +130,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 9 Discussion",
                 Body = "Chapter Title: ICU Scare\n\nChapter Summary: A health scare lands Hazel in the ICU. While recovering, she questions whether love is worth the inevitable pain she fears she will cause. Yet Augustus remains constant — a presence she can’t ignore.",
-                ChapterNumber = 9
+                BookId = "1",
+                AfterChapter = 9,
+                ChapterNumber = 9,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -111,7 +141,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 10 Discussion",
                 Body = "Chapter Title: Permission to Hope\n\nChapter Summary: Hazel’s trip approval clears with conditions, and her parents reluctantly support her wish to go to Amsterdam. A new, thrilling chapter in her life — one beyond hospitals and support groups — begins to take shape.",
-                ChapterNumber = 10
+                BookId = "1",
+                AfterChapter = 10,
+                ChapterNumber = 10,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -119,7 +152,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 11 Discussion",
                 Body = "Chapter Title: Amsterdam Arrival\n\nChapter Summary: Arrival in Amsterdam! Hazel and Augustus enjoy unforgettable first moments abroad — fancy restaurants, stunning sights, and a rare sense of teenage normalcy. Sparks are very much flying.",
-                ChapterNumber = 11
+                BookId = "1",
+                AfterChapter = 11,
+                ChapterNumber = 11,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -127,7 +163,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 12 Discussion",
                 Body = "Chapter Title: Meeting Van Houten\n\nChapter Summary: Hazel finally meets Peter Van Houten, the author she idolized — only to discover he is drunk, bitter, and cruel. The encounter shatters her expectations, leaving her emotionally devastated.",
-                ChapterNumber = 12
+                BookId = "1",
+                AfterChapter = 12,
+                ChapterNumber = 12,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -135,7 +174,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 13 Discussion",
                 Body = "Chapter Title: Anne Frank House\n\nChapter Summary: Picking up the pieces after Van Houten’s meltdown, Hazel and Augustus make the most of Amsterdam. A magical day at the Anne Frank House brings them closer than ever — including a kiss that sparks applause.",
-                ChapterNumber = 13
+                BookId = "1",
+                AfterChapter = 13,
+                ChapterNumber = 13,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -143,7 +185,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 14 Discussion",
                 Body = "Chapter Title: First Love\n\nChapter Summary: Hazel and Augustus share intimate, honest moments about life, fear, and love. Their relationship becomes real — and beautifully vulnerable — as they choose each other despite uncertainty.",
-                ChapterNumber = 14
+                BookId = "1",
+                AfterChapter = 14,
+                ChapterNumber = 14,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -151,7 +196,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 15 Discussion",
                 Body = "Chapter Title: The News\n\nChapter Summary: The joy of Amsterdam is pierced by a heartbreaking reveal: Augustus’ cancer has returned — aggressively. Hazel’s world tilts, and the emotional balance of their relationship shifts.",
-                ChapterNumber = 15
+                BookId = "1",
+                AfterChapter = 15,
+                ChapterNumber = 15,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -159,7 +207,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 16 Discussion",
                 Body = "Chapter Title: Role Reversal\n\nChapter Summary: Back home, Hazel becomes Augustus’ support system as his health declines. Their roles reverse, testing the strength of their love and the promises they made to one another.",
-                ChapterNumber = 16
+                BookId = "1",
+                AfterChapter = 16,
+                ChapterNumber = 16,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -167,7 +218,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 17 Discussion",
                 Body = "Chapter Title: The Pre-Funeral\n\nChapter Summary: Augustus begins pre-funeral planning, asking Hazel and Isaac to write eulogies for him. The trio faces mortality head-on, mixing humor and heartbreak in a way only they can.",
-                ChapterNumber = 17
+                BookId = "1",
+                AfterChapter = 17,
+                ChapterNumber = 17,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -175,7 +229,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 18 Discussion",
                 Body = "Chapter Title: Hazel’s Eulogy\n\nChapter Summary: Hazel delivers her eulogy to Augustus privately — raw, honest, and deeply emotional. Their love story reaches a devastatingly beautiful turning point.",
-                ChapterNumber = 18
+                BookId = "1",
+                AfterChapter = 18,
+                ChapterNumber = 18,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -183,7 +240,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 19 Discussion",
                 Body = "Chapter Title: Goodbye, Augustus\n\nChapter Summary: Augustus passes away, leaving Hazel heartbroken but forever changed. The reality of loss hits with full force as she navigates grief, memories, and love that refuses to fade.",
-                ChapterNumber = 19
+                BookId = "1",
+                AfterChapter = 19,
+                ChapterNumber = 19,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -191,7 +251,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 20 Discussion",
                 Body = "Chapter Title: The Funeral\n\nChapter Summary: Hazel struggles through the funeral and the aftermath, surrounded by people who never understood Augustus the way she did. Isaac provides comfort with brutal, loving honesty.",
-                ChapterNumber = 20
+                BookId = "1",
+                AfterChapter = 20,
+                ChapterNumber = 20,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -199,7 +262,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 21 Discussion",
                 Body = "Chapter Title: Unfinished Business\n\nChapter Summary: Hazel seeks closure but finds frustration when Van Houten reenters her life unexpectedly. Answers remain elusive, but an important truth begins to emerge.",
-                ChapterNumber = 21
+                BookId = "1",
+                AfterChapter = 21,
+                ChapterNumber = 21,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -207,7 +273,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 22 Discussion",
                 Body = "Chapter Title: The Missing Pages\n\nChapter Summary: Isaac reveals that Augustus had been writing something for Hazel before he died. A new mystery builds — one that might hold the kind of closure Hazel desperately needs.",
-                ChapterNumber = 22
+                BookId = "1",
+                AfterChapter = 22,
+                ChapterNumber = 22,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -215,7 +284,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 23 Discussion",
                 Body = "Chapter Title: Augustus’ Words\n\nChapter Summary: Hazel tracks down the missing pages of Augustus’ writing. Her love for him — and his love for her — lives on through words that continue to change her.",
-                ChapterNumber = 23
+                BookId = "1",
+                AfterChapter = 23,
+                ChapterNumber = 23,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -223,7 +295,10 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 24 Discussion",
                 Body = "Chapter Title: A Love That Stays\n\nChapter Summary: Hazel reads Augustus’ final letter — a breathtaking, soul-stirring goodbye that reframes grief, love, and what it means to leave a mark on someone’s life.",
-                ChapterNumber = 24
+                BookId = "1",
+                AfterChapter = 24,
+                ChapterNumber = 24,
+                LitClubId = null
             },
             new LitClubApi.Domain.Thread
             {
@@ -231,9 +306,30 @@ public static class SeedThreads
                 Author = adminAuthor,
                 Title = "Chapter 25 Discussion",
                 Body = "Chapter Title: Okay\n\nChapter Summary: Hazel reflects on Augustus’ final words and the impact of their love. Through grief, she finds peace — and a belief that joy is possible even after unimaginable loss.",
-                ChapterNumber = 25
+                BookId = "1",
+                AfterChapter = 25,
+                ChapterNumber = 25,
+                LitClubId = null
             }
         };
+
+        // --- LitClub-specific threads (Fans of John Green, LitClubId = "1") ---
+        // One per chapter, same book + afterChapter, but scoped to the club.
+        var litClubThreads = new List<LitClubApi.Domain.Thread>();
+        for (int chapter = 1; chapter <= 25; chapter++)
+        {
+            litClubThreads.Add(new LitClubApi.Domain.Thread
+            {
+                Id = $"fans-john-green-thread-{chapter}",
+                Author = adminAuthor,
+                Title = $"Fans of John Green – Chapter {chapter} Thread",
+                Body = $"Club-only discussion for Chapter {chapter} of The Fault in Our Stars.\n\nThis thread is visible under the My LitClub tab for members of 'Fans of John Green'.",
+                BookId = "1",
+                AfterChapter = chapter,
+                ChapterNumber = chapter,
+                LitClubId = "1"
+            });
+        }
 
         // Use a "now" reference for relative timestamps
         var now = DateTime.UtcNow;
@@ -296,13 +392,20 @@ public static class SeedThreads
 
         // ---------- Upserts ----------
 
-        // 1) Upsert threads (partition key = thread id)
+        // 1) Upsert GLOBAL threads
         foreach (var t in chapterThreads)
+        {
+            // PK is /threadId, which mirrors Id
+            await container.UpsertItemAsync(t, new PartitionKey(t.Id));
+        }
+
+        // 2) Upsert LitClub threads for "Fans of John Green" (LitClubId = "1")
+        foreach (var t in litClubThreads)
         {
             await container.UpsertItemAsync(t, new PartitionKey(t.Id));
         }
 
-        // 2) Compute reply counts for parent comments (so they display accurately)
+        // 3) Compute reply counts for parent comments (so they display accurately)
         var replyCounts = replies
             .Where(r => !string.IsNullOrEmpty(r.ParentCommentId))
             .GroupBy(r => r.ParentCommentId!)
@@ -314,7 +417,7 @@ public static class SeedThreads
                 c.ReplyCount = rc;
         }
 
-        // 3) Upsert comments and replies (partition key = parent thread id)
+        // 4) Upsert comments and replies (partition key = parent thread id)
         foreach (var c in comments)
         {
             await container.UpsertItemAsync(c, new PartitionKey(c.ThreadId));
@@ -326,3 +429,5 @@ public static class SeedThreads
         }
     }
 }
+
+/* end SeedThreads.cs */
