@@ -102,7 +102,7 @@ export default function ThreadScreen() {
             setLoadingThread(true);
             setError(null);
             try {
-                const t = await getThread(threadId);
+                const t = await getThread(threadId, CURRENT_USER_ID);
                 if (!mounted) return;
                 setThread(t);
                 await loadInitial();
