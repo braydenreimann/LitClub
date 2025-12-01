@@ -20,6 +20,7 @@ export type ThreadResponse = {
     commentCount: number;
     score: number;
     isDeleted: boolean;
+    userVote?: VoteDirection | null;
 };
 
 export type CommentResponse = {
