@@ -28,3 +28,9 @@ export function toDomainBook(dto: BookResponse): Book {
         chapterThreadIds: dto.chapterThreadIds ?? []
     }
 }
+
+type ListBooksResponse = components["schemas"]["ListBooksResponse"];
+
+export function toDomainBooks(dto: ListBooksResponse): Book[] {
+    return (dto.books ?? []).map(toDomainBook);
+}
