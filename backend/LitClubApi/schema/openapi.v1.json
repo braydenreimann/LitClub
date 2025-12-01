@@ -2794,12 +2794,17 @@
       },
       "LibraryBookResponse": {
         "required": [
+          "bookId",
           "id",
           "status"
         ],
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "bookId": {
             "type": "string",
             "nullable": true
           },

@@ -1626,6 +1626,7 @@ export interface components {
         };
         LibraryBookResponse: {
             id: string | null;
+            bookId: string | null;
             status: components["schemas"]["ShelfStatusContract"];
             /** Format: date */
             startedReading?: string | null;
