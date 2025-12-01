@@ -785,6 +785,13 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3193,6 +3200,11 @@
           },
           "isDeleted": {
             "type": "boolean"
+          },
+          "userVote": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false

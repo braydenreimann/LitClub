@@ -1729,6 +1729,8 @@ export interface components {
             /** Format: int32 */
             score?: number;
             isDeleted?: boolean;
+            /** Format: int32 */
+            userVote?: number | null;
         };
         ThreadVoteResponse: {
             threadId: string | null;
@@ -1898,7 +1900,9 @@ export interface operations {
     };
     threads: {
         parameters: {
-            query?: never;
+            query?: {
+                userId?: string;
+            };
             header?: never;
             path: {
                 threadId: string;
