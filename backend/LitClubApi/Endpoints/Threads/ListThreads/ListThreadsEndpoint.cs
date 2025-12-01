@@ -1,3 +1,5 @@
+/* begin Threads/ListThreads/ListThreadsEndpoint.cs */
+
 using Ardalis.ApiEndpoints;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
@@ -20,51 +22,73 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
     {
         try
         {
-            // WHERE
-            var conditions = new List<string> { "c.itemType = 'thread'", "c.IsDeleted = false" };
-            var qd = new QueryDefinition("SELECT * FROM c");
+            // WHERE conditions + parameter bag
+            var conditions = new List<string>
+            {
+                "c.itemType = 'thread'",
+                "c.IsDeleted = false"
+            };
+
+            var parameters = new Dictionary<string, object>();
 
             if (!string.IsNullOrWhiteSpace(request.BookId))
             {
                 conditions.Add("c.BookId = @bookId");
-                qd = qd.WithParameter("@bookId", request.BookId);
+                parameters["@bookId"] = request.BookId!;
             }
 
             if (!string.IsNullOrWhiteSpace(request.LitClubId))
             {
                 conditions.Add("c.LitClubId = @litClubId");
-                qd = qd.WithParameter("@litClubId", request.LitClubId);
+                parameters["@litClubId"] = request.LitClubId!;
             }
 
             if (!string.IsNullOrWhiteSpace(request.UserId))
             {
                 conditions.Add("c.Author.AuthorId = @userId");
-                qd = qd.WithParameter("@userId", request.UserId);
+                parameters["@userId"] = request.UserId!;
             }
 
-            var whereSql = $" WHERE {string.Join(" AND ", conditions)} ";
+            if (request.AfterChapter.HasValue)
+            {
+                conditions.Add("c.AfterChapter = @afterChapter");
+                parameters["@afterChapter"] = request.AfterChapter.Value;
+            }
+
+            var whereSql = conditions.Count > 0
+                ? " WHERE " + string.Join(" AND ", conditions)
+                : string.Empty;
 
             // ORDER BY
             var sort = (request.Sort ?? "new").Trim().ToLowerInvariant();
             var orderSql = sort == "top"
-                ? "ORDER BY c.Score DESC, c.Created DESC"
-                : "ORDER BY c.Created DESC";
+                ? " ORDER BY c.Score DESC, c.Created DESC"
+                : " ORDER BY c.Created DESC";
 
-            var sql = qd.QueryText + whereSql + orderSql;
-            var final = new QueryDefinition(sql);
+            var sql = "SELECT * FROM c" + whereSql + orderSql;
 
-            // copy parameters into final
-            foreach (var p in GetParameters(qd))
-                final = final.WithParameter(p.Key, p.Value);
+            var queryDefinition = new QueryDefinition(sql);
+            foreach (var kvp in parameters)
+            {
+                queryDefinition = queryDefinition.WithParameter(kvp.Key, kvp.Value);
+            }
+
+            // Page size defaults + cap
+            var pageSize = request.PageSize ?? 20;
+            if (pageSize <= 0) pageSize = 20;
+            if (pageSize > 100) pageSize = 100;
 
             var options = new QueryRequestOptions
             {
-                MaxItemCount = request.PageSize
-                // Cross-partition enabled automatically when no partition key supplied
+                MaxItemCount = pageSize
+                // Cross-partition is enabled automatically when no PK is supplied
             };
 
             var iterator = cosmosContext.Threads
-                .GetItemQueryIterator<Domain.Thread>(final, request.ContinuationToken, options);
+                .GetItemQueryIterator<Domain.Thread>(
+                    queryDefinition,
+                    request.ContinuationToken,
+                    options);
 
             var items = new List<ThreadResponse>();
             FeedResponse<Domain.Thread>? page = null;
@@ -90,17 +114,6 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
             return StatusCode(500, "Unable to access database");
         }
     }
-
-    // Reflection-free helper to extract parameters from a QueryDefinition built above.
-    private static IReadOnlyList<KeyValuePair<string, object>> GetParameters(QueryDefinition qd)
-    {
-        // The SDK doesn't expose parameters; we reconstruct by tracking our own,
-        // but here we only added via WithParameter and immediately materialize into 'final' using this helper.
-        // Since we can't access internals portably, we re-parse by storing alongside; however to keep this file self-contained,
-        // we fall back to building 'final' from scratch above and adding the same parameter values we already have in scope.
-        // In this context, qd only contains the parameters we added above; we keep them in a list here:
-        // NOTE: We can't actually read them back; so instead of relying on this, we built 'final' parameters inline.
-        // To keep code compiling, return empty. We add parameters directly to 'final' above.
-        return [];
-    }
 }
+
+/* end Threads/ListThreads/ListThreadsEndpoint.cs */

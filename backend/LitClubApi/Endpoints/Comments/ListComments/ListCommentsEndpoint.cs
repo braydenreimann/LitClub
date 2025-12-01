@@ -52,17 +52,21 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
                 if (!string.IsNullOrWhiteSpace(request.UserId) && baseList.Count > 0)
                 {
                     var votesQ = new QueryDefinition(@"
-        SELECT c.CommentId, c.Vote FROM c
+        SELECT * FROM c
         WHERE c.threadId = @t
-          AND c.UserId = @u
+          AND (
+               (IS_DEFINED(c.userId) AND c.userId = @u)
+            OR (IS_DEFINED(c.UserId) AND c.UserId = @u)
+          )
           AND (
                (IS_DEFINED(c.itemType) AND c.itemType = 'commentVote')
             OR (IS_DEFINED(c.ItemType) AND c.ItemType = 'commentVote')
-          )")
+          )
+          AND (IS_DEFINED(c.commentId) OR IS_DEFINED(c.CommentId))")
                         .WithParameter("@t", request.ThreadId)
                         .WithParameter("@u", request.UserId);
 
-                    var voteIt = cosmosContext.Threads.GetItemQueryIterator<dynamic>(
+                    var voteIt = cosmosContext.Threads.GetItemQueryIterator<CommentVote>(
                         votesQ, null, new QueryRequestOptions { PartitionKey = pk });
 
                     votesByCommentId = new Dictionary<string, sbyte>(baseList.Count);
@@ -71,7 +75,11 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
                         var votePage = await voteIt.ReadNextAsync(cancellationToken);
                         foreach (var v in votePage)
                         {
-                            string cid = v.CommentId;
+                            if (v is null) continue;
+
+                            string? cid = v.CommentId;
+                            if (string.IsNullOrWhiteSpace(cid)) continue; // skip non-comment vote docs defensively
+
                             sbyte vote = (sbyte)v.Vote;
                             // Keep the latest occurrence; duplicates shouldn't happen, but be robust.
                             votesByCommentId[cid] = vote;
