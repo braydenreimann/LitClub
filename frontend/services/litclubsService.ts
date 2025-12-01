@@ -1,3 +1,5 @@
+/* begin litclubsService.ts */
+
 import { client } from 'client';
 import { LitClub } from '../domain/models'
 import { type AddLitClubInput, toAddLitClubRequest, toDomainLitClub } from '@/api-mappers/litclubs/litclubs-mappers';
@@ -27,3 +29,5 @@ export async function createLitClub(input: AddLitClubInput): Promise<LitClub | n
         throw err;
     }
 }
+
+/* end litclubsService.ts */

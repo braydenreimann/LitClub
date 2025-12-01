@@ -1,3 +1,5 @@
+/* begin commentsService.ts */
+
 import { client } from "client";
 import type { VoteDirection, CommentResponse, CommentListResponse } from "../domain/models/thread-types";
 
@@ -118,3 +120,5 @@ export async function voteComment(
     const userVote = toVoteDirection((data as any).userVote);
     return { score, userVote };
 }
+
+/* end commentsService.ts */

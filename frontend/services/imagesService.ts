@@ -1,7 +1,6 @@
-import { client } from 'client';
+/* begin imagesService.ts */
+
 import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Edition, Book, LibraryBook, DisplayBook } from '../domain/models';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
@@ -15,7 +14,7 @@ export async function getUriRead(Path: string | undefined): Promise<string> {
 
     try {
         const response = await fetch(`${API_BASE_URL}/generate-sas-read/${Path}`)
-        
+
         if (!response.ok) {
             console.warn('Failed to fetch Uri for read', response.status)
             throw new Error(`HTTP error! Status: ${response.status}`)
@@ -53,3 +52,5 @@ export async function getUriWrite(Path: string | undefined): Promise<string> {
         throw err;
     }
 }
+
+/* end imagesService.ts */

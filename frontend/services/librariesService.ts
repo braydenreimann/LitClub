@@ -1,8 +1,9 @@
+/* begin librariesService.ts */
+
 import { LibraryBook } from '../domain/models'
 import { client } from 'client';
 import { toDomainLibraryBook } from '@/api-mappers/libraries/libraries-mappers';
 import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 // Fallback to your LAN IP if not available
@@ -10,7 +11,7 @@ const LAN_IP = hostFromExpo ?? '10.0.0.252';
 const API_BASE_URL = `http://${LAN_IP}:5112`;
 
 
-export async function getLibraryBook(ownerId: string, libraryBookId: string): Promise<LibraryBook | null> { 
+export async function getLibraryBook(ownerId: string, libraryBookId: string): Promise<LibraryBook | null> {
     try {
         const { data, error } = await client.GET("/libraries/{ownerId}/libraryBooks/{libraryBookId}", {
             params: { path: { ownerId, libraryBookId } },
@@ -44,14 +45,14 @@ export async function editLibraryBookStatus(id: string, libraryBookIdInput: stri
 
     try {
         const response = await fetch(`${API_BASE_URL}/${id}/libraryBooks/${libraryBookIdInput}`,
-        {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
 
-            },
-            body: JSON.stringify(body),
-        }
+                },
+                body: JSON.stringify(body),
+            }
         );
 
         if (!response.ok) {
@@ -59,9 +60,11 @@ export async function editLibraryBookStatus(id: string, libraryBookIdInput: stri
         }
 
         const data = await response.json()
-        return data ? toDomainLibraryBook(data) : null; 
+        return data ? toDomainLibraryBook(data) : null;
     } catch (err) {
         console.error("Error in Library Status update")
         return null;
     }
 }
+
+/* end librariesService.ts */

@@ -1,3 +1,5 @@
+/* begin usersService.ts */
+
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, Edition, Book, LibraryBook, DisplayBook } from '../domain/models';
@@ -142,7 +144,7 @@ export async function getBookshelfByStatus(userId: string, status: number): Prom
         const displayBooks: DisplayBook[] = fullBooks
             .filter((b): b is Book => b !== null) // TypeScript type guard
             .map((b, index) => ({
-                id: b.id, 
+                id: b.id,
                 title: b.title,
                 coverImageUrl: b.coverImageUrl// use the real book title now
             }));
@@ -155,23 +157,24 @@ export async function getBookshelfByStatus(userId: string, status: number): Prom
 }
 
 export async function editUser(input: EditUserInput) {
-  try {
-    const body = toEditUserBody(input);
+    try {
+        const body = toEditUserBody(input);
 
-    const { data, error } = await client.PATCH("/users/{userId}", {
-      params: { path: { userId: input.userId } },
-      body,
-    });
+        const { data, error } = await client.PATCH("/users/{userId}", {
+            params: { path: { userId: input.userId } },
+            body,
+        });
 
-    if (error) {
-      console.error("Error editing user:", error);
-      return { success: false, error };
+        if (error) {
+            console.error("Error editing user:", error);
+            return { success: false, error };
+        }
+
+        return { success: true, data };
+    } catch (err) {
+        console.error("Unexpected error editing user:", err);
+        return { success: false, error: err };
     }
-
-    return { success: true, data };
-  } catch (err) {
-    console.error("Unexpected error editing user:", err);
-    return { success: false, error: err };
-  }
 }
 
+/* end usersService.ts */
