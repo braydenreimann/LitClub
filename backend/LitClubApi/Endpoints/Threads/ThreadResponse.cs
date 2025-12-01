@@ -17,4 +17,5 @@ public sealed class ThreadResponse
     public int CommentCount { get; init; }
     public int Score { get; init; }
     public bool IsDeleted { get; init; }
+    public sbyte? UserVote { get; init; }
 }
