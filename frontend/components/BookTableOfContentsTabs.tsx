@@ -160,11 +160,6 @@ function BookTableOfContentsTabs({
         });
     };
 
-    const onPressChapter = (chapterNumber: number) => {
-        // Preserve the original behavior: jump directly to the main chapter thread page
-        router.push(`/threads/thread-${chapterNumber}`);
-    };
-
     const loadThreadsForChapter = async (chapterNumber: number, tab: TabKey) => {
         if (!bookId) return;
 
@@ -251,7 +246,8 @@ function BookTableOfContentsTabs({
         router.push(`/threads/${thread.id}`);
     };
 
-    const contextLabel = activeTab === "library" ? "All Readers" : "LitClub Threads";
+    const contextLabel =
+        activeTab === "library" ? "All Readers" : "LitClub Threads";
 
     return (
         <View style={styles.container}>
@@ -314,7 +310,7 @@ function BookTableOfContentsTabs({
                         {Array.from({ length: totalChapters }, (_, i) => i + 1).map(
                             (chapterNumber) => {
                                 const isExpanded = !!expandedChapters[chapterNumber];
-                                const threads =
+                                const storedThreads =
                                     chapterThreads[activeTab][chapterNumber] ?? [];
                                 const isLoadingThreads =
                                     chapterThreadsLoading[activeTab][chapterNumber] ?? false;
@@ -325,17 +321,36 @@ function BookTableOfContentsTabs({
                                 const hasLitClubContext =
                                     !!litClubId && typeof litClubId === "string";
 
+                                // Filter threads by context:
+                                // - My Library: only global threads (no litClubId)
+                                // - My LitClub: only threads for this litClubId
+                                const threads: ThreadSummary[] =
+                                    activeTab === "library"
+                                        ? storedThreads.filter(
+                                            (t) => !t.litClubId
+                                        )
+                                        : activeTab === "litclub"
+                                            ? storedThreads.filter(
+                                                (t) =>
+                                                    !!t.litClubId &&
+                                                    !!litClubId &&
+                                                    t.litClubId === litClubId
+                                            )
+                                            : storedThreads;
+
                                 return (
                                     <View key={chapterNumber}>
                                         <View style={styles.chapterRowOuter}>
                                             {/* Main chapter row */}
                                             <Pressable
                                                 style={styles.chapterRow}
-                                                onPress={() => onPressChapter(chapterNumber)}
+                                                onPress={() => toggleExpandChapter(chapterNumber)}
                                             >
                                                 <View style={styles.chapterLeft}>
                                                     <Pressable
-                                                        onPress={() => toggleExpandChapter(chapterNumber)}
+                                                        onPress={() =>
+                                                            toggleExpandChapter(chapterNumber)
+                                                        }
                                                         style={styles.expandButton}
                                                     >
                                                         {isExpanded ? (
@@ -365,7 +380,9 @@ function BookTableOfContentsTabs({
                                                 <View style={styles.chapterRight}>
                                                     <CustomCheckbox
                                                         value={!!checkedChapters[chapterNumber]}
-                                                        onChange={() => toggleChapterCheckbox(chapterNumber)}
+                                                        onChange={() =>
+                                                            toggleChapterCheckbox(chapterNumber)
+                                                        }
                                                     />
                                                 </View>
                                             </Pressable>
@@ -380,8 +397,8 @@ function BookTableOfContentsTabs({
                                                                 styles.emptyThreadsText,
                                                             ]}
                                                         >
-                                                            Open this book from a LitClub to see your club
-                                                            threads.
+                                                            Open this book from a LitClub to see your
+                                                            club threads.
                                                         </Text>
                                                     ) : isLoadingThreads ? (
                                                         <View style={styles.threadLoadingRow}>
@@ -431,7 +448,8 @@ function BookTableOfContentsTabs({
                                                                         ]}
                                                                         numberOfLines={1}
                                                                     >
-                                                                        {thread.title || "(Untitled thread)"}
+                                                                        {thread.title ||
+                                                                            "(Untitled thread)"}
                                                                     </Text>
                                                                 </View>
                                                                 <View style={styles.threadMeta}>
