@@ -65,7 +65,7 @@ export async function addTopLevelComment(
 ) {
     const { data, error } = await client.POST("/threads/{threadId}/comments", {
         params: { path: { threadId } },
-        body: { author, body, parentCommentId: "" },
+        body: { author, body, parentCommentId: null },
     });
     if (error || !data) throw new Error("Failed to add comment.");
     return data as CommentResponse;

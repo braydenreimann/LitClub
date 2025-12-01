@@ -1,7 +1,7 @@
 /* begin threadsService.ts */
 
 import { client } from "client";
-import type { ThreadResponse, Author } from "../domain/models/thread-types";
+import type { ThreadResponse, Author, VoteDirection } from "../domain/models/thread-types";
 
 export async function getThread(threadId: string): Promise<ThreadResponse> {
     const { data, error } = await client.GET("/threads/{threadId}", {
@@ -57,6 +57,11 @@ export type ThreadSummary = {
     title: string;
     upvotes: number;
     commentCount: number;
+    /**
+     * When present, this thread belongs to a LitClub.
+     * When null/undefined, it's a global "My Library" thread.
+     */
+    litClubId?: string | null;
 };
 
 /**
@@ -107,8 +112,39 @@ export async function getThreadsForChapter(params: {
             title: t.title ?? "(Untitled thread)",
             upvotes: (t as any).score ?? (t as any).Score ?? 0,
             commentCount: (t as any).commentCount ?? 0,
+            litClubId: (t as any).litClubId ?? null,
         }))
         .filter((t) => t.id);
+}
+
+/** Narrow server number -> union -1 | 0 | 1 (same helper as commentsService) */
+function toVoteDirection(x: unknown): VoteDirection {
+    const n = Number(x);
+    if (Number.isNaN(n)) return 0;
+    if (n > 0) return 1;
+    if (n < 0) return -1;
+    return 0;
+}
+
+/**
+ * Cast/flip/unvote a vote for a thread.
+ * Mirrors the comment voting API shape.
+ */
+export async function voteThread(
+    threadId: string,
+    userId: string,
+    vote: VoteDirection
+): Promise<{ score: number; userVote: VoteDirection }> {
+    const { data, error } = await client.POST("/threads/{threadId}/vote", {
+        params: { path: { threadId } },
+        body: { userId, vote },
+    });
+
+    if (error || !data) throw new Error("Failed to vote on thread.");
+
+    const score = Number((data as any).score ?? 0);
+    const userVote = toVoteDirection((data as any).userVote);
+    return { score, userVote };
 }
 
 /* end threadsService.ts */
