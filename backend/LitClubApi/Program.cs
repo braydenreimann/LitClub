@@ -157,7 +157,7 @@ using (var scope = app.Services.CreateScope())
 
     string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
     string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
-    string exist = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "bookdata.csv");
+    string exist = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "bookdata.csv");
 
     List<Book> booklist = CSVParserInsert.Parse(exist);
 
@@ -173,7 +173,7 @@ using (var scope = app.Services.CreateScope())
             continue;
         }
 
-        string coverPathLoop = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", $"{b.CoverImageUrl}");
+        string coverPathLoop = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "BookCovers", $"{b.CoverImageUrl}");
 
         string blobNameLoop = $"{b.CoverImageUrl}";
         var blobClientLoop = blobContainer.GetBlobClient(blobNameLoop);
@@ -185,7 +185,7 @@ using (var scope = app.Services.CreateScope())
 
     }
 
-    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", "the-fault-in-our-stars.jpg");
+    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "BookCovers", "the-fault-in-our-stars.jpg");
 
     string blobName = "the-fault-in-our-stars.jpg";
     var blobClient = blobContainer.GetBlobClient(blobName);
@@ -195,7 +195,7 @@ using (var scope = app.Services.CreateScope())
         await blobClient.UploadAsync(stream, overwrite: true);
     }
 
-    coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata",  "John-Green.png"); //Default profile image for John Green
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "John-Green.png"); //Default profile image for John Green
 
     blobName = "John-Green.png";
     blobClient = blobContainer.GetBlobClient(blobName);
