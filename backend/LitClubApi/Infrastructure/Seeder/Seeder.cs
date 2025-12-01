@@ -45,7 +45,8 @@ public static class SeedThreads
                 BookId = "1",
                 AfterChapter = 1,
                 ChapterNumber = 1,
-                LitClubId = null
+                LitClubId = null,
+                Score = 552
             },
             new LitClubApi.Domain.Thread
             {
