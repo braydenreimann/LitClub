@@ -1,4 +1,5 @@
 using Ardalis.ApiEndpoints;
+using LitClubApi.Domain;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
@@ -35,7 +36,26 @@ public class Get(ICosmosContext cosmosContext) : EndpointBaseAsync
             if (thread.IsDeleted)
                 return NotFound();
 
-            return Ok(thread.ToResponse());
+            sbyte? userVote = null;
+            if (!string.IsNullOrWhiteSpace(request.UserId))
+            {
+                var voteId = VoteIds.For(request.ThreadId, request.UserId);
+                try
+                {
+                    var vote = await cosmosContext.Threads.ReadItemAsync<ThreadVote>(
+                        id: voteId,
+                        partitionKey: pk,
+                        cancellationToken: cancellationToken);
+
+                    userVote = vote.Resource.Vote;
+                }
+                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    // no vote for this user/thread, keep null
+                }
+            }
+
+            return Ok(thread.ToResponse(userVote));
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
