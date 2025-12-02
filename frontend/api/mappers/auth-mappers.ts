@@ -1,4 +1,4 @@
-import { components } from "schema/openapi-types"
+import { components } from "@/api/schema/openapi-types"
 
 type LoginRequest = components["schemas"]["LoginRequest"];
 

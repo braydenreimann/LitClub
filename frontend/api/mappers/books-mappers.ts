@@ -1,4 +1,4 @@
-import { components } from "@/schema/openapi-types";
+import { components } from "@/api/schema/openapi-types";
 import type { Book, Edition } from "../../domain/models"
 
 type BookResponse = components["schemas"]["BookResponse"];

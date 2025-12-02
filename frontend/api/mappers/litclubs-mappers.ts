@@ -1,6 +1,6 @@
 // /frontend/api-mappers/litclubs/litclubs-mappers.ts
 
-import type { components } from '@/schema/openapi-types';
+import type { components } from '@/api/schema/openapi-types';
 import type { LitClub } from '@/domain/models';
 
 type AddLitClubRequest = components['schemas']['AddLitClubRequest'];

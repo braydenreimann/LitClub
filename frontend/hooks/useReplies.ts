@@ -1,7 +1,7 @@
 // hooks/useReplies.ts
 import { useCallback, useRef, useState } from "react";
 import type { CommentResponse } from "@/domain/models/thread-types";
-import { getReplies } from "@/services/commentsService";
+import { getReplies } from "@/api/services/commentsService";
 
 /**
  * Encapsulates replies list state, pagination, and optimistic mutations

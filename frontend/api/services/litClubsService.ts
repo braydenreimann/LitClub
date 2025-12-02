@@ -1,13 +1,13 @@
 // /frontend/services/litClubsService.ts
 
-import { client } from 'client';
+import { client } from '@/api/client';
 import type { LitClub } from '@/domain/models';
 import {
     type AddLitClubInput,
     toAddLitClubRequest,
     toDomainLitClub,
 } from '@/api/mappers/litclubs-mappers';
-import type { components } from '@/schema/openapi-types';
+import type { components } from '@/api/schema/openapi-types';
 
 // Backend DTO for listing clubs
 type ListLitClubsResponse = components['schemas']['ListLitClubsResponse'];

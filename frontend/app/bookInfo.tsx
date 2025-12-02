@@ -16,15 +16,15 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { globalStyles } from '@/styles/globalStyles';
 
 import { Book, User } from '../domain/models';
-import { getBook } from '../services/booksService';
-import { getUser } from '../services/usersService';
-import { getUriRead } from '@/services/imagesService';
+import { getBook } from '../api/services/booksService';
+import { getUser } from '../api/services/usersService';
+import { getUriRead } from '@/api/services/imagesService';
 import BookTableOfContentsTabs from '@/components/BookTableOfContentsTabs';
 import {
     getLibraryBookForBook,
     removeBookFromLibrary,
     setBookShelfStatus,
-} from '../services/librariesService';
+} from '../api/services/librariesService';
 
 // at top or bottom of bookInfo.tsx
 export const options = {

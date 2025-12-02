@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { View, Text, Pressable, StyleSheet, ActivityIndicator, Image } from "react-native";
 import { colors } from "@/theme";
 import type { CommentResponse, Author } from "@/domain/models/thread-types";
-import { addReply, voteComment } from "@/services/commentsService";
+import { addReply, voteComment } from "@/api/services/commentsService";
 import VoteButtons from "@/components/threads/VoteButtons";
 import HiddenToggle from "@/components/threads/HiddenToggle";
 import ReplyComposer from "@/components/threads/ReplyComposer";

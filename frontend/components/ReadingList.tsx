@@ -8,9 +8,9 @@ import { colors } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
 
 import { User, DisplayBook } from '../domain/models';
-import { getUser } from '@/services/usersService';
-import { getBookshelfByStatus } from '../services/librariesService';
-import { getUriRead } from '@/services/imagesService';
+import { getUser } from '@/api/services/usersService';
+import { getBookshelfByStatus } from '../api/services/librariesService';
+import { getUriRead } from '@/api/services/imagesService';
 
 // Status from backend enum: 0 | 1 | 2 | 3
 type ShelfStatus = 0 | 1 | 2 | 3;

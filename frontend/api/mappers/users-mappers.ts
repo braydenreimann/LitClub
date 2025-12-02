@@ -1,6 +1,6 @@
 // /frontend/api-mappers/users/users-mappers.ts
 
-import { components } from '@/schema/openapi-types';
+import { components } from '@/api/schema/openapi-types';
 import type { User } from '@/domain/models';
 
 type UserResponse = components['schemas']['UserResponse'];

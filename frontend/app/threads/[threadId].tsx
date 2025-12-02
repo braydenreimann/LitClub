@@ -7,7 +7,7 @@ import { colors } from "@/theme";
 import { globalStyles } from "@/styles/globalStyles";
 import type { ThreadResponse, CommentResponse, Author } from "@/domain/models/thread-types";
 import type { User } from "@/domain/models";
-import { getThread, voteThread } from "@/services/threadsService";
+import { getThread, voteThread } from "@/api/services/threadsService";
 import CommentItem from "@/components/threads/CommentItem";
 import AddCommentBar from "@/components/threads/AddCommentBar";
 import HiddenToggle from "@/components/threads/HiddenToggle";
@@ -15,7 +15,7 @@ import { useCommentsList } from "@/hooks/useCommentsList";
 import { MessageCircle } from "lucide-react-native";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { isHiddenByScore } from "@/constants/threadVisibility";
-import { getUser } from "@/services/usersService";
+import { getUser } from "@/api/services/usersService";
 import VoteButtons from "@/components/threads/VoteButtons";
 
 const PAGE_SIZE = 20;

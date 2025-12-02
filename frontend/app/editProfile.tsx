@@ -14,15 +14,12 @@ import {
 import { globalStyles } from '../styles/globalStyles';
 import { colors, fonts } from '../theme';
 import { User } from '../domain/models';
-import { editUser } from '../services/usersService';
-import { components } from '../schema/openapi-types';
-import { Modal, Pressable } from 'react-native';
+import { editUser } from '../api/services/usersService';
+import { Modal } from 'react-native';
 
 import { useSession } from '@/auth/authContext';
 import { type LoginInput } from '@/api/mappers/auth-mappers';
 import { EditUserInput } from '../api/mappers/users-mappers';
-import { verifyPassword } from '@/services/authService';
-import { bool, boolean } from 'yup';
 
 const pronounOptions = [
   'he', 'him', 'his',

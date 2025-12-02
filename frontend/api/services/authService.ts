@@ -1,6 +1,6 @@
 /* begin authService.ts */
 
-import { client } from "@/client";
+import { client } from "@/api/client";
 
 export async function verifyPassword(email: string, password: string): Promise<boolean> {
   try {

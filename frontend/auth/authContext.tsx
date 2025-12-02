@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
-import { client } from 'client';
+import { client } from '@/api/client';
 
 import {
   toLoginRequest,

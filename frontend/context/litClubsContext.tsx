@@ -9,7 +9,7 @@ import React, {
   type PropsWithChildren,
 } from 'react';
 import type { LitClub } from '@/domain/models';
-import { listLitClubs } from '@/services/litClubsService';
+import { listLitClubs } from '@/api/services/litClubsService';
 
 // Shape of the context
 interface LitClubContextType {

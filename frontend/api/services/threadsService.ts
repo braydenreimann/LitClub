@@ -1,7 +1,7 @@
 /* begin threadsService.ts */
 
-import { client } from "client";
-import type { ThreadResponse, Author, VoteDirection } from "../domain/models/thread-types";
+import { client } from "@/api/client";
+import type { ThreadResponse, Author, VoteDirection } from "../../domain/models/thread-types";
 
 export async function getThread(threadId: string, userId?: string): Promise<ThreadResponse> {
     const { data, error } = await client.GET("/threads/{threadId}", {

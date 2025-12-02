@@ -24,7 +24,7 @@ import { Book } from "@/domain/models";
 import {
     getThreadsForChapter,
     type ThreadSummary,
-} from "@/services/threadsService";
+} from "@/api/services/threadsService";
 
 type TabKey = "library" | "litclub";
 

@@ -10,8 +10,8 @@ import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { Book } from '@/domain/models';
-import { getBooks } from '@/services/booksService';
-import { getUriRead } from '@/services/imagesService';
+import { getBooks } from '@/api/services/booksService';
+import { getUriRead } from '@/api/services/imagesService';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 10;

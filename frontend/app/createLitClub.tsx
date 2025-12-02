@@ -17,8 +17,8 @@ import { Book, User } from '@/domain/models';
 import { useSession } from '@/auth/authContext';
 import { GenresSelector } from '@/components/genresSelector';
 
-import { getUser } from '@/services/usersService';
-import { createLitClub } from '@/services/litClubsService';
+import { getUser } from '@/api/services/usersService';
+import { createLitClub } from '@/api/services/litClubsService';
 import type { AddLitClubInput } from '@/api/mappers/litclubs-mappers';
 
 SplashScreen.preventAutoHideAsync();

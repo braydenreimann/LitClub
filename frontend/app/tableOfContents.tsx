@@ -10,7 +10,7 @@ import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Ionicons } from '@expo/vector-icons';
 import { globalStyles } from '@/styles/globalStyles';
 
-import { getBook } from '../services/booksService';
+import { getBook } from '../api/services/booksService';
 import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

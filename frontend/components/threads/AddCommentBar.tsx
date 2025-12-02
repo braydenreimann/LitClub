@@ -14,7 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@/theme";
 import type { Author, CommentResponse } from "@/domain/models/thread-types";
-import { addTopLevelComment, voteComment } from "@/services/commentsService";
+import { addTopLevelComment, voteComment } from "@/api/services/commentsService";
 
 type AddCommentBarProps = {
     threadId: string;

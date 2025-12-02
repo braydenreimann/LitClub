@@ -1,8 +1,8 @@
 // /frontend/services/usersService.ts
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User } from '../domain/models';
-import { client } from 'client';
+import { User } from '../../domain/models';
+import { client } from '@/api/client';
 import {
     toEditUserBody,
     type EditUserInput,

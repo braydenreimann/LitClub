@@ -1,7 +1,7 @@
 /* begin commentsService.ts */
 
-import { client } from "client";
-import type { VoteDirection, CommentResponse, CommentListResponse } from "../domain/models/thread-types";
+import { client } from "@/api/client";
+import type { VoteDirection, CommentResponse, CommentListResponse } from "../../domain/models/thread-types";
 
 /**
  * Fetch replies for a comment.

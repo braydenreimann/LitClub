@@ -1,6 +1,6 @@
 // /frontend/services/booksService.ts
 
-import { client } from 'client';
+import { client } from '@/api/client';
 import type { Book } from '@/domain/models';
 import { toDomainBook, toDomainBooks } from '@/api/mappers/books-mappers';
 

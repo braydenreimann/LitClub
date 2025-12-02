@@ -1,17 +1,15 @@
 // /frontend/services/librariesService.ts
 
-import { client } from 'client';
-import { LibraryBook, DisplayBook, Book } from '../domain/models';
+import { client } from '@/api/client';
+import { LibraryBook, DisplayBook, Book } from '../../domain/models';
 import { toDomainLibraryBook } from '@/api/mappers/libraries-mappers';
 import { getBook } from './booksService';
-import type { components } from '@/schema/openapi-types';
+import type { components } from '@/api/schema/openapi-types';
 
 // Backend enum: 0 | 1 | 2 | 3
 type ShelfStatus = components['schemas']['ShelfStatusContract'];
 type AddLibraryBookBody = components['schemas']['AddLibraryBookBody'];
 type EditLibraryBookBody = components['schemas']['EditLibraryBookBody'];
-type DeleteLibraryBookParams =
-    components['paths']['/libraries/{ownerId}/libraryBooks/{libraryBookId}']['delete']['parameters']['path'];
 
 // ---------------------------------------------------------------------------
 // Core helpers
@@ -128,9 +126,6 @@ export async function createLibraryBook(
 /**
  * Edit the status of an existing LibraryBook.
  * PATCH /libraries/{userId}/libraryBooks/{libraryBookId}
- *
- * NOTE: The OpenAPI path type requires { ownerId, userId, libraryBookId }.
- * In this app, ownerId === userId, so we pass both.
  */
 export async function editLibraryBookStatus(
     userId: string,
@@ -152,7 +147,6 @@ export async function editLibraryBookStatus(
             {
                 params: {
                     path: {
-                        ownerId: userId,      // 🔧 added to satisfy OpenAPI types
                         userId,
                         libraryBookId,
                     },
@@ -204,10 +198,16 @@ export async function deleteLibraryBook(
     libraryBookId: string
 ): Promise<boolean> {
     try {
-        const params: DeleteLibraryBookParams = { ownerId, libraryBookId };
         const { error } = await client.DELETE(
             '/libraries/{ownerId}/libraryBooks/{libraryBookId}',
-            { params: { path: params } }
+            {
+                params: {
+                    path: {
+                        ownerId,
+                        libraryBookId,
+                    },
+                },
+            }
         );
 
         if (error) {
@@ -240,46 +240,6 @@ export async function removeBookFromLibrary(
 // ---------------------------------------------------------------------------
 // Helpers for building lists / homepage sections
 // ---------------------------------------------------------------------------
-
-/**
- * Get DisplayBooks for all LibraryBooks with onPedastal === true.
- */
-// export async function getTopThree(
-//     ownerId: string
-// ): Promise<DisplayBook[] | null> {
-//     try {
-//         const libraryBooks = await getLibraryBooks(ownerId);
-//         const filtered = libraryBooks.filter((b) => b.onPedastal === true);
-
-//         const fullBooks: (Book | null)[] = await Promise.all(
-//             filtered.map(async (libBook) => {
-//                 if (!libBook.bookId) {
-//                     return null;
-//                 }
-//                 try {
-//                     const book = await getBook(libBook.bookId);
-//                     return book;
-//                 } catch (err) {
-//                     console.error(`Failed to fetch book ${libBook.bookId}`, err);
-//                     return null;
-//                 }
-//             })
-//         );
-
-//         const displayBooks: DisplayBook[] = fullBooks
-//             .filter((b): b is Book => b !== null)
-//             .map((b) => ({
-//                 id: b.id,
-//                 title: b.title,
-//                 coverImageUrl: b.coverImageUrl,
-//             }));
-
-//         return displayBooks;
-//     } catch (error) {
-//         console.error('Error fetching top three books:', error);
-//         return null;
-//     }
-// }
 
 /**
  * Get DisplayBooks for all LibraryBooks with a given status.
