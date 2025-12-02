@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Image } from 'react-native';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { colors } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
@@ -11,6 +11,7 @@ import { User, DisplayBook } from '../domain/models';
 import { getUser } from '@/api/services/usersService';
 import { getBookshelfByStatus } from '../api/services/librariesService';
 import { getUriRead } from '@/api/services/imagesService';
+import { pushBookDetail } from '@/navigation/routes';
 
 // Status from backend enum: 0 | 1 | 2 | 3
 type ShelfStatus = 0 | 1 | 2 | 3;
@@ -26,6 +27,7 @@ export default function ReadingList({ books, status, refreshKey }: ReadingListPr
     const [shelf, setShelf] = useState<DisplayBook[]>(books ?? []);
     const [loading, setLoading] = useState(!books);
     const [coverUris, setCoverUris] = useState<{ [id: string]: string }>({});
+    const router = useRouter();
 
     // Load user from session (via usersService)
     useEffect(() => {
@@ -95,28 +97,25 @@ export default function ReadingList({ books, status, refreshKey }: ReadingListPr
                     showsHorizontalScrollIndicator
                 >
                     {shelf.map((book) => (
-                        <Pressable key={book.id} style={styles.card}>
-                            <Link
-                                href={{
-                                    pathname: '/bookInfo',
-                                    params: { id: book.id },
+                        <Pressable
+                            key={book.id}
+                            style={styles.card}
+                            onPress={() => pushBookDetail(router, book.id)}
+                        >
+                            <Image
+                                source={
+                                    coverUris[book.id]
+                                        ? { uri: coverUris[book.id] }
+                                        : require('../assets/images/turkstra.jpg')
+                                }
+                                style={{
+                                    width: 120,
+                                    height: 180,
+                                    borderRadius: 8,
+                                    marginBottom: 6,
                                 }}
-                            >
-                                <Image
-                                    source={
-                                        coverUris[book.id]
-                                            ? { uri: coverUris[book.id] }
-                                            : require('../assets/images/turkstra.jpg')
-                                    }
-                                    style={{
-                                        width: 120,
-                                        height: 180,
-                                        borderRadius: 8,
-                                        marginBottom: 6,
-                                    }}
-                                    resizeMode="cover"
-                                />
-                            </Link>
+                                resizeMode="cover"
+                            />
                         </Pressable>
                     ))}
                 </ScrollView>

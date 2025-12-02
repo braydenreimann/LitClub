@@ -1,11 +1,10 @@
-import { View, ScrollView, Text, Pressable, Alert, ActivityIndicator, Dimensions, Image } from 'react-native';
-import Header from '../components/headerWithSearch';
+import { View, ScrollView, Text, Pressable, ActivityIndicator, Dimensions, Image } from 'react-native';
 import { globalStyles } from '@/styles/globalStyles';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { colors } from '../theme'
 import { StyleSheet } from 'react-native';
 
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
@@ -13,16 +12,16 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Book } from '@/domain/models';
 import { getBooks } from '@/api/services/booksService';
 import { getUriRead } from '@/api/services/imagesService';
+import { pushBookDetail } from '@/navigation/routes';
 
-const { width } = Dimensions.get('window');
+Dimensions.get('window');
 const CARD_MARGIN = 10;
-const NUM_COLUMNS = 3;
-const CARD_WIDTH = (width - CARD_MARGIN * (NUM_COLUMNS + 1)) / NUM_COLUMNS; // 3 cards per row with margins
 
 export default function BookRecs() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [coverUris, setCoverUris] = useState<string[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -92,8 +91,11 @@ export default function BookRecs() {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.gridContainer}>
             {books.map((book, index) => (
-              <Pressable key={book.id} style={styles.card}>
-                <Link href={{ pathname: "/bookInfo", params: { id: book.id } }}>
+              <View key={book.id} style={styles.card}>
+                <Pressable
+                  style={{ flex: 1, justifyContent: 'center', alignItems: 'center', width: '100%' }}
+                  onPress={() => pushBookDetail(router, book.id)}
+                >
                   {coverUris[index] ? (
                     <Image
                       source={{ uri: coverUris[index] }}
@@ -102,8 +104,8 @@ export default function BookRecs() {
                   ) : (
                     <Text style={globalStyles.subheading}>{book.title}</Text>
                   )}
-                </Link>
-              </Pressable>
+                </Pressable>
+              </View>
             ))}
           </View>
         </ScrollView>
@@ -143,4 +145,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: CARD_MARGIN / 1.5,
   },
 });
-

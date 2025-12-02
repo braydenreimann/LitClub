@@ -198,7 +198,7 @@ export default function LitClubScreen() {
                         }
 
                         await fetchLitClubs();
-                        router.replace('/litClubs');
+                        router.replace('/lit-clubs');
                     } catch (error) {
                         Alert.alert('Error leaving club', (error as Error).message);
                     } finally {
