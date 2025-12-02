@@ -12,9 +12,9 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { colors, fonts } from '@/theme';
 import { globalStyles } from '@/styles/globalStyles';
-import { useLitClubs } from '@/context/litClubsContext';
+import { useLitClubs } from '@/context/LitClubsContext';
 import { Book, User } from '@/domain/models';
-import { useSession } from '@/auth/authContext';
+import { useSession } from '@/context/AuthContext';
 import { GenresSelector } from '@/components/genresSelector';
 
 import { getUser } from '@/api/services/usersService';

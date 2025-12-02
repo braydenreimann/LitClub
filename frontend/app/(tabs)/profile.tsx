@@ -16,7 +16,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
-import { useLitClubs } from '../../context/litClubsContext';
+import { useLitClubs } from '../../context/LitClubsContext';
 import { getUriRead } from '../../api/services/imagesService';
 import { getUserFromId } from '../../api/services/usersService';
 

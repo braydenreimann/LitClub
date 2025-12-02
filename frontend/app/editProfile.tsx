@@ -17,7 +17,7 @@ import { User } from '../domain/models';
 import { editUser } from '../api/services/usersService';
 import { Modal } from 'react-native';
 
-import { useSession } from '@/auth/authContext';
+import { useSession } from '@/context/AuthContext';
 import { type LoginInput } from '@/api/mappers/auth-mappers';
 import { EditUserInput } from '../api/mappers/users-mappers';
 

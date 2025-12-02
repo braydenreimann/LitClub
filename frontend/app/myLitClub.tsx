@@ -17,7 +17,7 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLitClubs } from '@/context/litClubsContext';
+import { useLitClubs } from '@/context/LitClubsContext';
 import type { Book, User } from '@/domain/models';
 import { client } from '@/api/client';
 import { leaveLitClub } from '@/api/services/litClubsService';

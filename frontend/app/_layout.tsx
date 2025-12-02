@@ -1,10 +1,10 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import 'react-native-reanimated';
-import { SessionProvider } from '../auth/authContext';
+import { SessionProvider } from '../context/AuthContext';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { LitClubProvider } from '@/context/litClubsContext';
+import { LitClubProvider } from '@/context/LitClubsContext';
 import React from 'react';
 
 

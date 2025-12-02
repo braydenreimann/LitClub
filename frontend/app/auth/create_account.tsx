@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { useSession } from '@/auth/authContext';
+import { useSession } from '@/context/AuthContext';
 import {
   Alert,
   ScrollView,
