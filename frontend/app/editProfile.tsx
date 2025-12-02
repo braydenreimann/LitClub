@@ -14,13 +14,13 @@ import {
 import { globalStyles } from '../styles/globalStyles';
 import { colors, fonts } from '../theme';
 import { User } from '../domain/models';
-import { editUser } from '../services/usersService'; 
-import { components } from '../schema/openapi-types'; 
+import { editUser } from '../services/usersService';
+import { components } from '../schema/openapi-types';
 import { Modal, Pressable } from 'react-native';
 
 import { useSession } from '@/auth/authContext';
 import { type LoginInput } from '@/api-mappers/auth/auth-mappers';
-import { EditUserInput } from '../api-mappers/users/users-mappers'; 
+import { EditUserInput } from '../api-mappers/users/users-mappers';
 import { verifyPassword } from '@/services/authService';
 import { bool, boolean } from 'yup';
 
@@ -69,7 +69,7 @@ export default function EditProfileScreen() {
         setEmail(userData.email || '');
         setBiography(userData.bio || '');
         setPrivateAccount(userData.privateAccount || false);
-        {setSelectedPronouns(userData.pronouns || []);}
+        { setSelectedPronouns(userData.pronouns || []); }
       } catch (error) {
         console.error('Error loading user data:', error);
       }
@@ -78,20 +78,20 @@ export default function EditProfileScreen() {
   }, []);
 
   useEffect(() => { //chat-gpt is a quadrillion dollar idea
-        // Define an async function inside useEffect
-        const loadSession = async () => {
-            try {
-                const sessionString = await AsyncStorage.getItem('session');
-                if (!sessionString) return; // no session stored
+    // Define an async function inside useEffect
+    const loadSession = async () => {
+      try {
+        const sessionString = await AsyncStorage.getItem('session');
+        if (!sessionString) return; // no session stored
 
-                const session: User = JSON.parse(sessionString);
-                setUser(session); // update state
-            } catch (error) {
-                console.error('Error loading session:', error);
-            }
-        };
+        const session: User = JSON.parse(sessionString);
+        setUser(session); // update state
+      } catch (error) {
+        console.error('Error loading session:', error);
+      }
+    };
 
-        loadSession(); // call the async function
+    loadSession(); // call the async function
   }, []);
 
   const togglePronoun = (p: string) => {
@@ -120,15 +120,15 @@ export default function EditProfileScreen() {
 
     if (!user) return;
 
-  const input: EditUserInput = {
-    userId: user.id,
-    firstName,
-    lastName,
-    email,
-    bio: biography,
-    privateAccount,
-    pronouns: selectedPronouns,
-  };
+    const input: EditUserInput = {
+      userId: user.id,
+      firstName,
+      lastName,
+      email,
+      bio: biography,
+      privateAccount,
+      pronouns: selectedPronouns,
+    };
 
 
     try {
@@ -159,61 +159,61 @@ export default function EditProfileScreen() {
     ]);
   };
 
-const handleChangePasswordPress = () => {
-  setCurrentPasswordInput('');
-  setShowCurrentPasswordModal(true);
-};
-
-// Step 1: verify current password
-const handleVerifyCurrentPassword = async () => {
-  if (!user) return;
-
-  const input: LoginInput = {
-    email: user.email,
-    password: currentPasswordInput,
+  const handleChangePasswordPress = () => {
+    setCurrentPasswordInput('');
+    setShowCurrentPasswordModal(true);
   };
 
-  const success = await signIn(input);
+  // Step 1: verify current password
+  const handleVerifyCurrentPassword = async () => {
+    if (!user) return;
 
-  if (success) {
-    setShowCurrentPasswordModal(false);
-    setShowNewPasswordModal(true);
-  } else {
-    Alert.alert('Incorrect Password', 'The password you entered is incorrect.');
-  }
-};
+    const input: LoginInput = {
+      email: user.email,
+      password: currentPasswordInput,
+    };
 
-// Step 2: save new password
-const handleSaveNewPassword = async () => {
-  if (!user) return;
+    const success = await signIn(input);
 
-  if (!newPassword || !confirmNewPassword) {
-    Alert.alert('Missing Fields', 'Please enter your new password twice.');
-    return;
-  }
-  if (newPassword !== confirmNewPassword) {
-    Alert.alert('Mismatch', 'Passwords do not match.');
-    return;
-  }
-
-  setPasswordChangeLoading(true);
-
-  const input: EditUserInput = {
-    userId: user.id,
-    password: newPassword,
+    if (success) {
+      setShowCurrentPasswordModal(false);
+      setShowNewPasswordModal(true);
+    } else {
+      Alert.alert('Incorrect Password', 'The password you entered is incorrect.');
+    }
   };
 
-  const { success, error } = await editUser(input);
-  setPasswordChangeLoading(false);
-  setShowNewPasswordModal(false);
+  // Step 2: save new password
+  const handleSaveNewPassword = async () => {
+    if (!user) return;
 
-  if (success) {
-    Alert.alert('Success', 'Your password has been updated.');
-  } else {
-    console.error('Error updating password:', error);
-    Alert.alert('Error', 'Failed to update password. Try again.');
-  }
-};
+    if (!newPassword || !confirmNewPassword) {
+      Alert.alert('Missing Fields', 'Please enter your new password twice.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      Alert.alert('Mismatch', 'Passwords do not match.');
+      return;
+    }
+
+    setPasswordChangeLoading(true);
+
+    const input: EditUserInput = {
+      userId: user.id,
+      password: newPassword,
+    };
+
+    const { success, error } = await editUser(input);
+    setPasswordChangeLoading(false);
+    setShowNewPasswordModal(false);
+
+    if (success) {
+      Alert.alert('Success', 'Your password has been updated.');
+    } else {
+      console.error('Error updating password:', error);
+      Alert.alert('Error', 'Failed to update password. Try again.');
+    }
+  };
 
   return (
     <ScrollView
@@ -297,63 +297,63 @@ const handleSaveNewPassword = async () => {
           thumbColor={colors.cream}
         />
       </View>
-{/* Change Password Button */}
-<TouchableOpacity style={[styles.button, styles.passwordButton]} onPress={handleChangePasswordPress}>
-  <Text style={styles.buttonText}>Change Password</Text>
-</TouchableOpacity>
+      {/* Change Password Button */}
+      <TouchableOpacity style={[styles.button, styles.passwordButton]} onPress={handleChangePasswordPress}>
+        <Text style={styles.buttonText}>Change Password</Text>
+      </TouchableOpacity>
 
-{/* Modal 1: Current Password */}
-<Modal visible={showCurrentPasswordModal} transparent animationType="slide">
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <Text style={styles.label}>Enter Current Password</Text>
-      <TextInput
-        style={styles.input}
-        value={currentPasswordInput}
-        onChangeText={setCurrentPasswordInput}
-        secureTextEntry
-      />
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={[styles.button, styles.discardButton]} onPress={() => setShowCurrentPasswordModal(false)}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleVerifyCurrentPassword}>
-          <Text style={styles.buttonText}>{passwordChangeLoading ? 'Checking...' : 'Next'}</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
+      {/* Modal 1: Current Password */}
+      <Modal visible={showCurrentPasswordModal} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.label}>Enter Current Password</Text>
+            <TextInput
+              style={styles.input}
+              value={currentPasswordInput}
+              onChangeText={setCurrentPasswordInput}
+              secureTextEntry
+            />
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={[styles.button, styles.discardButton]} onPress={() => setShowCurrentPasswordModal(false)}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleVerifyCurrentPassword}>
+                <Text style={styles.buttonText}>{passwordChangeLoading ? 'Checking...' : 'Next'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
-{/* Modal 2: New Password */}
-<Modal visible={showNewPasswordModal} transparent animationType="slide">
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <Text style={styles.label}>Enter New Password</Text>
-      <TextInput
-        style={styles.input}
-        value={newPassword}
-        onChangeText={setNewPassword}
-        secureTextEntry
-      />
-      <Text style={styles.label}>Confirm New Password</Text>
-      <TextInput
-        style={styles.input}
-        value={confirmNewPassword}
-        onChangeText={setConfirmNewPassword}
-        secureTextEntry
-      />
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={[styles.button, styles.discardButton]} onPress={() => setShowNewPasswordModal(false)}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveNewPassword}>
-          <Text style={styles.buttonText}>{passwordChangeLoading ? 'Saving...' : 'Save'}</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
+      {/* Modal 2: New Password */}
+      <Modal visible={showNewPasswordModal} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.label}>Enter New Password</Text>
+            <TextInput
+              style={styles.input}
+              value={newPassword}
+              onChangeText={setNewPassword}
+              secureTextEntry
+            />
+            <Text style={styles.label}>Confirm New Password</Text>
+            <TextInput
+              style={styles.input}
+              value={confirmNewPassword}
+              onChangeText={setConfirmNewPassword}
+              secureTextEntry
+            />
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={[styles.button, styles.discardButton]} onPress={() => setShowNewPasswordModal(false)}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveNewPassword}>
+                <Text style={styles.buttonText}>{passwordChangeLoading ? 'Saving...' : 'Save'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Buttons */}
       <View style={styles.buttonRow}>
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   discardButton: {
     backgroundColor: colors.teal,
   },
-    passwordButton: {
+  passwordButton: {
     backgroundColor: colors.nextDarkest,
     marginTop: 16,
   },

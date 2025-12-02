@@ -53,7 +53,7 @@ function BackButton() {
     const router = useRouter();
     return (
         <Pressable>
-            <Link href="/bookclubs" onPress={() => router.back()}>
+            <Link href="/litClubs" onPress={() => router.back()}>
                 <EvilIcons
                     name="chevron-left"
                     size={50}
@@ -198,7 +198,7 @@ export default function LitClubScreen() {
                         }
 
                         await fetchLitClubs();
-                        router.replace('/bookclubs');
+                        router.replace('/litClubs');
                     } catch (error) {
                         Alert.alert('Error leaving club', (error as Error).message);
                     } finally {
@@ -234,7 +234,7 @@ export default function LitClubScreen() {
                             }
 
                             await fetchLitClubs();
-                            router.replace('/bookclubs');
+                            router.replace('/litClubs');
                         } catch (error) {
                             Alert.alert('Error deleting club', (error as Error).message);
                         } finally {
@@ -259,7 +259,7 @@ export default function LitClubScreen() {
         }
 
         Alert.alert(isArchived ? 'Club unarchived.' : 'Club archived.');
-        router.replace('/bookclubs');
+        router.replace('/litClubs');
     };
 
     return (

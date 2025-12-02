@@ -27,7 +27,7 @@ function BackButton() {
     const router = useRouter();
     return (
         <Pressable>
-            <Link href="/bookclubs" onPress={() => router.back()}>
+            <Link href="/litClubs" onPress={() => router.back()}>
                 <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 0 }} />
             </Link>
         </Pressable>

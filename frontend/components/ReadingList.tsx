@@ -8,7 +8,7 @@ import { colors } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
 
 import { User, DisplayBook } from '../domain/models';
-import { getUser } from '../services/usersService';
+import { getUser } from '@/services/usersService';
 import { getBookshelfByStatus } from '../services/librariesService';
 import { getUriRead } from '@/services/imagesService';
 

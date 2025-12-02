@@ -19,7 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
 import { useLitClubs } from '../../context/litClubsContext';
 import { getUriRead } from '../../services/imagesService';
-import { getUserFromId } from '../../services/usersService'
+import { getUserFromId } from '../../services/usersService';
 
 function EditButton() {
     return (
