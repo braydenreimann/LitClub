@@ -1068,7 +1068,7 @@
             }
           },
           {
-            "name": "LibraryBookId",
+            "name": "libraryBookId",
             "in": "path",
             "required": true,
             "schema": {

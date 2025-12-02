@@ -754,7 +754,7 @@ export interface paths {
                 header?: never;
                 path: {
                     ownerId: string;
-                    LibraryBookId: string;
+                    libraryBookId: string;
                 };
                 cookie?: never;
             };
