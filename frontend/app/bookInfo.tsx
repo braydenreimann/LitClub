@@ -1,10 +1,9 @@
-// /frontend/app/bookInfo.tsx (path may differ)
+//frontend/app / bookInfo.tsx(path may differ)
 
 import React, { useEffect, useState } from 'react';
 import { Pressable, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
 import {
     View,
@@ -12,7 +11,6 @@ import {
     ScrollView,
     StyleSheet,
 } from 'react-native';
-import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import { globalStyles } from '@/styles/globalStyles';
@@ -28,23 +26,11 @@ import {
     setBookShelfStatus,
 } from '../services/librariesService';
 
-function BackButton() {
-    const router = useRouter();
-
-    const handlePress = () => {
-        router.back();
-    };
-
-    return (
-        <Pressable onPress={handlePress}>
-            <EvilIcons
-                name="chevron-left"
-                size={40}
-                color="#193350"
-            />
-        </Pressable>
-    );
-}
+// at top or bottom of bookInfo.tsx
+export const options = {
+    title: 'Book Information',
+    headerBackTitleVisible: false,
+};
 
 // Backend enum: 0 | 1 | 2 | 3
 type ShelfStatus = 0 | 1 | 2 | 3;
@@ -230,10 +216,6 @@ export default function BookInfoScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <ScrollView>
-                <View style={infoStyle.headerRow}>
-                    <BackButton />
-                    <Text style={[globalStyles.heading, { fontSize: 22, marginTop: 7 }]}>Book Information</Text>
-                </View>
 
                 {loading ? (
                     <ActivityIndicator size="large" color={colors.midBlue} />
