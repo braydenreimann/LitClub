@@ -787,7 +787,50 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        patch?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    ownerId: string;
+                    userId: string;
+                    libraryBookId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EditLibraryBookBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LibraryBookResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         trace?: never;
     };
     "/threads/{threadId}/comments/{commentId}": {
@@ -1002,8 +1045,8 @@ export interface paths {
                 header?: never;
                 path: {
                     ownerId: string;
-                    libraryBookId: string;
                     userId: string;
+                    libraryBookId: string;
                 };
                 cookie?: never;
             };
@@ -1626,6 +1669,7 @@ export interface components {
         };
         LibraryBookResponse: {
             id: string | null;
+            bookId: string | null;
             status: components["schemas"]["ShelfStatusContract"];
             /** Format: date */
             startedReading?: string | null;

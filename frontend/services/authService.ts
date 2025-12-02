@@ -1,3 +1,5 @@
+/* begin authService.ts */
+
 import { client } from "@/client";
 
 export async function verifyPassword(email: string, password: string): Promise<boolean> {
@@ -12,3 +14,5 @@ export async function verifyPassword(email: string, password: string): Promise<b
     return false;
   }
 }
+
+/* end authService.ts */

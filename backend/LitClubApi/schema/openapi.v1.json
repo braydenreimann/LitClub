@@ -1531,7 +1531,7 @@
         ],
         "parameters": [
           {
-            "name": "ownerId",
+            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1540,14 +1540,6 @@
           },
           {
             "name": "libraryBookId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -2794,12 +2786,17 @@
       },
       "LibraryBookResponse": {
         "required": [
+          "bookId",
           "id",
           "status"
         ],
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "bookId": {
             "type": "string",
             "nullable": true
           },

@@ -1,50 +1,91 @@
-import React, { useEffect, useState, type PropsWithChildren } from 'react';
+// /frontend/app/bookInfo.tsx (path may differ)
+
+import React, { useEffect, useState } from 'react';
 import { Pressable, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
-import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
+import {
+    View,
+    Text,
+    ScrollView,
+    StyleSheet,
+} from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-import BookStatusDropdown from '@/components/BookStatusDropdown';
-import HiddenStatusDropdown from '@/components/HiddenStatusDropdown';
-import { Entypo } from '@expo/vector-icons';
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book } from '../domain/models';
+import { Book, User } from '../domain/models';
 import { getBook } from '../services/booksService';
+import { getUser } from '../services/usersService';
 import { getUriRead } from '@/services/imagesService';
 import BookTableOfContentsTabs from '@/components/BookTableOfContentsTabs';
-
-// playing around with importing the book
-export interface bookImport {
-    title: string;
-    author: string;
-    totalchapters: number;
-    genre: string;
-    description?: string;
-    coverImageUrl?: string;
-}
+import {
+    getLibraryBookForBook,
+    removeBookFromLibrary,
+    setBookShelfStatus,
+} from '../services/librariesService';
 
 function BackButton() {
-    const router = useRouter(); // Initialize the router hook
+    const router = useRouter();
 
     const handlePress = () => {
-        router.back(); // Call the back function
+        router.back();
     };
 
     return (
         <Pressable onPress={handlePress}>
             <EvilIcons
                 name="chevron-left"
-                size={50}
+                size={40}
                 color="#193350"
-                style={{ marginLeft: 20, marginBottom: 10, marginTop: 15 }} // Use style object for multiple styles
             />
         </Pressable>
     );
+}
+
+// Backend enum: 0 | 1 | 2 | 3
+type ShelfStatus = 0 | 1 | 2 | 3;
+
+type ShelfStatusOption = {
+    label: string;
+    value: ShelfStatus | 'remove';
+};
+
+const shelfStatusOptions: ShelfStatusOption[] = [
+    {
+        label: 'Currently Reading',
+        value: 1,
+    },
+    {
+        label: 'Future Reads',
+        value: 3,
+    },
+    {
+        label: 'Past Reads',
+        value: 0,
+    },
+    {
+        label: 'Remove from Bookshelf',
+        value: 'remove',
+    },
+];
+
+function mapStatusToLabel(status: ShelfStatus | null): string {
+    switch (status) {
+        case 1:
+            return 'Currently Reading';
+        case 3:
+            return 'Future Reads';
+        case 0:
+            return 'Past Reads';
+        case 2:
+            return 'On Hiatus';
+        default:
+            return 'Add to Bookshelf';
+    }
 }
 
 export default function BookInfoScreen() {
@@ -57,6 +98,41 @@ export default function BookInfoScreen() {
 
     const [coverUri, setCoverUri] = useState<string>('');
 
+    const [user, setUser] = useState<User | null>(null);
+    const [shelfStatus, setShelfStatus] = useState<ShelfStatus | null>(null);
+    const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+    const [statusLoading, setStatusLoading] = useState(true);
+    const [statusSaving, setStatusSaving] = useState(false);
+    const [statusError, setStatusError] = useState<string | null>(null);
+    const [triggerLayout, setTriggerLayout] = useState<{
+        height: number;
+        y: number;
+        width: number;
+        x: number;
+    }>({
+        height: 0,
+        y: 0,
+        width: 0,
+        x: 0,
+    });
+
+    // Load user from session
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const sessionUser = await getUser();
+                if (sessionUser) {
+                    setUser(sessionUser);
+                }
+            } catch (err) {
+                console.error('Error loading user:', err);
+            }
+        };
+
+        loadUser();
+    }, []);
+
+    // Fetch book data
     useEffect(() => {
         const fetchBook = async () => {
             setLoading(true);
@@ -69,9 +145,12 @@ export default function BookInfoScreen() {
                 setLoading(false);
             }
         };
-        fetchBook();
+        if (id) {
+            fetchBook();
+        }
     }, [id]);
 
+    // Load cover image
     useEffect(() => {
         let alive = true;
 
@@ -85,36 +164,91 @@ export default function BookInfoScreen() {
         };
     }, [book?.coverImageUrl]);
 
-    const [isPublic, setIsPublic] = useState(true);
+    // Load bookshelf status for this book
+    useEffect(() => {
+        if (!user || !book) return;
 
-    const handlePrivacyChange = (newPrivacyStatus: string) => {
-        setIsPublic(newPrivacyStatus === 'Public');
-        console.log('Privacy status changed to:', newPrivacyStatus);
-        // TODO: Implement function
+        let alive = true;
+        setStatusLoading(true);
+        setStatusError(null);
+
+        (async () => {
+            try {
+                const existing = await getLibraryBookForBook(user.id, book.id);
+                if (!alive) return;
+                setShelfStatus(existing?.status ?? null);
+            } catch (err) {
+                if (!alive) return;
+                console.error('Error loading shelf status:', err);
+                setStatusError('Unable to load bookshelf status right now.');
+            } finally {
+                if (!alive) return;
+                setStatusLoading(false);
+            }
+        })();
+
+        return () => {
+            alive = false;
+        };
+    }, [user, book]);
+
+    useEffect(() => {
+        if (book && !user) {
+            setStatusLoading(false);
+        }
+    }, [book, user]);
+
+    const handleShelfStatusSelect = async (option: ShelfStatusOption) => {
+        if (!user || !book) {
+            setStatusError('Sign in to save your bookshelf status.');
+            return;
+        }
+
+        setStatusSaving(true);
+        setStatusError(null);
+        try {
+            if (option.value === 'remove') {
+                const removed = await removeBookFromLibrary(user.id, book.id);
+                if (!removed) {
+                    throw new Error('Failed to remove from bookshelf');
+                }
+                setShelfStatus(null);
+            } else {
+                const nextStatus = option.value as ShelfStatus;
+                await setBookShelfStatus(user.id, book.id, nextStatus);
+                setShelfStatus(nextStatus);
+            }
+            setStatusMenuOpen(false);
+        } catch (err) {
+            console.error('Failed to update shelf status:', err);
+            setStatusError('Could not update your bookshelf. Please try again.');
+        } finally {
+            setStatusSaving(false);
+        }
     };
 
-    const handleStatusChange = (newStatus: string) => {
-        console.log('Book status changed to:', newStatus);
-        // TODO: Implement function
-    };
-
-    {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/ }
-    {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/ }
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <ScrollView>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={infoStyle.headerRow}>
                     <BackButton />
-                    <Text style={[globalStyles.heading, { marginTop: 15 }]}>
-                        {' '}
-                        Book Information{' '}
-                    </Text>
+                    <Text style={[globalStyles.heading, { fontSize: 22, marginTop: 7 }]}>Book Information</Text>
                 </View>
 
-                <View style={infoStyle.currentRead}>
-                    <View style={infoStyle.sideSect}>
-                        {/* Book Container */}
-                        <View style={infoStyle.bookContainer}>
+                {loading ? (
+                    <ActivityIndicator size="large" color={colors.midBlue} />
+                ) : book ? (
+                    <>
+                        <View style={infoStyle.titleBlock}>
+                            <Text style={[globalStyles.heading, { textAlign: 'center' }]}>
+                                {book.title}
+                            </Text>
+                            <Text style={[globalStyles.subheading, { textAlign: 'center' }]}>
+                                {book.author}
+                            </Text>
+                        </View>
+
+                        <View style={infoStyle.coverContainer}>
                             <Image
                                 source={
                                     coverUri
@@ -127,67 +261,38 @@ export default function BookInfoScreen() {
                             />
                         </View>
 
-                        <View style={{ flexDirection: 'row' }}>
-                            <FontAwesome name="star" size={24} color={colors.midBlue} />
-                            <FontAwesome name="star" size={24} color={colors.midBlue} />
-                            <FontAwesome name="star" size={24} color={colors.midBlue} />
-                            <FontAwesome name="star" size={24} color={colors.midBlue} />
-                            <FontAwesome name="star" size={24} color={colors.midBlue} />
-                        </View>
-                    </View>
-
-                    <View style={infoStyle.sideSect}>
-                        {loading ? (
-                            <ActivityIndicator size="large" color={colors.midBlue} />
-                        ) : book ? (
-                            <>
-                                <Text style={globalStyles.heading}>{book.title}</Text>
-                                <Text style={globalStyles.subheading}>{book.author}</Text>
-
-                                {(() => {
-                                    const desc =
-                                        (book.description ?? '') +
-                                        ' Sample Text Sample Text Sample Text';
-                                    const isLong = desc.length > 50;
-                                    return (
-                                        <>
-                                            <Text style={globalStyles.body}>
-                                                {isExpanded || !isLong
-                                                    ? desc
-                                                    : `${desc.slice(0, 50)}...`}
-                                            </Text>
-                                            {isLong && (
-                                                <Pressable
-                                                    onPress={() => setIsExpanded(prev => !prev)}
-                                                >
-                                                    <Text
-                                                        style={{ color: colors.midBlue, marginTop: 4 }}
-                                                    >
-                                                        {isExpanded ? 'Show less' : 'Show more'}
-                                                    </Text>
-                                                </Pressable>
-                                            )}
-                                        </>
-                                    );
-                                })()}
-                            </>
-                        ) : (
-                            <Text style={globalStyles.body}>
-                                Book information not available.
+                        <View style={infoStyle.descriptionBlock}>
+                            <Text style={[globalStyles.subheading, { fontSize: 16, paddingBottom: 6 }]}>
+                                Description
                             </Text>
-                        )}
-                    </View>
-                </View>
+                            {(() => {
+                                const desc =
+                                    (book.description ?? '') +
+                                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+                                const isLong = desc.length > 100;
+                                return (
+                                    <>
+                                        <Text style={globalStyles.body}>
+                                            {isExpanded || !isLong
+                                                ? desc
+                                                : `${desc.slice(0, 100)}...`}
+                                        </Text>
+                                        {isLong && (
+                                            <Pressable onPress={() => setIsExpanded((prev) => !prev)}>
+                                                <Text style={{ color: colors.midBlue, marginTop: 4 }}>
+                                                    {isExpanded ? 'Show less' : 'Show more'}
+                                                </Text>
+                                            </Pressable>
+                                        )}
+                                    </>
+                                );
+                            })()}
+                        </View>
+                    </>
+                ) : (
+                    <Text style={globalStyles.body}>Book information not available.</Text>
+                )}
 
-                {/*
-                right now: you can see cover, name, and author
-                take out summary
-                page count
-                chapter count
-                summary (no summary available rn)
-                genre
-                all in csv
-                 */}
                 <View style={{ height: 4, backgroundColor: colors.darkest }} />
                 {book && (
                     <View style={infoStyle.bookStatsContainer}>
@@ -213,40 +318,87 @@ export default function BookInfoScreen() {
                 )}
                 <View style={{ height: 4, backgroundColor: colors.darkest }} />
 
-                {/* NEW: embedded tabs + table of contents (My Library / My LitClub) */}
-                {book && id && (
-                    <BookTableOfContentsTabs
-                        bookId={id}
-                        book={book}
-                    />
+                {/* Shelf status selector */}
+                {book && (
+                    <View style={infoStyle.statusContainer}>
+                        <Text style={[globalStyles.subheading, { fontSize: 18 }]}>
+                            Bookshelf status
+                        </Text>
+
+                        <Pressable
+                            style={[
+                                infoStyle.statusTrigger,
+                                statusMenuOpen && infoStyle.statusTriggerActive,
+                            ]}
+                            onPress={() => {
+                                if (statusLoading || statusSaving) return;
+                                setStatusMenuOpen((prev) => !prev);
+                            }}
+                            onLayout={(e) =>
+                                setTriggerLayout({
+                                    height: e.nativeEvent.layout.height,
+                                    y: e.nativeEvent.layout.y,
+                                    width: e.nativeEvent.layout.width,
+                                    x: e.nativeEvent.layout.x,
+                                })
+                            }
+                        >
+                            <View style={{ flex: 1 }}>
+                                <Text style={infoStyle.statusLabel}>
+                                    {statusLoading
+                                        ? 'Checking status...'
+                                        : mapStatusToLabel(shelfStatus)}
+                                </Text>
+                            </View>
+                            <FontAwesome
+                                name={statusMenuOpen ? 'chevron-up' : 'chevron-down'}
+                                size={18}
+                                color={colors.darkest}
+                            />
+                        </Pressable>
+
+                        {statusMenuOpen && (
+                            <View
+                                style={[
+                                    infoStyle.statusDropdown,
+                                    {
+                                        top: triggerLayout.y + triggerLayout.height + 6,
+                                        left: triggerLayout.x,
+                                        width: Math.max(triggerLayout.width, 200),
+                                    },
+                                ]}
+                            >
+                                {shelfStatusOptions.map((option) => (
+                                    <Pressable
+                                        key={option.label}
+                                        style={({ pressed }) => [
+                                            infoStyle.statusOption,
+                                            shelfStatus === option.value && {
+                                                backgroundColor: colors.sage,
+                                            },
+                                            pressed && { backgroundColor: colors.sage },
+                                        ]}
+                                        onPress={() => handleShelfStatusSelect(option)}
+                                    >
+                                        <Text style={[globalStyles.subheading, { fontSize: 15 }]}>
+                                            {option.label}
+                                        </Text>
+                                    </Pressable>
+                                ))}
+                            </View>
+                        )}
+
+                        {statusError && (
+                            <Text style={{ color: 'red', marginTop: 8 }}>{statusError}</Text>
+                        )}
+                    </View>
                 )}
+                <View style={{ height: 4, backgroundColor: colors.darkest }} />
 
-                {/*<Pressable style={infoStyle.forumBox}
-                    onPress={() => {
-                        router.push("/threads/thread-1"); //needs to change later to be dynamic
-                    }} >
-                    <Text
-                        style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest, textAlign: "center"}]}
-                    >- View the chapter 1 thread- </Text>
-                </Pressable>*/}
-
-                <View style={infoStyle.dropdownRow}>
-                    {/* Library Status */}
-                    <View style={infoStyle.column}>
-                        <Text style={[globalStyles.subheading, { fontSize: 18 }]}>
-                            Library Status
-                        </Text>
-                        <BookStatusDropdown onStatusChange={handleStatusChange} />
-                    </View>
-
-                    {/* Visibility */}
-                    <View style={infoStyle.column}>
-                        <Text style={[globalStyles.subheading, { fontSize: 18 }]}>
-                            Visibility
-                        </Text>
-                        <HiddenStatusDropdown onStatusChange={handlePrivacyChange} />
-                    </View>
-                </View>
+                {/* Embedded tabs + table of contents */}
+                {book && id && (
+                    <BookTableOfContentsTabs bookId={id} book={book} />
+                )}
             </ScrollView>
         </View>
     );
@@ -254,18 +406,17 @@ export default function BookInfoScreen() {
 
 const infoStyle = StyleSheet.create({
     bookContainer: {
-        width: 150,
-        height: 220,
-        borderRadius: 12,
+        width: 220,
+        height: 320,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
     },
     bookImage: {
-        width: 150,
-        height: 220,
+        width: 220,
+        height: 320,
         backgroundColor: colors.teal,
-        borderRadius: 12,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
@@ -286,124 +437,104 @@ const infoStyle = StyleSheet.create({
         alignItems: 'center',
         marginTop: 15,
     },
-    currentRead: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 15,
-        gap: 20,
-    },
-    sideSect: {
-        flex: 1,
-        alignItems: 'flex-start',
-    },
-    discBox: {
-        backgroundColor: colors.cream,
-        borderColor: '#193350',
-        borderWidth: 4,
-        borderRadius: 12,
-        margin: 5,
-        marginTop: 20,
-        height: 120,
-        width: '120%',
-    },
-    ToCButton: {
-        backgroundColor: colors.teal,
-        borderColor: colors.darkest,
-        borderLeftWidth: 30,
-        borderWidth: 4,
-        borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        marginVertical: 10,
-        marginHorizontal: 10,
-    },
-    scrollContainer: {
-        overflowX: 'scroll',
-        overflowY: 'hidden',
-        padding: 10,
-    },
-    scrollingWrapper: {
-        flex: 1,
-    },
-    cardGroup: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        padding: 5,
-        margin: 5,
-    },
-    forumBox: {
-        backgroundColor: colors.sage,
-        borderWidth: 4,
-        borderRightWidth: 20,
-        borderColor: colors.darkest,
-        borderRadius: 12,
-        padding: 12,
-        textAlign: 'center',
-        marginVertical: 10,
-        marginHorizontal: 10,
-    },
-    rowContainer: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        gap: 20,
-        marginVertical: 10,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 15,
-    },
-
-    column: {
-        flex: 1,
-        marginHorizontal: 5,
-    },
-
-    dropdownWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1.5,
-        borderColor: colors.midBlue,
-        borderRadius: 10,
-        backgroundColor: colors.cream,
-    },
-    dropdownRow: {
-        flexDirection: 'row', // horizontal layout
-        justifyContent: 'center', // center horizontally
-        alignItems: 'flex-start', // align items to top
-        gap: 20, // space between the two dropdowns
-        marginVertical: 15,
-        paddingHorizontal: 10, // optional, so it doesn’t hit screen edges
-    },
     bookStatsContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-start', // evenly space items
+        justifyContent: 'flex-start',
         alignItems: 'center',
         paddingHorizontal: 10,
-        backgroundColor: colors.sage, // matches background
+        backgroundColor: colors.sage,
         paddingVertical: 4,
     },
-
     bookStat: {
         width: 100,
         alignItems: 'center',
-        flex: 1, // optional: lets each stat take equal space
+        flex: 1,
     },
-
     bookStatLabel: {
-        fontFamily: fonts.heading, // same font as header
-        fontSize: 18, // smaller size
+        fontFamily: fonts.heading,
+        fontSize: 18,
         color: colors.midBlue,
         marginBottom: 4,
     },
-
     bookStatValue: {
         fontFamily: fonts.subheading,
         fontSize: 16,
         color: colors.darkest,
         textAlign: 'center',
+    },
+    statusContainer: {
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        backgroundColor: colors.cream,
+        gap: 10,
+        position: 'relative',
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        gap: 8,
+    },
+    titleBlock: {
+        paddingHorizontal: 16,
+        paddingTop: 6,
+        paddingBottom: 8,
+    },
+    coverContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 16,
+    },
+    descriptionBlock: {
+        paddingTop: 8,
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        gap: 8,
+    },
+    statusTrigger: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: colors.darkest,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        backgroundColor: colors.sage,
+    },
+    statusTriggerActive: {
+        borderColor: colors.midBlue,
+        shadowColor: colors.midBlue,
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    statusLabel: {
+        fontFamily: fonts.subheading,
+        fontSize: 15,
+        color: colors.darkest,
+    },
+    statusDropdown: {
+        position: 'absolute',
+        borderWidth: 2,
+        borderColor: colors.darkest,
+        borderRadius: 12,
+        backgroundColor: colors.cream,
+        overflow: 'hidden',
+        zIndex: 20,
+        elevation: 6,
+        shadowColor: colors.darkest,
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    statusOption: {
+        flexDirection: 'row',
+        alignItems: 'center', // centers labels and icons vertically
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        paddingTop: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.darkest,
     },
 });

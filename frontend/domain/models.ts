@@ -50,6 +50,7 @@ export type Book = {
 
 export type LibraryBook = {
     id: string;
+    bookId: string;
     status: number;
     startedReading: string;
     finishedReading: string;

@@ -5,6 +5,7 @@ using LitClubApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
+using System.Net.Sockets;
 
 namespace LitClubApi.Endpoints.Blobs.SasWrite;
 
@@ -44,11 +45,8 @@ public class Get(BlobServiceClient blobServiceClient, IOptions<BlobOptions> blob
 		var sasUri = blobClient.GenerateSasUri(sasBuilder);
 		var uriString = sasUri.ToString();
 
-		var host = Dns.GetHostAddresses(Dns.GetHostName())
-			.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?
-			.ToString();
-
-		if (!string.IsNullOrEmpty(host))
+		var host = GetLanIpAddress(HttpContext);
+		if (!string.IsNullOrWhiteSpace(host))
 		{
 			uriString = uriString
 				.Replace("127.0.0.1", host)
@@ -56,5 +54,21 @@ public class Get(BlobServiceClient blobServiceClient, IOptions<BlobOptions> blob
 		}
 
 		return Ok(new SasWriteResponse { SasUri = uriString });
+	}
+
+	private static string? GetLanIpAddress(HttpContext httpContext)
+	{
+		var localIp = httpContext?.Connection?.LocalIpAddress;
+		if (localIp is not null
+			&& localIp.AddressFamily == AddressFamily.InterNetwork
+			&& !IPAddress.IsLoopback(localIp)
+			&& !localIp.Equals(IPAddress.Any))
+		{
+			return localIp.ToString();
+		}
+
+		return Dns.GetHostAddresses(Dns.GetHostName())
+			.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip))
+			?.ToString();
 	}
 }

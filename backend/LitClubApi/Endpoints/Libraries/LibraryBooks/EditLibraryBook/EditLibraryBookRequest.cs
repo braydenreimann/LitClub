@@ -6,7 +6,8 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks.EditLibraryBook;
 
 public sealed class EditLibraryBookRequest
 {
-    [FromRoute(Name = "ownerId")]
+    // Route template uses {userId}; bind that into OwnerId
+    [FromRoute(Name = "userId")]
     public required string OwnerId { get; init; }
     [FromRoute(Name = "libraryBookId")]
     public required string LibraryBookId { get; init; }
