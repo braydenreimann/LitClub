@@ -1,10 +1,8 @@
-//frontend/app / bookInfo.tsx(path may differ)
-
 import React, { useEffect, useState } from 'react';
 import { Pressable, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
-import { colors, fonts } from '../theme';
+import { colors, fonts } from '../../theme';
 import {
     View,
     Text,
@@ -15,22 +13,16 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book, User } from '../domain/models';
-import { getBook } from '../api/services/booksService';
-import { getUser } from '../api/services/usersService';
+import { Book, User } from '../../domain/models';
+import { getBook } from '../../api/services/booksService';
+import { getUser } from '../../api/services/usersService';
 import { getUriRead } from '@/api/services/imagesService';
 import BookTableOfContentsTabs from '@/components/BookTableOfContentsTabs';
 import {
     getLibraryBookForBook,
     removeBookFromLibrary,
     setBookShelfStatus,
-} from '../api/services/librariesService';
-
-// at top or bottom of bookInfo.tsx
-export const options = {
-    title: 'Book Information',
-    headerBackTitleVisible: false,
-};
+} from '../../api/services/librariesService';
 
 // Backend enum: 0 | 1 | 2 | 3
 type ShelfStatus = 0 | 1 | 2 | 3;
@@ -75,7 +67,7 @@ function mapStatusToLabel(status: ShelfStatus | null): string {
 }
 
 export default function BookInfoScreen() {
-    const { id } = useLocalSearchParams<{ id: string }>();
+    const { bookId } = useLocalSearchParams<{ bookId: string }>();
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [book, setBook] = useState<Book | null>(null);
@@ -123,7 +115,7 @@ export default function BookInfoScreen() {
         const fetchBook = async () => {
             setLoading(true);
             try {
-                const data = await getBook(id);
+                const data = await getBook(bookId);
                 setBook(data);
             } catch (err: any) {
                 setError(err.message);
@@ -131,10 +123,10 @@ export default function BookInfoScreen() {
                 setLoading(false);
             }
         };
-        if (id) {
+        if (bookId) {
             fetchBook();
         }
-    }, [id]);
+    }, [bookId]);
 
     // Load cover image
     useEffect(() => {
@@ -162,7 +154,7 @@ export default function BookInfoScreen() {
             try {
                 const existing = await getLibraryBookForBook(user.id, book.id);
                 if (!alive) return;
-                setShelfStatus(existing?.status ?? null);
+                setShelfStatus((existing?.status ?? null) as ShelfStatus | null);
             } catch (err) {
                 if (!alive) return;
                 console.error('Error loading shelf status:', err);
@@ -235,7 +227,7 @@ export default function BookInfoScreen() {
                                 source={
                                     coverUri
                                         ? { uri: coverUri }
-                                        : require('../assets/images/turkstra.jpg')
+                                        : require('@/assets/images/turkstra.jpg')
                                 }
                                 style={infoStyle.bookImage}
                                 contentFit="cover"
@@ -378,8 +370,8 @@ export default function BookInfoScreen() {
                 <View style={{ height: 4, backgroundColor: colors.darkest }} />
 
                 {/* Embedded tabs + table of contents */}
-                {book && id && (
-                    <BookTableOfContentsTabs bookId={id} book={book} />
+                {book && bookId && (
+                    <BookTableOfContentsTabs bookId={bookId} book={book} />
                 )}
             </ScrollView>
         </View>
