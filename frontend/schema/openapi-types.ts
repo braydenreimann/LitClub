@@ -787,50 +787,7 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    ownerId: string;
-                    userId: string;
-                    libraryBookId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["EditLibraryBookBody"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["LibraryBookResponse"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Internal Server Error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        patch?: never;
         trace?: never;
     };
     "/threads/{threadId}/comments/{commentId}": {
@@ -1044,7 +1001,6 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    ownerId: string;
                     userId: string;
                     libraryBookId: string;
                 };
@@ -1136,6 +1092,13 @@ export interface paths {
                     content: {
                         "application/json": components["schemas"]["ProblemDetails"];
                     };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
                 };
             };
         };
@@ -1244,7 +1207,48 @@ export interface paths {
                 };
             };
         };
-        delete?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    litClubId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LeaveLitClubBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LitClubResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1665,6 +1669,9 @@ export interface components {
             isbn13s: string[] | null;
         };
         JoinLitClubBody: {
+            userId: string | null;
+        };
+        LeaveLitClubBody: {
             userId: string | null;
         };
         LibraryBookResponse: {
