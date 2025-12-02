@@ -6,8 +6,7 @@ import { Image } from 'expo-image';
 import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
 import ReadingList from '../../components/ReadingList';
-import TopThreeBooks from '../../components/TopThreeBooks';
-import { View, Text, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
@@ -208,7 +207,6 @@ export default function ProfileScreen() {
 
                 {/* Books Section */}
                 <View>
-                    <TopThreeBooks />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Currently Reading</Text>
                     <ReadingList status={1} />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Future Reads</Text>
