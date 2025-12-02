@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, FlatList, Text, TouchableWithoutFeedback } from 'react-native';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 
 const SearchBar = () => {
     const [searchInput, setSearchInput] = useState("");
@@ -23,7 +22,7 @@ const SearchBar = () => {
         { id: "12", title: "MySql" },
     ];
 
-    const filteredData = DATA.filter((item) => 
+    const filteredData = DATA.filter((item) =>
         item.title.toLowerCase().includes(searchInput.toLowerCase())
     );
 
@@ -50,54 +49,54 @@ const SearchBar = () => {
                                 setIsFocused(false);
                             }}
                             >
-                            <View style={styles.item}>
-                                <Text style={styles.title}>{item.title}</Text>
-                            </View>
+                                <View style={styles.item}>
+                                    <Text style={styles.title}>{item.title}</Text>
+                                </View>
                             </TouchableWithoutFeedback>
                         )}
                     />
-                    </View>       
+                </View>
             )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-container: {
-    flex: 1,
-    paddingLeft: 20,
-    alignContent: 'center',
-    marginTop: 20,
-},
-searchBar: {
-    borderRadius: 10,
-    borderColor: '#212f3e',
-    borderWidth: 3,
-    paddingHorizontal: 10,
-    height: 38,
-    fontSize: 16,
-    width: 180,
-},
-dropdown: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    width: 180,
-    maxHeight: 150,
-    zIndex: 10,
-},
-title: {
-    fontSize: 16,
-    color: '#333',
-},
-item: {
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-},
+    container: {
+        flex: 1,
+        paddingLeft: 20,
+        alignContent: 'center',
+        marginTop: 20,
+    },
+    searchBar: {
+        borderRadius: 10,
+        borderColor: '#212f3e',
+        borderWidth: 3,
+        paddingHorizontal: 10,
+        height: 38,
+        fontSize: 16,
+        width: 180,
+    },
+    dropdown: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        width: 180,
+        maxHeight: 150,
+        zIndex: 10,
+    },
+    title: {
+        fontSize: 16,
+        color: '#333',
+    },
+    item: {
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+    },
 });
 
 export default SearchBar;

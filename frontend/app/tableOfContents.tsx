@@ -1,23 +1,16 @@
 /* begin tableOfContents.tsx */
 
-import React, { useEffect, useState, type PropsWithChildren } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, ActivityIndicator } from 'react-native';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { Image } from 'expo-image';
-import Header from '../components/headerWithSearch';
-import { colors, fonts } from '../theme';
-import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { colors } from '../theme';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-import BookStatusDropdown from '@/components/BookStatusDropdown';
-import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
-import { Entypo, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book } from '../domain/models';
 import { getBook } from '../services/booksService';
-import { getUriRead } from '@/services/imagesService';
 import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -165,7 +158,6 @@ export default function TableOfContents() {
                 onPress={() => {
                   router.push(`/threads/thread-${chapterNumber}`)
                 }}
-              //router.push("/threads/thread-1");
               >
                 <Text style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest }]}>
                   Chapter {chapterNumber}

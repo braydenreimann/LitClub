@@ -4,7 +4,7 @@ import 'react-native-reanimated';
 import { SessionProvider } from '../auth/authContext';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { LitClubProvider } from '@/LitClubImport/LitClubContext';
+import { LitClubProvider } from '@/context/litClubsContext';
 import React from 'react';
 
 
@@ -24,7 +24,6 @@ export default function RootLayout() {
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
             <Stack.Screen name="createLitClub" options={{ title: 'Create Club', headerShown: false }} />
           </Stack>
-          {/*<StatusBar style="auto" />*/}
         </ThemeProvider>
       </LitClubProvider>
     </SessionProvider>

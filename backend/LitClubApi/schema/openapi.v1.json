@@ -1652,6 +1652,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -1715,6 +1718,56 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/JoinLitClubBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitClubResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Leave"
+        ],
+        "parameters": [
+          {
+            "name": "litClubId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveLitClubBody"
               }
             }
           },
@@ -2772,6 +2825,19 @@
         "additionalProperties": false
       },
       "JoinLitClubBody": {
+        "required": [
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LeaveLitClubBody": {
         "required": [
           "userId"
         ],

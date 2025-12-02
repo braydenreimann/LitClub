@@ -246,7 +246,8 @@ using (var scope = app.Services.CreateScope())
         PasswordHash = "johngreenpw",
         Bio = "I'm just a Nerdfighter that loves reading and science",
         PreferredGenres = ["Fiction", "Science-Fiction", "Romance", "Drama", "Thriller"],
-        ProfilePhotoUrl = "John-Green.png"
+        ProfilePhotoUrl = "John-Green.png",
+        LitClubIds = ["1"]
     };
 
     LitClub litClub = new()

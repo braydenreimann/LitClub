@@ -1,40 +1,44 @@
-import { LitClub } from "@/domain/models";
-import { components } from "schema/openapi-types"
+// /frontend/api-mappers/litclubs/litclubs-mappers.ts
 
-type AddLitClubRequest = components["schemas"]["AddLitClubRequest"]
+import type { components } from '@/schema/openapi-types';
+import type { LitClub } from '@/domain/models';
 
+type AddLitClubRequest = components['schemas']['AddLitClubRequest'];
+type LitClubResponse = components['schemas']['LitClubResponse'];
+
+// Frontend-defined input for creating a LitClub
 export type AddLitClubInput = {
-    name: string,
-    ownerUserId: string,
-    description: string,
-    preferredGenres: string[] | null,
-    privateClub: boolean,
-    memberUserIds: string[] | null,
-}
+    name: string;
+    ownerUserId: string;
+    description: string;
+    preferredGenres: string[] | null;
+    privateClub: boolean;
+    memberUserIds: string[] | null;
+};
 
-export function toAddLitClubRequest(input: AddLitClubInput) {
-    const addLitClubRequest: AddLitClubRequest = {
+// Map frontend AddLitClubInput -> backend AddLitClubRequest (OpenAPI)
+export function toAddLitClubRequest(input: AddLitClubInput): AddLitClubRequest {
+    return {
         name: input.name,
         ownerUserId: input.ownerUserId,
         description: input.description,
         preferredGenres: input.preferredGenres,
         privateClub: input.privateClub,
-        memberUserIds: input.memberUserIds
-    }
-
-    return addLitClubRequest;
+        memberUserIds: input.memberUserIds,
+        // libraryId is not set here; backend will handle it if applicable
+    };
 }
 
-type LitClubReponse = components["schemas"]["LitClubResponse"]
-
-export function toDomainLitClub(dto: LitClubReponse): LitClub {
+// Map backend LitClubResponse (DTO) -> domain LitClub
+export function toDomainLitClub(dto: LitClubResponse): LitClub {
     return {
         id: dto.id!,
         name: dto.name!,
         ownerUserId: dto.ownerUserId!,
-        description: dto.description!,
-        preferredGenres: dto.preferredGenres!,
-        privateClub: dto.privateClub!,
-        memberUserIds: dto.memberUserIds!
-    }
+        description: dto.description ?? '',
+        preferredGenres: dto.preferredGenres ?? [],
+        privateClub: dto.privateClub ?? false,
+        memberUserIds: dto.memberUserIds ?? [],
+        // NOTE: we are intentionally *not* including libraryId in the domain LitClub
+    };
 }
