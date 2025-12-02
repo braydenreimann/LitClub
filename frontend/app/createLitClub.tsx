@@ -168,7 +168,7 @@ export default function CreateLitClub() {
             //   using a librariesService method.
 
             Alert.alert('Success', `${trimmedName} club created successfully!`);
-            router.push('/bookclubs');
+            router.push('/litClubs');
         } catch (error: any) {
             console.error('Error creating club:', error);
             Alert.alert('Error', `Failed to create club: ${error.message ?? 'Unknown error'}`);
