@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { View, Pressable, Text, StyleSheet, Animated } from "react-native";
 import { colors } from "@/theme";
 import { ChevronUp, ChevronDown } from "lucide-react-native";
-import { formatScore } from "@/utils/formatScore";
+import { formatScore } from "@/features/threads/utils/formatScore";
 
 type Props = {
     currentVote: -1 | 0 | 1;

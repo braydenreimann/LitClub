@@ -5,11 +5,11 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator, Image } from "rea
 import { colors } from "@/theme";
 import type { CommentResponse, Author } from "@/domain/models/thread-types";
 import { addReply, voteComment } from "@/api/services/commentsService";
-import VoteButtons from "@/components/threads/VoteButtons";
-import HiddenToggle from "@/components/threads/HiddenToggle";
-import ReplyComposer from "@/components/threads/ReplyComposer";
-import { useReplies } from "@/hooks/useReplies";
-import { isHiddenByScore } from "@/constants/threadVisibility";
+import VoteButtons from "@/features/threads/components/VoteButtons";
+import HiddenToggle from "@/features/threads/components/HiddenToggle";
+import ReplyComposer from "@/features/threads/components/ReplyComposer";
+import { useReplies } from "@/features/threads/hooks/useReplies";
+import { isHiddenByScore } from "@/features/threads/utils/commentVisbility";
 
 const formatCreated = (created: string) => {
     const createdMs = new Date(created).getTime();

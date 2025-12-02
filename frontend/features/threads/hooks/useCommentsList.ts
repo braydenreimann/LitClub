@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { CommentResponse } from "@/domain/models/thread-types";
 import { getTopLevelComments } from "@/api/services/commentsService";
-import { isHiddenByScore } from "@/constants/threadVisibility";
+import { isHiddenByScore } from "@/features/threads/utils/commentVisbility";
 
 export function useCommentsList(threadId: string, userId?: string, pageSize = 20) {
     const [comments, setComments] = useState<CommentResponse[]>([]);
