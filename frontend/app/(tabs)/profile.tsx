@@ -17,7 +17,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
-import { useLitClubs } from '../../LitClubImport/LitClubContext';
+import { useLitClubs } from '../../context/litClubsContext';
 import { getUriRead } from '../../services/imagesService';
 import { getUserFromId } from '../../services/usersService'
 
@@ -30,9 +30,7 @@ function EditButton() {
 }
 function SettingsButton() {
     return (
-        <Link href="/settingsPage">
-            <EvilIcons name="gear" size={30} color={colors.darkest} />
-        </Link>
+        <EvilIcons name="gear" size={30} color={colors.darkest} />
     );
 }
 function StatsButton() {
