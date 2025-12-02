@@ -6,7 +6,7 @@ import {
     type AddLitClubInput,
     toAddLitClubRequest,
     toDomainLitClub,
-} from '@/api-mappers/litclubs/litclubs-mappers';
+} from '@/api/mappers/litclubs-mappers';
 import type { components } from '@/schema/openapi-types';
 
 // Backend DTO for listing clubs

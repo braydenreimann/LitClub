@@ -2,7 +2,7 @@
 
 import { client } from 'client';
 import type { Book } from '@/domain/models';
-import { toDomainBook, toDomainBooks } from '@/api-mappers/books/books-mappers';
+import { toDomainBook, toDomainBooks } from '@/api/mappers/books-mappers';
 
 // Domain-facing list shape (frontend)
 export type ListBooksResult = {

@@ -18,7 +18,7 @@ import { useSession } from '@/auth/authContext';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
 
-import type { LoginInput } from '@/api-mappers/auth/auth-mappers';
+import type { LoginInput } from '@/api/mappers/auth-mappers';
 
 SplashScreen.preventAutoHideAsync();
 

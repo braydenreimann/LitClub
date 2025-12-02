@@ -14,7 +14,7 @@ import {
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
 
-import type { CreateAccountInput } from '@/api-mappers/auth/auth-mappers';
+import type { CreateAccountInput } from '@/api/mappers/auth-mappers';
 
 const pronounOptions = [
   'he', 'him', 'his',
@@ -95,7 +95,7 @@ export default function CreateAccountScreen() {
 
       {/* Username */}
       <Text style={styles.label}>Username *</Text>
-      <Text style={[styles.label, {marginTop: 0, fontSize: 12, color: colors.nextDarkest}]}>Choose wisely - this can't be changed later!</Text>
+      <Text style={[styles.label, { marginTop: 0, fontSize: 12, color: colors.nextDarkest }]}>Choose wisely - this can't be changed later!</Text>
       <TextInput
         style={styles.input}
         value={username}

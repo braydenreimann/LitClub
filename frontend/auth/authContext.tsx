@@ -7,7 +7,7 @@ import {
   toCreateAccountRequest,
   type LoginInput,
   type CreateAccountInput
-} from '../api-mappers/auth/auth-mappers';
+} from '../api/mappers/auth-mappers';
 
 // ---- Context types
 type AuthContextType = {

@@ -19,8 +19,8 @@ import { components } from '../schema/openapi-types';
 import { Modal, Pressable } from 'react-native';
 
 import { useSession } from '@/auth/authContext';
-import { type LoginInput } from '@/api-mappers/auth/auth-mappers';
-import { EditUserInput } from '../api-mappers/users/users-mappers';
+import { type LoginInput } from '@/api/mappers/auth-mappers';
+import { EditUserInput } from '../api/mappers/users-mappers';
 import { verifyPassword } from '@/services/authService';
 import { bool, boolean } from 'yup';
 

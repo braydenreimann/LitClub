@@ -7,7 +7,7 @@ import {
     toEditUserBody,
     type EditUserInput,
     toDomainUser,
-} from '@/api-mappers/users/users-mappers';
+} from '@/api/mappers/users-mappers';
 
 // Pull the current user from session storage (not an API call)
 export async function getUser(): Promise<User | null> {

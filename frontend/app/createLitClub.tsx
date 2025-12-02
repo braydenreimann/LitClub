@@ -19,7 +19,7 @@ import { GenresSelector } from '@/components/genresSelector';
 
 import { getUser } from '@/services/usersService';
 import { createLitClub } from '@/services/litClubsService';
-import type { AddLitClubInput } from '@/api-mappers/litclubs/litclubs-mappers';
+import type { AddLitClubInput } from '@/api/mappers/litclubs-mappers';
 
 SplashScreen.preventAutoHideAsync();
 

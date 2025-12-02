@@ -2,7 +2,7 @@
 
 import { client } from 'client';
 import { LibraryBook, DisplayBook, Book } from '../domain/models';
-import { toDomainLibraryBook } from '@/api-mappers/libraries/libraries-mappers';
+import { toDomainLibraryBook } from '@/api/mappers/libraries-mappers';
 import { getBook } from './booksService';
 import type { components } from '@/schema/openapi-types';
 
