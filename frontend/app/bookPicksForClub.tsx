@@ -1,8 +1,7 @@
 import { View, ScrollView, Text, Pressable, Alert, ActivityIndicator, Dimensions, Image } from 'react-native';
-import Header from '../components/headerWithSearch';
 import { globalStyles } from '@/styles/globalStyles';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import {colors} from '../theme'
+import { colors } from '../theme'
 import { StyleSheet } from 'react-native';
 
 import React, { use, useEffect, useState } from 'react';
@@ -12,7 +11,6 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { Book } from '@/domain/models';
 import { getBooks } from '@/services/booksService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUriRead } from '@/services/imagesService';
 
 const { width } = Dimensions.get('window');
@@ -45,33 +43,33 @@ export default function BookPicksForClubs() {
     loadBooks();
   }, []);
 
-    useEffect(() => {
-        let alive = true;
+  useEffect(() => {
+    let alive = true;
 
-        const loadBooksWithCovers = async () => {
-            try {
-                const { books: fetchedBooks } = await getBooks();
+    const loadBooksWithCovers = async () => {
+      try {
+        const { books: fetchedBooks } = await getBooks();
 
-                // Fetch all cover URIs
-                const uris = await Promise.all(
-                    fetchedBooks.map(book => getUriRead(book.coverImageUrl))
-                );
+        // Fetch all cover URIs
+        const uris = await Promise.all(
+          fetchedBooks.map(book => getUriRead(book.coverImageUrl))
+        );
 
-                if (alive) {
-                    setBooks(fetchedBooks);
-                    setCoverUris(uris.map(uri => uri || "")); // store in array
-                }
-            } catch (err) {
-                console.error("Error loading books:", err);
-            } finally {
-                if (alive) setLoading(false);
-            }
-        };
+        if (alive) {
+          setBooks(fetchedBooks);
+          setCoverUris(uris.map(uri => uri || "")); // store in array
+        }
+      } catch (err) {
+        console.error("Error loading books:", err);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    };
 
-        loadBooksWithCovers();
+    loadBooksWithCovers();
 
-        return () => { alive = false; };
-    }, []);
+    return () => { alive = false; };
+  }, []);
 
   const [fontsLoaded] = useFonts({
     Fraunces_700Bold,
@@ -82,75 +80,75 @@ export default function BookPicksForClubs() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-// Toggle book selection handler  
-    const toggleSelect = (book: Book) => {
-        if (selectedBooks.find(b => b.id === book.id)) {
-            setSelectedBooks(selectedBooks.filter(b => b.id !== book.id));
-        } else {
-            if (selectedBooks.length >= 10) {
-                Alert.alert('Selection Limit', 'You can select up to 10 books only.');
-                return;
-            }
-            setSelectedBooks([...selectedBooks, book]);
-        }   
-    };
+  // Toggle book selection handler  
+  const toggleSelect = (book: Book) => {
+    if (selectedBooks.find(b => b.id === book.id)) {
+      setSelectedBooks(selectedBooks.filter(b => b.id !== book.id));
+    } else {
+      if (selectedBooks.length >= 10) {
+        Alert.alert('Selection Limit', 'You can select up to 10 books only.');
+        return;
+      }
+      setSelectedBooks([...selectedBooks, book]);
+    }
+  };
 
   const handleConfirmSelection = async () => {
     router.push({
       pathname: '/createLitClub',
-      params: { selectedBooks: JSON.stringify(selectedBooks)}
+      params: { selectedBooks: JSON.stringify(selectedBooks) }
     })
   };
-  
+
   if (loading) {
     return (
-      <View style={[globalStyles.container, {justifyContent: 'center', alignItems: 'center'}]}>
-        <ActivityIndicator size="large" color={colors.darkest}/>
+      <View style={[globalStyles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.darkest} />
       </View>
     );
   }
   return (
     <View style={globalStyles.container}>
-      <Text style={[globalStyles.heading, {textAlign:'center', alignContent: 'center', justifyContent: 'center'}]}>Select Books for Your Club to Read</Text>
-      <Text style={[globalStyles.body, {textAlign: 'center', marginBottom: 20}]}> Pick between 1 and 10 books </Text>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <View style={styles.gridContainer}>
-            {books.map((book, index) => {
-              const isSelected = selectedBooks.some(b => b.id === book.id);
-              return (
-                <Pressable
-                  key={book.id}
-                  style={[
-                    styles.card,
-                    isSelected && styles.cardSelected
-                  ]}
-                  onPress={() => toggleSelect(book)}
-                >
-                  
-                    {coverUris[index] ? (
-                              <Image
-                                  source={{ uri: coverUris[index] }}
-                                  style={styles.bookImage}
-                              />
-                          ) : (
-                              <Text style={globalStyles.subheading}>{book.title}</Text>
-                          )}
-                  
-                </Pressable>
-              );
-            })}
-            </View>
-        </ScrollView>
+      <Text style={[globalStyles.heading, { textAlign: 'center', alignContent: 'center', justifyContent: 'center' }]}>Select Books for Your Club to Read</Text>
+      <Text style={[globalStyles.body, { textAlign: 'center', marginBottom: 20 }]}> Pick between 1 and 10 books </Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.gridContainer}>
+          {books.map((book, index) => {
+            const isSelected = selectedBooks.some(b => b.id === book.id);
+            return (
+              <Pressable
+                key={book.id}
+                style={[
+                  styles.card,
+                  isSelected && styles.cardSelected
+                ]}
+                onPress={() => toggleSelect(book)}
+              >
 
-        <Pressable
-            style={globalStyles.button}
-            onPress={handleConfirmSelection}
-        >
-            <Text style={[globalStyles.buttonText]}> 
-                Confirm Selection ({selectedBooks.length})
-            </Text>
+                {coverUris[index] ? (
+                  <Image
+                    source={{ uri: coverUris[index] }}
+                    style={styles.bookImage}
+                  />
+                ) : (
+                  <Text style={globalStyles.subheading}>{book.title}</Text>
+                )}
 
-        </Pressable>
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
+
+      <Pressable
+        style={globalStyles.button}
+        onPress={handleConfirmSelection}
+      >
+        <Text style={[globalStyles.buttonText]}>
+          Confirm Selection ({selectedBooks.length})
+        </Text>
+
+      </Pressable>
     </View>
   );
 }
@@ -159,27 +157,27 @@ const styles = StyleSheet.create({
   card: {
     width: 120,
     height: 180,
-    margin: CARD_MARGIN/2,
+    margin: CARD_MARGIN / 2,
     backgroundColor: colors.yellow,
     borderColor: colors.darkest,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    },
-    bookImage: {
-        width: 120,
-        height: 160,
-        backgroundColor: colors.teal,
-        borderRadius: 8,
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
-    },
+  },
+  bookImage: {
+    width: 120,
+    height: 160,
+    backgroundColor: colors.teal,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
   cardSelected: {
     width: 120,
     height: 180,
-    margin: CARD_MARGIN/2,
+    margin: CARD_MARGIN / 2,
     backgroundColor: colors.teal,
     borderColor: colors.darkest,
     borderRadius: 12,
@@ -193,7 +191,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingVertical: CARD_MARGIN,
-    paddingHorizontal: CARD_MARGIN/1.5,
+    paddingHorizontal: CARD_MARGIN / 1.5,
   },
 });
 
