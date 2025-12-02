@@ -7,16 +7,16 @@ import { colors } from "@/theme";
 import { globalStyles } from "@/styles/globalStyles";
 import type { ThreadResponse, CommentResponse, Author } from "@/domain/models/thread-types";
 import type { User } from "@/domain/models";
-import { getThread, voteThread } from "@/services/threadsService";
-import CommentItem from "@/components/threads/CommentItem";
-import AddCommentBar from "@/components/threads/AddCommentBar";
-import HiddenToggle from "@/components/threads/HiddenToggle";
-import { useCommentsList } from "@/hooks/useCommentsList";
+import { getThread, voteThread } from "@/api/services/threadsService";
+import CommentItem from "@/features/threads/components/CommentItem";
+import AddCommentBar from "@/features/threads/components/AddCommentBar";
+import HiddenToggle from "@/features/threads/components/HiddenToggle";
+import { useCommentsList } from "@/features/threads/hooks/useCommentsList";
 import { MessageCircle } from "lucide-react-native";
-import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
-import { isHiddenByScore } from "@/constants/threadVisibility";
-import { getUser } from "@/services/usersService";
-import VoteButtons from "@/components/threads/VoteButtons";
+import { useKeyboardHeight } from "@/features/threads/hooks/useKeyboardHeight";
+import { isHiddenByScore } from "@/features/threads/utils/commentVisbility";
+import { getUser } from "@/api/services/usersService";
+import VoteButtons from "@/features/threads/components/VoteButtons";
 
 const PAGE_SIZE = 20;
 

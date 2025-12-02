@@ -17,10 +17,10 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLitClubs } from '@/context/litClubsContext';
+import { useLitClubs } from '@/context/LitClubsContext';
 import type { Book, User } from '@/domain/models';
-import { client } from 'client';
-import { leaveLitClub } from '@/services/litClubsService';
+import { client } from '@/api/client';
+import { leaveLitClub } from '@/api/services/litClubsService';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -198,7 +198,7 @@ export default function LitClubScreen() {
                         }
 
                         await fetchLitClubs();
-                        router.replace('/litClubs');
+                        router.replace('/lit-clubs');
                     } catch (error) {
                         Alert.alert('Error leaving club', (error as Error).message);
                     } finally {

@@ -14,11 +14,11 @@ import {
   View,
 } from 'react-native';
 import * as yup from 'yup';
-import { useSession } from '@/auth/authContext';
+import { useSession } from '@/context/AuthContext';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
 
-import type { LoginInput } from '@/api-mappers/auth/auth-mappers';
+import type { LoginInput } from '@/api/mappers/auth-mappers';
 
 SplashScreen.preventAutoHideAsync();
 
