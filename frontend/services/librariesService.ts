@@ -1,70 +1,324 @@
-/* begin librariesService.ts */
+// /frontend/services/librariesService.ts
 
-import { LibraryBook } from '../domain/models'
 import { client } from 'client';
+import { LibraryBook, DisplayBook, Book } from '../domain/models';
 import { toDomainLibraryBook } from '@/api-mappers/libraries/libraries-mappers';
-import Constants from 'expo-constants';
+import { getBook } from './booksService';
+import type { components } from '@/schema/openapi-types';
 
-const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
-// Fallback to your LAN IP if not available
-const LAN_IP = hostFromExpo ?? '10.0.0.252';
-const API_BASE_URL = `http://${LAN_IP}:5112`;
+// Backend enum: 0 | 1 | 2 | 3
+type ShelfStatus = components['schemas']['ShelfStatusContract'];
+type AddLibraryBookBody = components['schemas']['AddLibraryBookBody'];
+type EditLibraryBookBody = components['schemas']['EditLibraryBookBody'];
+type DeleteLibraryBookParams =
+    components['paths']['/libraries/{ownerId}/libraryBooks/{libraryBookId}']['delete']['parameters']['path'];
 
+// ---------------------------------------------------------------------------
+// Core helpers
+// ---------------------------------------------------------------------------
 
-export async function getLibraryBook(ownerId: string, libraryBookId: string): Promise<LibraryBook | null> {
+/**
+ * Get a single LibraryBook by owner + libraryBookId.
+ */
+export async function getLibraryBook(
+    ownerId: string,
+    libraryBookId: string
+): Promise<LibraryBook | null> {
     try {
-        const { data, error } = await client.GET("/libraries/{ownerId}/libraryBooks/{libraryBookId}", {
-            params: { path: { ownerId, libraryBookId } },
-        });
+        const { data, error } = await client.GET(
+            '/libraries/{ownerId}/libraryBooks/{libraryBookId}',
+            {
+                params: { path: { ownerId, libraryBookId } },
+            }
+        );
 
-        if (error) {
-            console.warn('Failed to fetch book literal', error.status);
-            throw new Error(`HTTP error! Status: ${error.status}`);
-        }
-
-        if (!data) {
-            console.error('No library data returned:', { ownerId, libraryBookId });
+        if (error || !data) {
+            console.warn('Failed to fetch library book', error);
             return null;
         }
 
-        return toDomainLibraryBook(data!);
-
+        return toDomainLibraryBook(data);
     } catch (err) {
-        console.error('Error fetching book:', err);
+        console.error('Error fetching library book:', err);
         throw err;
     }
 }
 
-//statuses 0:hasRead 1:currentlyReading 2: hiatus, 3:Want to Read
-export async function editLibraryBookStatus(id: string, libraryBookIdInput: string, status: number): Promise<LibraryBook | null> {
-    //Format body as payload for edit request. userId and libraryBookId always required
-    const body = {
-        OwnerId: id, libraryBookId: libraryBookIdInput,
-        Body: { Status: status }
-    };
-
+/**
+ * Get all LibraryBooks for an owner.
+ */
+export async function getLibraryBooks(ownerId: string): Promise<LibraryBook[]> {
     try {
-        const response = await fetch(`${API_BASE_URL}/${id}/libraryBooks/${libraryBookIdInput}`,
+        const { data, error } = await client.GET(
+            '/libraries/{ownerId}/libraryBooks',
             {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-
-                },
-                body: JSON.stringify(body),
+                params: { path: { ownerId } },
             }
         );
 
-        if (!response.ok) {
-            throw new Error(`Server retured ${response.status}`);
+        if (error || !data) {
+            console.warn('Failed to fetch library books', error);
+            return [];
         }
 
-        const data = await response.json()
-        return data ? toDomainLibraryBook(data) : null;
+        const items = data.libraryBooks ?? [];
+        return items.map(toDomainLibraryBook);
     } catch (err) {
-        console.error("Error in Library Status update")
+        console.error('Error fetching library books:', err);
+        return [];
+    }
+}
+
+/**
+ * Find a LibraryBook for a given owner + bookId, if it exists.
+ */
+export async function getLibraryBookForBook(
+    ownerId: string,
+    bookId: string
+): Promise<LibraryBook | null> {
+    const all = await getLibraryBooks(ownerId);
+    const match = all.find((lb) => lb.bookId === bookId);
+    return match ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Creating / editing LibraryBooks (status changes)
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a new LibraryBook for a given book with an initial status.
+ * POST /libraries/{ownerId}/libraryBooks
+ */
+export async function createLibraryBook(
+    ownerId: string,
+    bookId: string,
+    status: ShelfStatus
+): Promise<LibraryBook | null> {
+    try {
+        const body: AddLibraryBookBody = {
+            bookId,
+            status,
+            startedReading: null,
+            finishedReading: null,
+            currentPage: null,
+            percentComplete: null,
+            onPedastal: false,
+        };
+
+        const { data, error } = await client.POST(
+            '/libraries/{ownerId}/libraryBooks',
+            {
+                params: { path: { ownerId } },
+                body,
+            }
+        );
+
+        if (error || !data) {
+            console.error('Failed to create library book', error);
+            return null;
+        }
+
+        return toDomainLibraryBook(data);
+    } catch (err) {
+        console.error('Error creating library book:', err);
         return null;
     }
 }
 
-/* end librariesService.ts */
+/**
+ * Edit the status of an existing LibraryBook.
+ * PATCH /libraries/{userId}/libraryBooks/{libraryBookId}
+ *
+ * NOTE: The OpenAPI path type requires { ownerId, userId, libraryBookId }.
+ * In this app, ownerId === userId, so we pass both.
+ */
+export async function editLibraryBookStatus(
+    userId: string,
+    libraryBookId: string,
+    status: ShelfStatus
+): Promise<LibraryBook | null> {
+    try {
+        const body: EditLibraryBookBody = {
+            status,
+            startedReading: null,
+            finishedReading: null,
+            currentPage: null,
+            percentComplete: null,
+            onPedastal: null,
+        };
+
+        const { data, error } = await client.PATCH(
+            '/libraries/{userId}/libraryBooks/{libraryBookId}',
+            {
+                params: {
+                    path: {
+                        ownerId: userId,      // 🔧 added to satisfy OpenAPI types
+                        userId,
+                        libraryBookId,
+                    },
+                },
+                body,
+            }
+        );
+
+        if (error || !data) {
+            console.error('Failed to edit library book status', error);
+            return null;
+        }
+
+        return toDomainLibraryBook(data);
+    } catch (err) {
+        console.error('Error editing library book status:', err);
+        return null;
+    }
+}
+
+/**
+ * High-level helper for the user story:
+ *
+ * "As a reader, I would like to select books to place on my bookshelf
+ *  in a specified booklist (Currently Reading, Past Reads, Future Reads, Not in Library)"
+ *
+ * - If a LibraryBook doesn't exist yet for (ownerId, bookId), it creates one.
+ * - If it exists, it updates the status.
+ */
+export async function setBookShelfStatus(
+    ownerId: string,
+    bookId: string,
+    status: ShelfStatus
+): Promise<LibraryBook | null> {
+    const existing = await getLibraryBookForBook(ownerId, bookId);
+
+    if (!existing) {
+        return createLibraryBook(ownerId, bookId, status);
+    }
+
+    return editLibraryBookStatus(ownerId, existing.id, status);
+}
+
+/**
+ * Remove a LibraryBook entirely.
+ */
+export async function deleteLibraryBook(
+    ownerId: string,
+    libraryBookId: string
+): Promise<boolean> {
+    try {
+        const params: DeleteLibraryBookParams = { ownerId, libraryBookId };
+        const { error } = await client.DELETE(
+            '/libraries/{ownerId}/libraryBooks/{libraryBookId}',
+            { params: { path: params } }
+        );
+
+        if (error) {
+            console.error('Failed to delete library book', error);
+            return false;
+        }
+
+        return true;
+    } catch (err) {
+        console.error('Error deleting library book:', err);
+        return false;
+    }
+}
+
+/**
+ * Remove a book from the user's library by bookId (finds the LibraryBook and deletes it).
+ */
+export async function removeBookFromLibrary(
+    ownerId: string,
+    bookId: string
+): Promise<boolean> {
+    const existing = await getLibraryBookForBook(ownerId, bookId);
+    if (!existing) {
+        return true; // nothing to remove
+    }
+
+    return deleteLibraryBook(ownerId, existing.id);
+}
+
+// ---------------------------------------------------------------------------
+// Helpers for building lists / homepage sections
+// ---------------------------------------------------------------------------
+
+/**
+ * Get DisplayBooks for all LibraryBooks with onPedastal === true.
+ */
+export async function getTopThree(
+    ownerId: string
+): Promise<DisplayBook[] | null> {
+    try {
+        const libraryBooks = await getLibraryBooks(ownerId);
+        const filtered = libraryBooks.filter((b) => b.onPedastal === true);
+
+        const fullBooks: (Book | null)[] = await Promise.all(
+            filtered.map(async (libBook) => {
+                if (!libBook.bookId) {
+                    return null;
+                }
+                try {
+                    const book = await getBook(libBook.bookId);
+                    return book;
+                } catch (err) {
+                    console.error(`Failed to fetch book ${libBook.bookId}`, err);
+                    return null;
+                }
+            })
+        );
+
+        const displayBooks: DisplayBook[] = fullBooks
+            .filter((b): b is Book => b !== null)
+            .map((b) => ({
+                id: b.id,
+                title: b.title,
+                coverImageUrl: b.coverImageUrl,
+            }));
+
+        return displayBooks;
+    } catch (error) {
+        console.error('Error fetching top three books:', error);
+        return null;
+    }
+}
+
+/**
+ * Get DisplayBooks for all LibraryBooks with a given status.
+ * This powers the Currently Reading / Past Reads / Future Reads lists.
+ */
+export async function getBookshelfByStatus(
+    ownerId: string,
+    status: ShelfStatus
+): Promise<DisplayBook[] | null> {
+    try {
+        const libraryBooks = await getLibraryBooks(ownerId);
+        const filtered = libraryBooks.filter((b) => b.status === status);
+
+        const fullBooks: (Book | null)[] = await Promise.all(
+            filtered.map(async (libBook) => {
+                if (!libBook.bookId) {
+                    return null;
+                }
+                try {
+                    const book = await getBook(libBook.bookId);
+                    return book;
+                } catch (err) {
+                    console.error(`Failed to fetch book ${libBook.bookId}`, err);
+                    return null;
+                }
+            })
+        );
+
+        const displayBooks: DisplayBook[] = fullBooks
+            .filter((b): b is Book => b !== null)
+            .map((b) => ({
+                id: b.id,
+                title: b.title,
+                coverImageUrl: b.coverImageUrl,
+            }));
+
+        return displayBooks;
+    } catch (error) {
+        console.error('Error fetching bookshelf by status:', error);
+        return null;
+    }
+}
