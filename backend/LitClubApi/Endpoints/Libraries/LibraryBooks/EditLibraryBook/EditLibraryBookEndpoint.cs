@@ -12,7 +12,7 @@ public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<EditLibraryBookRequest>
     .WithActionResult<LibraryBookResponse>
 {
-    [HttpPatch("libraries/{userId}/libraryBooks/{libraryBookId}")]
+[HttpPatch("libraries/{userId}/libraryBooks/{libraryBookId}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(LibraryBookResponse), StatusCodes.Status200OK)]
@@ -23,11 +23,12 @@ public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         Library? library;
+        var ownerId = request.OwnerId;
         try
         {
             var response = await cosmosContext.Libraries.ReadItemAsync<Library>(
-                id: request.OwnerId,
-                partitionKey: new PartitionKey(request.OwnerId),
+                id: ownerId,
+                partitionKey: new PartitionKey(ownerId),
                 cancellationToken: cancellationToken);
             library = response.Resource;
         }
