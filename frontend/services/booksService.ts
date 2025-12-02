@@ -22,7 +22,7 @@ export async function getBooks(
         });
 
         if (error || !data) {
-            console.warn('Failed to fetch books', error?.status);
+            console.warn('Failed to fetch books', error);
             return { books: [], continuationToken: null };
         }
 
@@ -43,7 +43,7 @@ export async function getBook(bookId: string): Promise<Book | null> {
         });
 
         if (error || !data) {
-            console.warn('Failed to fetch book', error?.status);
+            console.warn('Failed to fetch book', error);
             return null;
         }
 
