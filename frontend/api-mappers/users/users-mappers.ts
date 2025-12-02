@@ -1,6 +1,10 @@
-import { components } from "@/schema/openapi-types";
+// /frontend/api-mappers/users/users-mappers.ts
 
-type EditUserBody = components["schemas"]["EditUserBody"];
+import { components } from '@/schema/openapi-types';
+import type { User } from '@/domain/models';
+
+type UserResponse = components['schemas']['UserResponse'];
+type EditUserBody = components['schemas']['EditUserBody'];
 
 export type EditUserInput = {
   userId: string;
@@ -37,3 +41,43 @@ export type PasswordChangeInput = {
   currentPassword: string;
   newPassword: string;
 };
+
+export function toDomainUser(dto: UserResponse): User {
+  const firstName = dto.firstName ?? "";
+  const lastName = dto.lastName ?? "";
+  const userName = dto.userName ?? "";
+
+  return {
+    id: dto.id ?? "",
+
+    // Domain requires these, so we must synthesize safe values
+    name: `${firstName} ${lastName}`.trim() || userName || "Unknown User",
+    username: userName || "",   // domain requires this separate field
+
+    firstName,
+    lastName,
+    userName,
+    email: dto.email ?? "",
+
+    bio: dto.bio ?? "",
+    pronouns: dto.pronouns ?? [],
+    preferredGenres: dto.preferredGenres ?? [],
+
+    // Nullable -> string
+    profilePhotoUrl: dto.profilePhotoUrl ?? "",
+
+    // Nullable -> boolean
+    privateAccount: dto.privateAccount ?? false,
+    publicInteractionRestricted: dto.publicInteractionRestricted ?? false,
+
+    followingUserIds: dto.followingUserIds ?? [],
+    followerUserIds: dto.followerUserIds ?? [],
+    blockedUserIds: dto.blockedUserIds ?? [],
+    litClubIds: dto.litClubIds ?? [],
+
+    created: dto.created ?? "",
+
+    // Domain requires password but backend never returns one, so default safely
+    password: "",
+  };
+}
