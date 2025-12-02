@@ -1,28 +1,24 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
-import { useState } from 'react';
-import SearchBar from '@/components/SearchBar';
+import SearchBar from '@/components/temp/SearchBar';
 
 export default function Header() {
   return (
-  // Sample data to display in the FlatList - Sourced from GeeksforGeeks
+    // Sample data to display in the FlatList - Sourced from GeeksforGeeks
     <View style={styles.header}>
       <Link href="/bookrecs">
-       <Image
+        <Image
           source={require('@/assets/images/small logo.png')}
           style={styles.headerImage}
           contentFit="contain"
         />
       </Link>
 
-        <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 20 }}>
-          <SearchBar />
-        </View>  
+      <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 20 }}>
+        <SearchBar />
+      </View>
     </View>
   );
 }
@@ -45,7 +41,6 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     marginTop: 10,
-    
+
   }
 });
-
