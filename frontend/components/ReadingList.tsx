@@ -20,17 +20,26 @@ interface ReadingListProps {
     status: ShelfStatus;
     books?: DisplayBook[];
     refreshKey?: number;
+    ownerId?: string; // optional owner for shelves; defaults to current user
+    onBookPress?: (bookId: string) => void;
 }
 
-export default function ReadingList({ books, status, refreshKey }: ReadingListProps) {
+export default function ReadingList({
+    books,
+    status,
+    refreshKey,
+    ownerId,
+    onBookPress,
+}: ReadingListProps) {
     const [user, setUser] = useState<User | null>(null);
     const [shelf, setShelf] = useState<DisplayBook[]>(books ?? []);
     const [loading, setLoading] = useState(!books);
     const [coverUris, setCoverUris] = useState<{ [id: string]: string }>({});
     const router = useRouter();
 
-    // Load user from session (via usersService)
+    // Load user from session (via usersService) if an explicit owner isn't provided
     useEffect(() => {
+        if (ownerId) return;
         const loadUser = async () => {
             try {
                 const sessionUser = await getUser();
@@ -43,16 +52,19 @@ export default function ReadingList({ books, status, refreshKey }: ReadingListPr
         };
 
         loadUser();
-    }, []);
+    }, [ownerId]);
 
     // Load bookshelf by status (from librariesService)
     useEffect(() => {
-        if (books || !user) return;
+        if (books) return;
+
+        const resolvedOwnerId = ownerId ?? user?.id;
+        if (!resolvedOwnerId) return;
 
         const loadBookshelf = async () => {
             setLoading(true);
             try {
-                const fetched = await getBookshelfByStatus(user.id, status);
+                const fetched = await getBookshelfByStatus(resolvedOwnerId, status);
                 setShelf(fetched ?? []);
             } catch (err) {
                 console.error('Error loading bookshelf:', err);
@@ -62,7 +74,7 @@ export default function ReadingList({ books, status, refreshKey }: ReadingListPr
         };
 
         loadBookshelf();
-    }, [books, user, status, refreshKey]);
+    }, [books, user?.id, ownerId, status, refreshKey]);
 
     // Load cover images for the shelf
     useEffect(() => {
@@ -100,7 +112,11 @@ export default function ReadingList({ books, status, refreshKey }: ReadingListPr
                         <Pressable
                             key={book.id}
                             style={styles.card}
-                            onPress={() => pushBookDetail(router, book.id)}
+                            onPress={() =>
+                                onBookPress
+                                    ? onBookPress(book.id)
+                                    : pushBookDetail(router, book.id)
+                            }
                         >
                             <Image
                                 source={

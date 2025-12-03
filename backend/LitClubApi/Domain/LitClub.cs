@@ -10,7 +10,7 @@ public class LitClub
     public required string OwnerUserId { get; set; }
     public string? Description { get; set; }
     public List<string> PreferredGenres { get; set; } = [];
-    public bool PrivateClub { get; set; } = false;
+    public bool PrivateClub { get; set; } = true;
 
     // Members
     public List<string> MemberUserIds { get; set; } = [];

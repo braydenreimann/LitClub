@@ -21,6 +21,8 @@ import { useLitClubs } from '@/context/LitClubsContext';
 import type { Book, User } from '@/domain/models';
 import { client } from '@/api/client';
 import { leaveLitClub } from '@/api/services/litClubsService';
+import { pushBookDetail } from '@/navigation/routes';
+import { useFocusEffect } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -84,6 +86,7 @@ export default function LitClubScreen() {
     const [actionLoading, setActionLoading] = useState(false);
     const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
     const [user, setUser] = useState<User | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [currentBook, setCurrentBook] = useState<Book | null>(null);
     const [upcomingBooks, setUpcomingBooks] = useState<Book[]>([]); // still loaded, not yet rendered
 
@@ -144,6 +147,14 @@ export default function LitClubScreen() {
         };
         loadSelectedBooks();
     }, []);
+
+    // Refresh reading lists when this screen regains focus
+    useFocusEffect(
+        React.useCallback(() => {
+            setRefreshKey((k) => k + 1);
+            return undefined;
+        }, [])
+    );
 
     const club = litClubs.find((c) => c.id === id);
 
@@ -368,16 +379,63 @@ export default function LitClubScreen() {
                     ))}
                 </View>
 
-                {/* Reading lists */}
-                <Text style={[globalStyles.subheading, { margin: 20 }]}>
-                    Upcoming Reads
+                {/* Club Library reading lists */}
+                <Text
+                    style={[
+                        globalStyles.subheading,
+                        { paddingTop: 25, paddingHorizontal: 20 },
+                    ]}
+                >
+                    Currently Reading
                 </Text>
-                <ReadingList status={0} />
+                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5 }}>
+                    <ReadingList
+                        status={1}
+                        ownerId={club.id}
+                        refreshKey={refreshKey}
+                        onBookPress={(bookId) =>
+                            pushBookDetail(router, bookId, club.id, club.name, club.ownerUserId)
+                        }
+                    />
+                </View>
 
-                <Text style={[globalStyles.subheading, { margin: 20 }]}>
+                <Text
+                    style={[
+                        globalStyles.subheading,
+                        { paddingTop: 25, paddingHorizontal: 20 },
+                    ]}
+                >
+                    Future Reads
+                </Text>
+                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5 }}>
+                    <ReadingList
+                        status={3}
+                        ownerId={club.id}
+                        refreshKey={refreshKey}
+                        onBookPress={(bookId) =>
+                            pushBookDetail(router, bookId, club.id, club.name, club.ownerUserId)
+                        }
+                    />
+                </View>
+
+                <Text
+                    style={[
+                        globalStyles.subheading,
+                        { paddingTop: 25, paddingHorizontal: 20 },
+                    ]}
+                >
                     Past Reads
                 </Text>
-                <ReadingList status={1} />
+                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5 }}>
+                    <ReadingList
+                        status={0}
+                        ownerId={club.id}
+                        refreshKey={refreshKey}
+                        onBookPress={(bookId) =>
+                            pushBookDetail(router, bookId, club.id, club.name, club.ownerUserId)
+                        }
+                    />
+                </View>
 
                 {/* Members */}
                 <Text style={[globalStyles.subheading, { margin: 20 }]}>

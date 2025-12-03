@@ -9,65 +9,25 @@ import {
     ScrollView,
     StyleSheet,
 } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book, User } from '../../domain/models';
+import { Book } from '../../domain/models';
 import { getBook } from '../../api/services/booksService';
-import { getUser } from '../../api/services/usersService';
 import { getUriRead } from '@/api/services/imagesService';
 import BookTableOfContentsTabs from '@/components/BookTableOfContentsTabs';
-import {
-    getLibraryBookForBook,
-    removeBookFromLibrary,
-    setBookShelfStatus,
-} from '../../api/services/librariesService';
-
-// Backend enum: 0 | 1 | 2 | 3
-type ShelfStatus = 0 | 1 | 2 | 3;
-
-type ShelfStatusOption = {
-    label: string;
-    value: ShelfStatus | 'remove';
-};
-
-const shelfStatusOptions: ShelfStatusOption[] = [
-    {
-        label: 'Currently Reading',
-        value: 1,
-    },
-    {
-        label: 'Future Reads',
-        value: 3,
-    },
-    {
-        label: 'Past Reads',
-        value: 0,
-    },
-    {
-        label: 'Remove from Bookshelf',
-        value: 'remove',
-    },
-];
-
-function mapStatusToLabel(status: ShelfStatus | null): string {
-    switch (status) {
-        case 1:
-            return 'Currently Reading';
-        case 3:
-            return 'Future Reads';
-        case 0:
-            return 'Past Reads';
-        case 2:
-            return 'On Hiatus';
-        default:
-            return 'Add to Bookshelf';
-    }
-}
 
 export default function BookInfoScreen() {
-    const { bookId } = useLocalSearchParams<{ bookId: string }>();
+    const params = useLocalSearchParams<{
+        bookId: string | string[];
+        litClubId?: string | string[];
+        litClubName?: string | string[];
+        litClubOwnerId?: string | string[];
+    }>();
+    const bookId = Array.isArray(params.bookId) ? params.bookId[0] : params.bookId;
+    const litClubIdParam = Array.isArray(params.litClubId) ? params.litClubId[0] : params.litClubId;
+    const litClubNameParam = Array.isArray(params.litClubName) ? params.litClubName[0] : params.litClubName;
+    const litClubOwnerIdParam = Array.isArray(params.litClubOwnerId) ? params.litClubOwnerId[0] : params.litClubOwnerId;
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [book, setBook] = useState<Book | null>(null);
@@ -75,40 +35,6 @@ export default function BookInfoScreen() {
     const [error, setError] = useState<string | null>(null);
 
     const [coverUri, setCoverUri] = useState<string>('');
-
-    const [user, setUser] = useState<User | null>(null);
-    const [shelfStatus, setShelfStatus] = useState<ShelfStatus | null>(null);
-    const [statusMenuOpen, setStatusMenuOpen] = useState(false);
-    const [statusLoading, setStatusLoading] = useState(true);
-    const [statusSaving, setStatusSaving] = useState(false);
-    const [statusError, setStatusError] = useState<string | null>(null);
-    const [triggerLayout, setTriggerLayout] = useState<{
-        height: number;
-        y: number;
-        width: number;
-        x: number;
-    }>({
-        height: 0,
-        y: 0,
-        width: 0,
-        x: 0,
-    });
-
-    // Load user from session
-    useEffect(() => {
-        const loadUser = async () => {
-            try {
-                const sessionUser = await getUser();
-                if (sessionUser) {
-                    setUser(sessionUser);
-                }
-            } catch (err) {
-                console.error('Error loading user:', err);
-            }
-        };
-
-        loadUser();
-    }, []);
 
     // Fetch book data
     useEffect(() => {
@@ -137,77 +63,14 @@ export default function BookInfoScreen() {
             if (alive) setCoverUri(uri || '');
         })();
 
-        return () => {
-            alive = false;
-        };
-    }, [book?.coverImageUrl]);
-
-    // Load bookshelf status for this book
-    useEffect(() => {
-        if (!user || !book) return;
-
-        let alive = true;
-        setStatusLoading(true);
-        setStatusError(null);
-
-        (async () => {
-            try {
-                const existing = await getLibraryBookForBook(user.id, book.id);
-                if (!alive) return;
-                setShelfStatus((existing?.status ?? null) as ShelfStatus | null);
-            } catch (err) {
-                if (!alive) return;
-                console.error('Error loading shelf status:', err);
-                setStatusError('Unable to load bookshelf status right now.');
-            } finally {
-                if (!alive) return;
-                setStatusLoading(false);
-            }
-        })();
-
-        return () => {
-            alive = false;
-        };
-    }, [user, book]);
-
-    useEffect(() => {
-        if (book && !user) {
-            setStatusLoading(false);
-        }
-    }, [book, user]);
-
-    const handleShelfStatusSelect = async (option: ShelfStatusOption) => {
-        if (!user || !book) {
-            setStatusError('Sign in to save your bookshelf status.');
-            return;
-        }
-
-        setStatusSaving(true);
-        setStatusError(null);
-        try {
-            if (option.value === 'remove') {
-                const removed = await removeBookFromLibrary(user.id, book.id);
-                if (!removed) {
-                    throw new Error('Failed to remove from bookshelf');
-                }
-                setShelfStatus(null);
-            } else {
-                const nextStatus = option.value as ShelfStatus;
-                await setBookShelfStatus(user.id, book.id, nextStatus);
-                setShelfStatus(nextStatus);
-            }
-            setStatusMenuOpen(false);
-        } catch (err) {
-            console.error('Failed to update shelf status:', err);
-            setStatusError('Could not update your bookshelf. Please try again.');
-        } finally {
-            setStatusSaving(false);
-        }
+    return () => {
+        alive = false;
     };
+}, [book?.coverImageUrl]);
 
-    return (
-        <View style={{ flex: 1, backgroundColor: colors.cream }}>
-            <ScrollView>
+return (
+    <View style={{ flex: 1, backgroundColor: colors.cream }}>
+        <ScrollView>
 
                 {loading ? (
                     <ActivityIndicator size="large" color={colors.midBlue} />
@@ -292,86 +155,15 @@ export default function BookInfoScreen() {
                 )}
                 <View style={{ height: 4, backgroundColor: colors.darkest }} />
 
-                {/* Shelf status selector */}
-                {book && (
-                    <View style={infoStyle.statusContainer}>
-                        <Text style={[globalStyles.subheading, { fontSize: 18 }]}>
-                            Bookshelf status
-                        </Text>
-
-                        <Pressable
-                            style={[
-                                infoStyle.statusTrigger,
-                                statusMenuOpen && infoStyle.statusTriggerActive,
-                            ]}
-                            onPress={() => {
-                                if (statusLoading || statusSaving) return;
-                                setStatusMenuOpen((prev) => !prev);
-                            }}
-                            onLayout={(e) =>
-                                setTriggerLayout({
-                                    height: e.nativeEvent.layout.height,
-                                    y: e.nativeEvent.layout.y,
-                                    width: e.nativeEvent.layout.width,
-                                    x: e.nativeEvent.layout.x,
-                                })
-                            }
-                        >
-                            <View style={{ flex: 1 }}>
-                                <Text style={infoStyle.statusLabel}>
-                                    {statusLoading
-                                        ? 'Checking status...'
-                                        : mapStatusToLabel(shelfStatus)}
-                                </Text>
-                            </View>
-                            <FontAwesome
-                                name={statusMenuOpen ? 'chevron-up' : 'chevron-down'}
-                                size={18}
-                                color={colors.darkest}
-                            />
-                        </Pressable>
-
-                        {statusMenuOpen && (
-                            <View
-                                style={[
-                                    infoStyle.statusDropdown,
-                                    {
-                                        top: triggerLayout.y + triggerLayout.height + 6,
-                                        left: triggerLayout.x,
-                                        width: Math.max(triggerLayout.width, 200),
-                                    },
-                                ]}
-                            >
-                                {shelfStatusOptions.map((option) => (
-                                    <Pressable
-                                        key={option.label}
-                                        style={({ pressed }) => [
-                                            infoStyle.statusOption,
-                                            shelfStatus === option.value && {
-                                                backgroundColor: colors.sage,
-                                            },
-                                            pressed && { backgroundColor: colors.sage },
-                                        ]}
-                                        onPress={() => handleShelfStatusSelect(option)}
-                                    >
-                                        <Text style={[globalStyles.subheading, { fontSize: 15 }]}>
-                                            {option.label}
-                                        </Text>
-                                    </Pressable>
-                                ))}
-                            </View>
-                        )}
-
-                        {statusError && (
-                            <Text style={{ color: 'red', marginTop: 8 }}>{statusError}</Text>
-                        )}
-                    </View>
-                )}
-                <View style={{ height: 4, backgroundColor: colors.darkest }} />
-
                 {/* Embedded tabs + table of contents */}
                 {book && bookId && (
-                    <BookTableOfContentsTabs bookId={bookId} book={book} />
+                    <BookTableOfContentsTabs
+                        bookId={bookId}
+                        book={book}
+                        litClubId={litClubIdParam}
+                        litClubName={litClubNameParam}
+                        litClubOwnerId={litClubOwnerIdParam}
+                    />
                 )}
             </ScrollView>
         </View>
@@ -436,13 +228,6 @@ const infoStyle = StyleSheet.create({
         color: colors.darkest,
         textAlign: 'center',
     },
-    statusContainer: {
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        backgroundColor: colors.cream,
-        gap: 10,
-        position: 'relative',
-    },
     headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -465,50 +250,5 @@ const infoStyle = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         gap: 8,
-    },
-    statusTrigger: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.darkest,
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        backgroundColor: colors.sage,
-    },
-    statusTriggerActive: {
-        borderColor: colors.midBlue,
-        shadowColor: colors.midBlue,
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 2 },
-    },
-    statusLabel: {
-        fontFamily: fonts.subheading,
-        fontSize: 15,
-        color: colors.darkest,
-    },
-    statusDropdown: {
-        position: 'absolute',
-        borderWidth: 2,
-        borderColor: colors.darkest,
-        borderRadius: 12,
-        backgroundColor: colors.cream,
-        overflow: 'hidden',
-        zIndex: 20,
-        elevation: 6,
-        shadowColor: colors.darkest,
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 2 },
-    },
-    statusOption: {
-        flexDirection: 'row',
-        alignItems: 'center', // centers labels and icons vertically
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        paddingTop: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.darkest,
     },
 });

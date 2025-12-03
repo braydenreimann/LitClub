@@ -54,7 +54,7 @@ export default function HomeScreen() {
         <Text
           style={[
             globalStyles.subheading,
-            { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 },
+            { paddingTop: 25, paddingHorizontal: 25 },
           ]}
         >
           Currently Reading
@@ -67,7 +67,7 @@ export default function HomeScreen() {
         <Text
           style={[
             globalStyles.subheading,
-            { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 },
+            { paddingTop: 25, paddingHorizontal: 25 },
           ]}
         >
           Future Reads
@@ -80,7 +80,7 @@ export default function HomeScreen() {
         <Text
           style={[
             globalStyles.subheading,
-            { fontSize: 25, paddingTop: 25, paddingHorizontal: 25 },
+            { paddingTop: 25, paddingHorizontal: 25 },
           ]}
         >
           Past Reads

@@ -19,5 +19,4 @@ public sealed class EditLitClubBody
     public List<string>? PreferredGenres { get; init; }
     public bool? PrivateClub { get; init; }
     public List<string>? MemberUserIds { get; init; }
-    public string? LibraryId { get; init; }
 }
