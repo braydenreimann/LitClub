@@ -8,22 +8,13 @@ public static class LitClubMapper
 {
     public static LitClub ToDomain(AddLitClubRequest request)
     {
-        var members = request.MemberUserIds?.ToList() ?? new List<string>();
-
-        if (!members.Contains(request.OwnerUserId, StringComparer.Ordinal))
-        {
-            members.Add(request.OwnerUserId);
-        }
-
         return new LitClub
         {
             Name = request.Name,
             OwnerUserId = request.OwnerUserId,
             Description = request.Description,
-            PreferredGenres = request.PreferredGenres?.ToList() ?? new List<string>(),
+            PreferredGenres = request.PreferredGenres?.ToList() ?? [],
             PrivateClub = request.PrivateClub,
-            MemberUserIds = members,
-            LibraryId = request.LibraryId
         };
     }
 
@@ -47,7 +38,7 @@ public static class LitClubMapper
 
         if (body.PreferredGenres is not null)
         {
-            litClub.PreferredGenres = body.PreferredGenres.ToList();
+            litClub.PreferredGenres = [.. body.PreferredGenres];
         }
 
         if (body.PrivateClub is not null)
@@ -57,13 +48,8 @@ public static class LitClubMapper
 
         if (body.MemberUserIds is not null)
         {
-            litClub.MemberUserIds = body.MemberUserIds.ToList();
+            litClub.MemberUserIds = [.. body.MemberUserIds];
             EnsureOwnerMembership(litClub);
-        }
-
-        if (body.LibraryId is not null)
-        {
-            litClub.LibraryId = body.LibraryId;
         }
     }
 
@@ -76,7 +62,6 @@ public static class LitClubMapper
         PreferredGenres = litClub.PreferredGenres.ToArray(),
         PrivateClub = litClub.PrivateClub,
         MemberUserIds = litClub.MemberUserIds.ToArray(),
-        LibraryId = litClub.LibraryId,
         Created = litClub.Created
     };
 

@@ -17,14 +17,64 @@ import {
     ArrowBigUp,
 } from "lucide-react-native";
 import { router } from "expo-router";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { colors, fonts } from "../theme";
 import { globalStyles } from "@/styles/globalStyles";
-import { Book } from "@/domain/models";
+import { Book, LitClub, User } from "@/domain/models";
 import {
     getThreadsForChapter,
     type ThreadSummary,
 } from "@/api/services/threadsService";
+import { getUser } from "@/api/services/usersService";
+import { listLitClubs } from "@/api/services/litClubsService";
+import {
+    getLibraryBookForBook,
+    removeBookFromLibrary,
+    setBookShelfStatus,
+} from "@/api/services/librariesService";
+
+// Backend enum: 0 | 1 | 2 | 3
+type ShelfStatus = 0 | 1 | 2 | 3;
+
+type ShelfStatusOption = {
+    label: string;
+    value: ShelfStatus | "remove";
+};
+
+const shelfStatusOptions: ShelfStatusOption[] = [
+    {
+        label: "Currently Reading",
+        value: 1,
+    },
+    {
+        label: "Future Reads",
+        value: 3,
+    },
+    {
+        label: "Past Reads",
+        value: 0,
+    },
+    {
+        label: "Remove from Bookshelf",
+        value: "remove",
+    },
+];
+
+function mapStatusToLabel(status: ShelfStatus | null): string {
+    switch (status) {
+        case 1:
+            return "Currently Reading";
+        case 3:
+            return "Future Reads";
+        case 0:
+            return "Past Reads";
+        case 2:
+            return "On Hiatus";
+        default:
+            return "Add to Bookshelf";
+    }
+}
 
 type TabKey = "library" | "litclub";
 
@@ -78,6 +128,36 @@ function BookTableOfContentsTabs({
     litClubId,
 }: BookTableOfContentsTabsProps) {
     const [activeTab, setActiveTab] = useState<TabKey>("library");
+    const [user, setUser] = useState<User | null>(null);
+    const [litClubMenuOpen, setLitClubMenuOpen] = useState(false);
+    const [availableLitClubs, setAvailableLitClubs] = useState<LitClub[]>([]);
+    const [litClubLoading, setLitClubLoading] = useState(false);
+    const [litClubError, setLitClubError] = useState<string | null>(null);
+    const [selectedLitClubId, setSelectedLitClubId] = useState<string | null>(
+        litClubId ?? null
+    );
+    const [litClubTriggerLayout, setLitClubTriggerLayout] = useState<{
+        height: number;
+        y: number;
+        width: number;
+        x: number;
+    }>({ height: 0, y: 0, width: 0, x: 0 });
+    const [shelfStatus, setShelfStatus] = useState<ShelfStatus | null>(null);
+    const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+    const [statusLoading, setStatusLoading] = useState(true);
+    const [statusSaving, setStatusSaving] = useState(false);
+    const [statusError, setStatusError] = useState<string | null>(null);
+    const [triggerLayout, setTriggerLayout] = useState<{
+        height: number;
+        y: number;
+        width: number;
+        x: number;
+    }>({
+        height: 0,
+        y: 0,
+        width: 0,
+        x: 0,
+    });
 
     const [checkedChapters, setCheckedChapters] =
         useState<CheckedChaptersState>({});
@@ -105,6 +185,110 @@ function BookTableOfContentsTabs({
 
     // For now, both tabs share the same checkbox state.
     const storageKey = `book-${bookId}-checkedChapters`;
+
+    // Load user from session
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const sessionUser = await getUser();
+                if (sessionUser) {
+                    setUser(sessionUser);
+                }
+            } catch (err) {
+                console.error("Error loading user:", err);
+            }
+        };
+
+        loadUser();
+    }, []);
+
+    // Load bookshelf status for this book
+    useEffect(() => {
+        if (!user || !book) return;
+
+        let alive = true;
+        setStatusLoading(true);
+        setStatusError(null);
+
+        (async () => {
+            try {
+                const existing = await getLibraryBookForBook(user.id, book.id);
+                if (!alive) return;
+                setShelfStatus((existing?.status ?? null) as ShelfStatus | null);
+            } catch (err) {
+                if (!alive) return;
+                console.error("Error loading shelf status:", err);
+                setStatusError("Unable to load bookshelf status right now.");
+            } finally {
+                if (!alive) return;
+                setStatusLoading(false);
+            }
+        })();
+
+        return () => {
+            alive = false;
+        };
+    }, [user?.id, book?.id]);
+
+    useEffect(() => {
+        if (book && !user) {
+            setStatusLoading(false);
+        }
+    }, [book, user]);
+
+    useEffect(() => {
+        setStatusMenuOpen(false);
+    }, [activeTab]);
+
+    useEffect(() => {
+        if (activeTab === "library") {
+            setLitClubMenuOpen(false);
+        }
+    }, [activeTab]);
+
+    useEffect(() => {
+        if (litClubId && !selectedLitClubId) {
+            setSelectedLitClubId(litClubId);
+        }
+    }, [litClubId, selectedLitClubId]);
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        let alive = true;
+        setLitClubLoading(true);
+        setLitClubError(null);
+
+        (async () => {
+            try {
+                const clubs = await listLitClubs();
+                if (!alive) return;
+
+                const memberships = clubs.filter(
+                    (club) =>
+                        club.memberUserIds?.includes(user.id) ||
+                        user.litClubIds?.includes(club.id)
+                );
+
+                setAvailableLitClubs(memberships);
+
+                if (!selectedLitClubId && memberships.length > 0) {
+                    setSelectedLitClubId(memberships[0].id);
+                }
+            } catch (err) {
+                if (!alive) return;
+                console.error("Failed to load LitClubs:", err);
+                setLitClubError("Unable to load your LitClubs right now.");
+            } finally {
+                if (!alive) return;
+                setLitClubLoading(false);
+            }
+        })();
+
+        return () => {
+            alive = false;
+        };
+    }, [user?.id]);
 
     // Load checkbox state from storage
     useEffect(() => {
@@ -160,16 +344,65 @@ function BookTableOfContentsTabs({
         });
     };
 
+    const handleSelectLitClub = (clubId: string) => {
+        setSelectedLitClubId(clubId);
+        setActiveTab("litclub");
+        setLitClubMenuOpen(false);
+        setChapterThreads((prev) => ({
+            ...prev,
+            litclub: {},
+        }));
+        setExpandedChapters({});
+        setChapterThreadsError((prev) => ({
+            ...prev,
+            litclub: {},
+        }));
+        setChapterThreadsLoading((prev) => ({
+            ...prev,
+            litclub: {},
+        }));
+    };
+
+    const handleShelfStatusSelect = async (option: ShelfStatusOption) => {
+        if (!user || !book) {
+            setStatusError("Sign in to save your bookshelf status.");
+            return;
+        }
+
+        setStatusSaving(true);
+        setStatusError(null);
+        try {
+            if (option.value === "remove") {
+                const removed = await removeBookFromLibrary(user.id, book.id);
+                if (!removed) {
+                    throw new Error("Failed to remove from bookshelf");
+                }
+                setShelfStatus(null);
+            } else {
+                const nextStatus = option.value as ShelfStatus;
+                await setBookShelfStatus(user.id, book.id, nextStatus);
+                setShelfStatus(nextStatus);
+            }
+            setStatusMenuOpen(false);
+        } catch (err) {
+            console.error("Failed to update shelf status:", err);
+            setStatusError("Could not update your bookshelf. Please try again.");
+        } finally {
+            setStatusSaving(false);
+        }
+    };
+
     const loadThreadsForChapter = async (chapterNumber: number, tab: TabKey) => {
         if (!bookId) return;
+        const effectiveLitClubId = selectedLitClubId ?? litClubId ?? null;
 
         // If LitClub tab is active but we don't have a litClubId, no API call.
-        if (tab === "litclub" && !litClubId) {
-            setChapterThreads((prev) => ({
+        if (tab === "litclub" && !effectiveLitClubId) {
+            setChapterThreadsError((prev) => ({
                 ...prev,
                 litclub: {
                     ...prev.litclub,
-                    [chapterNumber]: [],
+                    [chapterNumber]: "Select a LitClub to view threads.",
                 },
             }));
             return;
@@ -194,7 +427,7 @@ function BookTableOfContentsTabs({
             const threads = await getThreadsForChapter({
                 bookId,
                 afterChapter: chapterNumber,
-                litClubId: tab === "litclub" ? litClubId ?? undefined : undefined,
+                litClubId: tab === "litclub" ? effectiveLitClubId ?? undefined : undefined,
             });
 
             setChapterThreads((prev) => ({
@@ -246,8 +479,7 @@ function BookTableOfContentsTabs({
         router.push(`/threads/${thread.id}`);
     };
 
-    const contextLabel =
-        activeTab === "library" ? "All Readers" : "LitClub Threads";
+    const effectiveLitClubId = selectedLitClubId ?? litClubId ?? null;
 
     return (
         <View style={styles.container}>
@@ -287,12 +519,194 @@ function BookTableOfContentsTabs({
 
             {/* Chapter discussions area (same structure for both tabs, different context) */}
             <View style={styles.tocContainer}>
-                <Text style={[globalStyles.subheading, styles.tocTitle]}>
-                    Chapter Discussions
-                </Text>
-                <Text style={[globalStyles.body, styles.contextLabel]}>
-                    {contextLabel}
-                </Text>
+                {activeTab === "litclub" && (
+                    <View style={styles.litClubSelectContainer}>
+                        <Text style={[globalStyles.subheading, styles.statusHeading]}>
+                            My LitClub
+                        </Text>
+
+                        <Pressable
+                            style={[
+                                styles.statusTrigger,
+                                litClubMenuOpen && styles.statusTriggerActive,
+                            ]}
+                            onPress={() => {
+                                if (litClubLoading) return;
+                                setLitClubMenuOpen((prev) => !prev);
+                            }}
+                            onLayout={(e) =>
+                                setLitClubTriggerLayout({
+                                    height: e.nativeEvent.layout.height,
+                                    y: e.nativeEvent.layout.y,
+                                    width: e.nativeEvent.layout.width,
+                                    x: e.nativeEvent.layout.x,
+                                })
+                            }
+                        >
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.statusLabel}>
+                                    {litClubLoading
+                                        ? "Loading your LitClubs..."
+                                        : availableLitClubs.length === 0
+                                            ? "No LitClubs found"
+                                            : availableLitClubs.find(
+                                                (club) => club.id === selectedLitClubId
+                                            )?.name ?? "Select a LitClub"}
+                                </Text>
+                            </View>
+                            <FontAwesome
+                                name={litClubMenuOpen ? "chevron-up" : "chevron-down"}
+                                size={18}
+                                color={colors.darkest}
+                            />
+                        </Pressable>
+
+                        {litClubMenuOpen && (
+                            <View
+                                style={[
+                                    styles.statusDropdown,
+                                    {
+                                        top:
+                                            litClubTriggerLayout.y +
+                                            litClubTriggerLayout.height +
+                                            6,
+                                        left: litClubTriggerLayout.x,
+                                        width: Math.max(litClubTriggerLayout.width, 220),
+                                        zIndex: 999,
+                                    },
+                                ]}
+                            >
+                                {litClubLoading ? (
+                                    <View style={styles.overlayLoadingRow}>
+                                        <ActivityIndicator
+                                            size="small"
+                                            color={colors.midBlue}
+                                        />
+                                        <Text style={styles.overlayLoadingText}>
+                                            Loading clubs...
+                                        </Text>
+                                    </View>
+                                ) : litClubError ? (
+                                    <Text style={styles.overlayError}>{litClubError}</Text>
+                                ) : availableLitClubs.length === 0 ? (
+                                    <Text style={styles.overlayEmpty}>
+                                        Join a LitClub to view club threads.
+                                    </Text>
+                                ) : (
+                                    availableLitClubs.map((club) => {
+                                        const isSelected = club.id === selectedLitClubId;
+                                        return (
+                                            <Pressable
+                                                key={club.id}
+                                                style={({ pressed }) => [
+                                                    styles.statusOption,
+                                                    isSelected && {
+                                                        backgroundColor: colors.sage,
+                                                    },
+                                                    pressed && { backgroundColor: colors.sage },
+                                                ]}
+                                                onPress={() => handleSelectLitClub(club.id)}
+                                            >
+                                                <Text
+                                                    style={[
+                                                        globalStyles.subheading,
+                                                        { fontSize: 15 },
+                                                    ]}
+                                                >
+                                                    {club.name}
+                                                </Text>
+                                            </Pressable>
+                                        );
+                                    })
+                                )}
+                            </View>
+                        )}
+
+                        {litClubError && (
+                            <Text style={styles.statusErrorText}>{litClubError}</Text>
+                        )}
+                    </View>
+                )}
+
+                <View style={styles.statusContainer}>
+                    <Text style={[globalStyles.subheading, styles.statusHeading]}>
+                        Bookshelf status
+                    </Text>
+
+                    <Pressable
+                        style={[
+                            styles.statusTrigger,
+                            statusMenuOpen && styles.statusTriggerActive,
+                        ]}
+                        onPress={() => {
+                            if (statusLoading || statusSaving) return;
+                            setStatusMenuOpen((prev) => !prev);
+                        }}
+                        onLayout={(e) =>
+                            setTriggerLayout({
+                                height: e.nativeEvent.layout.height,
+                                y: e.nativeEvent.layout.y,
+                                width: e.nativeEvent.layout.width,
+                                x: e.nativeEvent.layout.x,
+                            })
+                        }
+                    >
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.statusLabel}>
+                                {statusLoading
+                                    ? "Checking status..."
+                                    : mapStatusToLabel(shelfStatus)}
+                            </Text>
+                        </View>
+                        <FontAwesome
+                            name={statusMenuOpen ? "chevron-up" : "chevron-down"}
+                            size={18}
+                            color={colors.darkest}
+                        />
+                    </Pressable>
+
+                    {statusMenuOpen && (
+                        <View
+                            style={[
+                                styles.statusDropdown,
+                                {
+                                    top: triggerLayout.y + triggerLayout.height + 6,
+                                    left: triggerLayout.x,
+                                    width: Math.max(triggerLayout.width, 200),
+                                    zIndex: 999,
+                                },
+                            ]}
+                        >
+                            {shelfStatusOptions.map((option) => (
+                                <Pressable
+                                    key={option.label}
+                                    style={({ pressed }) => [
+                                        styles.statusOption,
+                                        shelfStatus === option.value && {
+                                            backgroundColor: colors.sage,
+                                        },
+                                        pressed && { backgroundColor: colors.sage },
+                                    ]}
+                                    onPress={() => handleShelfStatusSelect(option)}
+                                >
+                                    <Text style={[globalStyles.subheading, { fontSize: 15 }]}>
+                                        {option.label}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    )}
+
+                    {statusError && (
+                        <Text style={styles.statusErrorText}>{statusError}</Text>
+                    )}
+                </View>
+
+                <View style={styles.sectionHeaderCard}>
+                    <Text style={[globalStyles.subheading, styles.tocTitle]}>
+                        Chapters & Threads
+                    </Text>
+                </View>
 
                 <View style={styles.tocDivider} />
 
@@ -319,7 +733,7 @@ function BookTableOfContentsTabs({
 
                                 const isLitClubTab = activeTab === "litclub";
                                 const hasLitClubContext =
-                                    !!litClubId && typeof litClubId === "string";
+                                    !!effectiveLitClubId && typeof effectiveLitClubId === "string";
 
                                 // Filter threads by context:
                                 // - My Library: only global threads (no litClubId)
@@ -333,8 +747,8 @@ function BookTableOfContentsTabs({
                                             ? storedThreads.filter(
                                                 (t) =>
                                                     !!t.litClubId &&
-                                                    !!litClubId &&
-                                                    t.litClubId === litClubId
+                                                    !!effectiveLitClubId &&
+                                                    t.litClubId === effectiveLitClubId
                                             )
                                             : storedThreads;
 
@@ -397,8 +811,7 @@ function BookTableOfContentsTabs({
                                                                 styles.emptyThreadsText,
                                                             ]}
                                                         >
-                                                            Open this book from a LitClub to see your
-                                                            club threads.
+                                                            Select a LitClub to see your club threads.
                                                         </Text>
                                                     ) : isLoadingThreads ? (
                                                         <View style={styles.threadLoadingRow}>
@@ -506,7 +919,7 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: colors.darkest,
         backgroundColor: colors.cream,
-        overflow: "hidden",
+        overflow: "visible",
     },
     tabHeader: {
         flexDirection: "row",
@@ -542,14 +955,120 @@ const styles = StyleSheet.create({
     },
     tocTitle: {
         fontSize: 20,
-        color: colors.midBlue,
+        color: colors.darkest,
     },
-    contextLabel: {
-        marginTop: 2,
-        marginBottom: 4,
-        fontSize: 13,
+    statusContainer: {
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        gap: 10,
+        position: "relative",
+        zIndex: 10,
+        backgroundColor: colors.sage,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: colors.darkest,
+        shadowColor: colors.darkest,
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 3 },
+        marginVertical: 8,
+    },
+    litClubSelectContainer: {
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        gap: 10,
+        position: "relative",
+        zIndex: 3000,
+        backgroundColor: colors.cream,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: colors.darkest,
+        shadowColor: colors.darkest,
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 3 },
+        marginTop: 4,
+        marginBottom: 8,
+    },
+    statusHeading: {
+        fontSize: 18,
+    },
+    statusTrigger: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: 2,
+        borderColor: colors.darkest,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        backgroundColor: colors.cream,
+    },
+    statusTriggerActive: {
+        borderColor: colors.midBlue,
+        shadowColor: colors.midBlue,
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    statusLabel: {
+        fontFamily: fonts.subheading,
+        fontSize: 15,
+        color: colors.darkest,
+    },
+    statusDropdown: {
+        position: "absolute",
+        borderWidth: 2,
+        borderColor: colors.darkest,
+        borderRadius: 12,
+        backgroundColor: colors.cream,
+        overflow: "hidden",
+        zIndex: 2000,
+        elevation: 12,
+        shadowColor: colors.darkest,
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    statusOption: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        paddingTop: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.darkest,
+    },
+    statusErrorText: {
+        color: "red",
+        marginTop: 4,
+    },
+    overlayLoadingRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+    },
+    overlayLoadingText: {
         color: colors.nextDarkest,
-        fontFamily: fonts.body,
+    },
+    overlayError: {
+        color: "red",
+    },
+    overlayEmpty: {
+        color: colors.nextDarkest,
+        fontStyle: "italic",
+    },
+    sectionHeaderCard: {
+        marginTop: 12,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: colors.darkest,
+        backgroundColor: colors.teal,
+        shadowColor: colors.darkest,
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
     },
     bookTitle: {
         marginBottom: 8,

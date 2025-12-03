@@ -7,6 +7,4 @@ public sealed class AddLitClubRequest
     public string? Description { get; init; }
     public List<string>? PreferredGenres { get; init; }
     public bool PrivateClub { get; init; }
-    public List<string>? MemberUserIds { get; init; }
-    public string? LibraryId { get; init; }
 }
