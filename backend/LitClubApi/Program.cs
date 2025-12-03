@@ -250,18 +250,58 @@ using (var scope = app.Services.CreateScope())
         LitClubIds = ["1"]
     };
 
+    LitClubUser litClubUser2 = new()
+    {
+        Id = "2",
+        FirstName = "Billy",
+        LastName = "Wayne",
+        UserName = "billywayne",
+        Email = "billywayne@gmail.com",
+        Bio = "I am a proud member of the LGBTQ+ MAGA community.",
+        PreferredGenres = ["Non-Fiction", "Science", "Podcasts", "Comedy"],
+        ProfilePhotoUrl = "John-Green.png",
+        PasswordHash = "billywaynepw",
+        LitClubIds = ["1"]
+    };
+
     LitClub litClub = new()
     {
-        Id = "1",
+        Id = "litclub-1",
         Name = "Fans of John Green",
         OwnerUserId = "1",
         Description = "We love all of John Green's books. And some of Hank's too.",
         MemberUserIds = ["1"],
     };
 
+    LitClub litClub2 = new()
+    {
+        Id = "litclub-2",
+        Name = "LGBTQ+ MAGA Readers",
+        OwnerUserId = "2",
+        Description = "A safe space for LGBTQ+ MAGA members to discuss their favorite books.",
+        MemberUserIds = ["1", "2"],
+    };
+
     Library library = new()
     {
         OwnerId = "1",
+        LibraryBooks =
+        [
+            new LibraryBook()
+            {
+                BookId = "1",
+                Status = ShelfStatus.currentlyReading,
+                StartedReading = DateOnly.Parse("October 11, 2025"),
+                CurrentPage = 114,
+                PercentComplete = 22,
+                OnPedastal = false
+            }
+        ]
+    };
+
+    Library library2 = new()
+    {
+        OwnerId = "2",
         LibraryBooks =
         [
             new LibraryBook()
@@ -322,8 +362,11 @@ using (var scope = app.Services.CreateScope())
 
     await books.UpsertItemAsync(book, new PartitionKey(book.Id));
     await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
+    await users.UpsertItemAsync(litClubUser2, new PartitionKey(litClubUser2.Id));
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
+    await clubs.UpsertItemAsync(litClub2, new PartitionKey(litClub2.Id));
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
+    await libs.UpsertItemAsync(library2, new PartitionKey(library2.OwnerId));
 
     await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
 }

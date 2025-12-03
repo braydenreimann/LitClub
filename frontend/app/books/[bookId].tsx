@@ -18,7 +18,16 @@ import { getUriRead } from '@/api/services/imagesService';
 import BookTableOfContentsTabs from '@/components/BookTableOfContentsTabs';
 
 export default function BookInfoScreen() {
-    const { bookId } = useLocalSearchParams<{ bookId: string }>();
+    const params = useLocalSearchParams<{
+        bookId: string | string[];
+        litClubId?: string | string[];
+        litClubName?: string | string[];
+        litClubOwnerId?: string | string[];
+    }>();
+    const bookId = Array.isArray(params.bookId) ? params.bookId[0] : params.bookId;
+    const litClubIdParam = Array.isArray(params.litClubId) ? params.litClubId[0] : params.litClubId;
+    const litClubNameParam = Array.isArray(params.litClubName) ? params.litClubName[0] : params.litClubName;
+    const litClubOwnerIdParam = Array.isArray(params.litClubOwnerId) ? params.litClubOwnerId[0] : params.litClubOwnerId;
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [book, setBook] = useState<Book | null>(null);
@@ -148,7 +157,13 @@ return (
 
                 {/* Embedded tabs + table of contents */}
                 {book && bookId && (
-                    <BookTableOfContentsTabs bookId={bookId} book={book} />
+                    <BookTableOfContentsTabs
+                        bookId={bookId}
+                        book={book}
+                        litClubId={litClubIdParam}
+                        litClubName={litClubNameParam}
+                        litClubOwnerId={litClubOwnerIdParam}
+                    />
                 )}
             </ScrollView>
         </View>

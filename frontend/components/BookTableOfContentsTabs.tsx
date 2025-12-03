@@ -86,6 +86,8 @@ export interface BookTableOfContentsTabsProps {
      * When provided, "My LitClub" tab will load chapter threads for this club.
      */
     litClubId?: string | null;
+    litClubName?: string | null;
+    litClubOwnerId?: string | null;
 }
 
 type CheckedChaptersState = { [chapterNumber: number]: boolean };
@@ -126,8 +128,12 @@ function BookTableOfContentsTabs({
     bookId,
     book,
     litClubId,
+    litClubName,
+    litClubOwnerId,
 }: BookTableOfContentsTabsProps) {
-    const [activeTab, setActiveTab] = useState<TabKey>("library");
+    const [activeTab, setActiveTab] = useState<TabKey>(
+        litClubId ? "litclub" : "library"
+    );
     const [user, setUser] = useState<User | null>(null);
     const [litClubMenuOpen, setLitClubMenuOpen] = useState(false);
     const [availableLitClubs, setAvailableLitClubs] = useState<LitClub[]>([]);
@@ -158,6 +164,7 @@ function BookTableOfContentsTabs({
         width: 0,
         x: 0,
     });
+    const [statusByOwner, setStatusByOwner] = useState<Record<string, ShelfStatus | null>>({});
 
     const [checkedChapters, setCheckedChapters] =
         useState<CheckedChaptersState>({});
@@ -202,9 +209,12 @@ function BookTableOfContentsTabs({
         loadUser();
     }, []);
 
-    // Load bookshelf status for this book
+    // Load bookshelf status for this book (for the current owner context)
     useEffect(() => {
-        if (!user || !book) return;
+        if (!book || !ownerForStatus) {
+            setStatusLoading(false);
+            return;
+        }
 
         let alive = true;
         setStatusLoading(true);
@@ -212,9 +222,12 @@ function BookTableOfContentsTabs({
 
         (async () => {
             try {
-                const existing = await getLibraryBookForBook(user.id, book.id);
+                const existing = await getLibraryBookForBook(ownerForStatus, book.id);
                 if (!alive) return;
-                setShelfStatus((existing?.status ?? null) as ShelfStatus | null);
+                setStatusByOwner((prev) => ({
+                    ...prev,
+                    [ownerForStatus]: (existing?.status ?? null) as ShelfStatus | null,
+                }));
             } catch (err) {
                 if (!alive) return;
                 console.error("Error loading shelf status:", err);
@@ -228,13 +241,7 @@ function BookTableOfContentsTabs({
         return () => {
             alive = false;
         };
-    }, [user?.id, book?.id]);
-
-    useEffect(() => {
-        if (book && !user) {
-            setStatusLoading(false);
-        }
-    }, [book, user]);
+    }, [ownerForStatus, book?.id]);
 
     useEffect(() => {
         setStatusMenuOpen(false);
@@ -247,10 +254,16 @@ function BookTableOfContentsTabs({
     }, [activeTab]);
 
     useEffect(() => {
-        if (litClubId && !selectedLitClubId) {
+        if (litClubId) {
             setSelectedLitClubId(litClubId);
         }
-    }, [litClubId, selectedLitClubId]);
+    }, [litClubId]);
+
+    useEffect(() => {
+        if (litClubId) {
+            setActiveTab("litclub");
+        }
+    }, [litClubId]);
 
     useEffect(() => {
         if (!user?.id) return;
@@ -364,8 +377,13 @@ function BookTableOfContentsTabs({
     };
 
     const handleShelfStatusSelect = async (option: ShelfStatusOption) => {
-        if (!user || !book) {
-            setStatusError("Sign in to save your bookshelf status.");
+        if (!book || !ownerForStatus) {
+            setStatusError("Unable to update bookshelf right now.");
+            return;
+        }
+
+        if (!canEditStatus) {
+            setStatusError("You don't have permission to edit this bookshelf.");
             return;
         }
 
@@ -373,15 +391,21 @@ function BookTableOfContentsTabs({
         setStatusError(null);
         try {
             if (option.value === "remove") {
-                const removed = await removeBookFromLibrary(user.id, book.id);
+                const removed = await removeBookFromLibrary(ownerForStatus, book.id);
                 if (!removed) {
                     throw new Error("Failed to remove from bookshelf");
                 }
-                setShelfStatus(null);
+                setStatusByOwner((prev) => ({
+                    ...prev,
+                    [ownerForStatus]: null,
+                }));
             } else {
                 const nextStatus = option.value as ShelfStatus;
-                await setBookShelfStatus(user.id, book.id, nextStatus);
-                setShelfStatus(nextStatus);
+                await setBookShelfStatus(ownerForStatus, book.id, nextStatus);
+                setStatusByOwner((prev) => ({
+                    ...prev,
+                    [ownerForStatus]: nextStatus,
+                }));
             }
             setStatusMenuOpen(false);
         } catch (err) {
@@ -480,6 +504,31 @@ function BookTableOfContentsTabs({
     };
 
     const effectiveLitClubId = selectedLitClubId ?? litClubId ?? null;
+    const selectedClub =
+        availableLitClubs.find((club) => club.id === effectiveLitClubId) ?? null;
+    const selectedClubName = selectedClub?.name ?? litClubName ?? null;
+    const selectedClubOwnerId =
+        selectedClub?.ownerUserId ?? litClubOwnerId ?? null;
+    const isSelectedClubOwner = !!selectedClubOwnerId && selectedClubOwnerId === user?.id;
+    const ownerForStatus =
+        activeTab === "litclub" ? effectiveLitClubId ?? null : user?.id ?? null;
+    const canEditStatus =
+        activeTab === "library"
+            ? !!user
+            : !!effectiveLitClubId && isSelectedClubOwner;
+    const currentStatus =
+        ownerForStatus && ownerForStatus in statusByOwner
+            ? statusByOwner[ownerForStatus] ?? null
+            : null;
+    const litClubLabel = litClubLoading
+        ? "Loading your LitClubs..."
+        : selectedClubName
+            ? selectedClubName
+            : litClubId
+                ? "LitClub selected"
+                : availableLitClubs.length === 0
+                    ? "No LitClubs found"
+                    : "Select a LitClub";
 
     return (
         <View style={styles.container}>
@@ -544,15 +593,7 @@ function BookTableOfContentsTabs({
                             }
                         >
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.statusLabel}>
-                                    {litClubLoading
-                                        ? "Loading your LitClubs..."
-                                        : availableLitClubs.length === 0
-                                            ? "No LitClubs found"
-                                            : availableLitClubs.find(
-                                                (club) => club.id === selectedLitClubId
-                                            )?.name ?? "Select a LitClub"}
-                                </Text>
+                                <Text style={styles.statusLabel}>{litClubLabel}</Text>
                             </View>
                             <FontAwesome
                                 name={litClubMenuOpen ? "chevron-up" : "chevron-down"}
@@ -633,39 +674,49 @@ function BookTableOfContentsTabs({
                         Bookshelf status
                     </Text>
 
-                    <Pressable
-                        style={[
-                            styles.statusTrigger,
-                            statusMenuOpen && styles.statusTriggerActive,
-                        ]}
-                        onPress={() => {
-                            if (statusLoading || statusSaving) return;
-                            setStatusMenuOpen((prev) => !prev);
-                        }}
-                        onLayout={(e) =>
-                            setTriggerLayout({
-                                height: e.nativeEvent.layout.height,
-                                y: e.nativeEvent.layout.y,
-                                width: e.nativeEvent.layout.width,
-                                x: e.nativeEvent.layout.x,
-                            })
-                        }
-                    >
-                        <View style={{ flex: 1 }}>
+                    {canEditStatus ? (
+                        <Pressable
+                            style={[
+                                styles.statusTrigger,
+                                statusMenuOpen && styles.statusTriggerActive,
+                            ]}
+                            onPress={() => {
+                                if (statusLoading || statusSaving) return;
+                                setStatusMenuOpen((prev) => !prev);
+                            }}
+                            onLayout={(e) =>
+                                setTriggerLayout({
+                                    height: e.nativeEvent.layout.height,
+                                    y: e.nativeEvent.layout.y,
+                                    width: e.nativeEvent.layout.width,
+                                    x: e.nativeEvent.layout.x,
+                                })
+                            }
+                        >
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.statusLabel}>
+                                    {statusLoading
+                                        ? "Checking status..."
+                                        : mapStatusToLabel(currentStatus)}
+                                </Text>
+                            </View>
+                            <FontAwesome
+                                name={statusMenuOpen ? "chevron-up" : "chevron-down"}
+                                size={18}
+                                color={colors.darkest}
+                            />
+                        </Pressable>
+                    ) : (
+                        <View style={[styles.statusTrigger, { opacity: 0.8 }]}>
                             <Text style={styles.statusLabel}>
                                 {statusLoading
                                     ? "Checking status..."
-                                    : mapStatusToLabel(shelfStatus)}
+                                    : mapStatusToLabel(currentStatus)}
                             </Text>
                         </View>
-                        <FontAwesome
-                            name={statusMenuOpen ? "chevron-up" : "chevron-down"}
-                            size={18}
-                            color={colors.darkest}
-                        />
-                    </Pressable>
+                    )}
 
-                    {statusMenuOpen && (
+                    {canEditStatus && statusMenuOpen && (
                         <View
                             style={[
                                 styles.statusDropdown,
@@ -682,7 +733,7 @@ function BookTableOfContentsTabs({
                                     key={option.label}
                                     style={({ pressed }) => [
                                         styles.statusOption,
-                                        shelfStatus === option.value && {
+                                        currentStatus === option.value && {
                                             backgroundColor: colors.sage,
                                         },
                                         pressed && { backgroundColor: colors.sage },
