@@ -7,15 +7,16 @@ import { colors } from "@/theme";
 import { globalStyles } from "@/styles/globalStyles";
 import type { ThreadResponse, CommentResponse, Author } from "@/domain/models/thread-types";
 import type { User } from "@/domain/models";
-import { getThread } from "@/services/threadsService";
-import CommentItem from "@/components/threads/CommentItem";
-import AddCommentBar from "@/components/threads/AddCommentBar";
-import HiddenToggle from "@/components/threads/HiddenToggle";
-import { useCommentsList } from "@/hooks/useCommentsList";
-import { MessageCircle } from "lucide-react-native"; //npm install lucide-react-native
-import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
-import { isHiddenByScore } from "@/constants/threadVisibility";
-import { getUser } from "@/services/usersService";
+import { getThread, voteThread } from "@/api/services/threadsService";
+import CommentItem from "@/features/threads/components/CommentItem";
+import AddCommentBar from "@/features/threads/components/AddCommentBar";
+import HiddenToggle from "@/features/threads/components/HiddenToggle";
+import { useCommentsList } from "@/features/threads/hooks/useCommentsList";
+import { MessageCircle } from "lucide-react-native";
+import { useKeyboardHeight } from "@/features/threads/hooks/useKeyboardHeight";
+import { isHiddenByScore } from "@/features/threads/utils/commentVisbility";
+import { getUser } from "@/api/services/usersService";
+import VoteButtons from "@/features/threads/components/VoteButtons";
 
 const PAGE_SIZE = 20;
 
@@ -27,6 +28,11 @@ export default function ThreadScreen() {
     const [error, setError] = useState<string | null>(null);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
+
+    // Local vote state for the thread itself (mirrors CommentItem logic)
+    const [threadScore, setThreadScore] = useState(0);
+    const [threadUserVote, setThreadUserVote] = useState<-1 | 0 | 1>(0);
+
     const adjustThreadCommentCount = useCallback((delta: number) => {
         setThread((prev) => {
             if (!prev) return prev;
@@ -79,6 +85,13 @@ export default function ThreadScreen() {
     const { keyboardHeight, keyboardShown } = useKeyboardHeight();
     const [commentBarFocused, setCommentBarFocused] = useState(false);
 
+    // When thread changes from server, sync local vote state
+    useEffect(() => {
+        if (!thread) return;
+        setThreadScore((thread as any).score ?? (thread as any).Score ?? 0);
+        setThreadUserVote(((thread as any).userVote ?? 0) as -1 | 0 | 1);
+    }, [thread]);
+
     useEffect(() => {
         let mounted = true;
         const run = async () => {
@@ -89,7 +102,7 @@ export default function ThreadScreen() {
             setLoadingThread(true);
             setError(null);
             try {
-                const t = await getThread(threadId);
+                const t = await getThread(threadId, CURRENT_USER_ID);
                 if (!mounted) return;
                 setThread(t);
                 await loadInitial();
@@ -113,17 +126,50 @@ export default function ThreadScreen() {
         }
     }, [loadInitial]);
 
+    // Thread-level vote handler (same pattern as top-level comment voting)
+    const onChangeThreadVote = useCallback(
+        async (nextVote: -1 | 0 | 1) => {
+            if (!threadId || !CURRENT_USER_ID) return;
+
+            const prev = threadUserVote;
+            const delta = nextVote - prev;
+
+            if (delta !== 0) setThreadScore((s) => s + delta);
+            setThreadUserVote(nextVote);
+
+            try {
+                const res = await voteThread(threadId, CURRENT_USER_ID, nextVote);
+                setThreadScore(res.score);
+                setThreadUserVote(res.userVote as -1 | 0 | 1);
+            } catch {
+                // Rollback on error
+                if (delta !== 0) setThreadScore((s) => s - delta);
+                setThreadUserVote(prev);
+            }
+        },
+        [threadId, CURRENT_USER_ID, threadUserVote]
+    );
+
     const header = useMemo(
         () => (
             <>
                 <View style={styles.postCard}>
                     <Text style={styles.title}>{thread?.title ?? "(Untitled thread)"}</Text>
                     <Text style={styles.meta}>
-                        by {thread?.author?.username ?? "unknown"} • {new Date(thread?.created ?? Date.now()).toLocaleString()}
+                        by {thread?.author?.username ?? "unknown"} •{" "}
+                        {new Date(thread?.created ?? Date.now()).toLocaleString()}
                     </Text>
                     <Text style={[styles.body]}>{thread?.body}</Text>
 
                     <View style={styles.actions}>
+                        {/* Thread vote buttons – same layout/logic as CommentItem top-level */}
+                        <VoteButtons
+                            currentVote={threadUserVote}
+                            score={threadScore}
+                            onChange={onChangeThreadVote}
+                            disabled={!currentUser}
+                        />
+
                         <View style={[styles.pill, styles.pillRow]}>
                             <MessageCircle size={14} color={colors.midBlue} />
                             <Text style={styles.pillText}>{thread?.commentCount ?? 0}</Text>
@@ -134,7 +180,7 @@ export default function ThreadScreen() {
                 <Text style={styles.commentsHeader}>Comments</Text>
             </>
         ),
-        [thread]
+        [thread, threadScore, threadUserVote, onChangeThreadVote, currentUser]
     );
 
     const renderItem = useCallback(
@@ -257,7 +303,7 @@ const styles = StyleSheet.create({
     },
     title: { fontSize: 22, fontWeight: "700", color: colors.midBlue },
     meta: { marginTop: 4, fontSize: 12, color: colors.nextDarkest },
-    actions: { marginTop: 10, flexDirection: "row", gap: 8 },
+    actions: { marginTop: 10, flexDirection: "row", alignItems: "center", gap: 8 },
     description: {
         marginTop: 8,
         fontSize: 12,

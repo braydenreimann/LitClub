@@ -6,6 +6,6 @@ public sealed class DeleteLibraryBookRequest
 {
     [FromRoute(Name = "ownerId")]
     public required string OwnerId { get; init; }
-    [FromRoute]
+    [FromRoute(Name = "libraryBookId")]
     public required string LibraryBookId { get; init; }
 }

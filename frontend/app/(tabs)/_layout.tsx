@@ -11,7 +11,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorSchemeRaw = useColorScheme();
-  const colorScheme = colorSchemeRaw === 'dark' ? 'dark' : 'light';
+  const colorScheme = 'dark';
 
   return (
     <Tabs
@@ -28,7 +28,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="bookclubs"
+        name="litClubs"
         options={{
           title: 'LitClubs',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,

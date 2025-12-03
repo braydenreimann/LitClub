@@ -2,7 +2,7 @@ namespace LitClubApi.Endpoints.Threads;
 
 public static class ThreadMapper
 {
-    public static ThreadResponse ToResponse(this Domain.Thread thread) => new()
+    public static ThreadResponse ToResponse(this Domain.Thread thread, sbyte? userVote = null) => new()
     {
         Id = thread.Id,
         Author = thread.Author,
@@ -16,6 +16,7 @@ public static class ThreadMapper
         Updated = thread.Updated,
         CommentCount = thread.CommentCount,
         Score = thread.Score,
-        IsDeleted = thread.IsDeleted
+        IsDeleted = thread.IsDeleted,
+        UserVote = userVote
     };
 }

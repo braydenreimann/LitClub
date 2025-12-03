@@ -1,3 +1,5 @@
+/* begin Endpoints/Threads/AddThread/AddThreadEndpoint.cs */
+
 using Ardalis.ApiEndpoints;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.AspNetCore.Mvc;
@@ -50,3 +52,5 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
         return CreatedAtRoute("threads", new { threadId = response.Id }, response);
     }
 }
+
+/* end Endpoints/Threads/AddThread/AddThreadEndpoint.cs */

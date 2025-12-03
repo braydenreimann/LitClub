@@ -1,63 +1,67 @@
 import React from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
-import { Platform, Pressable } from 'react-native';
-import { ThemedText } from '../components/themed-text';
-import { ThemedView } from '../components/themed-view';
+import { Pressable, View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Link } from 'expo-router';
-import { Image } from 'expo-image';
-import SearchBar from '../components/SearchBar';
+
 import Header from '../components/headerWithSearch';
 import { colors, fonts } from '../theme';
 import ReadingList from '../components/ReadingList';
-import TopThreeBooks from '../components/TopThreeBooks';
-import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../constants/theme';
-
 
 function Jump2discButton() {
     return (
         <Pressable
             style={globalStyles.discButton}
-            onPress={() => { Alert.alert('jumping to discussion...')/*TODO make the buttons go to their clubs*/ }} >
+            onPress={() => {
+                Alert.alert('jumping to discussion...'); /* TODO make the buttons go to their clubs */
+            }}
+        >
             <Text>Jump To Discussion</Text>
         </Pressable>
-
     );
 }
+
 function BackButton() {
     return (
         <Pressable>
             <Link href="/profile">
-                <EvilIcons name="chevron-left" size={50} color="#193350" marginLeft="20" marginBottom="10" />
+                <EvilIcons
+                    name="chevron-left"
+                    size={50}
+                    color="#193350"
+                    marginLeft="20"
+                    marginBottom="10"
+                />
             </Link>
         </Pressable>
-
     );
 }
 
-export default function StatsScreen() { //PRE_INTEGRATION: Tis will be a template page for all book clubs to go to
+export default function StatsScreen() {
+    // PRE_INTEGRATION: This will be a template page for all book clubs to go to
     return (
-        <View style={{ flex: 1, backgroundColor: "#E4D7C8" }}> {/*background is cream*/}
+        <View style={{ flex: 1, backgroundColor: '#E4D7C8' }}>
             <Header />
-            {/*TODO: make it not look like shit, add a back button or the things at the bottom to go to past pages*/}
             <ScrollView>
-                <View style={{ flexDirection: 'row' }} >
-                    <BackButton /> {/*TODO: eventually we should make 1 back button that world everywhere but that time is not now*/}
-                    <Text style={globalStyles.heading} > Reading Statistics </Text>
+                <View style={{ flexDirection: 'row' }}>
+                    <BackButton />
+                    <Text style={globalStyles.heading}> Reading Statistics </Text>
                 </View>
-                <Text style={globalStyles.body}> this is the bio for my LitClub! </Text> {/*TODO: are they able to change the bio??*/}
+
+                <Text style={globalStyles.body}> this is the bio for my LitClub! </Text>
+
                 <View style={globalStyles.leaderBanner}>
                     <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
                     <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
                     <Text style={globalStyles.subheading}>@username</Text>
                     <Foundation name="crown" size={30} color="#193350" margin="5" marginTop="0" />
                 </View>
-                {/*currently reading section*/}
+
+                {/* currently reading section */}
                 <View style={globalStyles.currentRead}>
                     <View style={globalStyles.sideRead}>
-                        {/*TODO: replace this card with the appropriate image*/}
-                        <View style={globalStyles.card}>  </View>
+                        <View style={globalStyles.card} />
                         <Text>Book Title</Text>
                     </View>
                     <View style={globalStyles.sideRead}>
@@ -67,33 +71,21 @@ export default function StatsScreen() { //PRE_INTEGRATION: Tis will be a templat
                         <Jump2discButton />
                     </View>
                 </View>
-                <View> {/*this is the part where we show the lists of the books*/}
-                    <Text style={globalStyles.subheading}>Upcoming Reads</Text>
-                    <ReadingList /> {/* reading list for the club's upcoming reads*/}
-                    <Text style={globalStyles.subheading}>Past Reads</Text>
-                    <ReadingList /> {/* reading list for the Past Reads*/}
-                </View>
 
+                {/* shelves */}
+                <View>
+                    <Text style={globalStyles.subheading}>Upcoming Reads</Text>
+                    {/* 2 = Future / Upcoming Reads */}
+                    <ReadingList status={2} />
+
+                    <Text style={globalStyles.subheading}>Past Reads</Text>
+                    {/* 0 = Past Reads */}
+                    <ReadingList status={0} />
+                </View>
             </ScrollView>
         </View>
     );
 }
-
-
-/*BREAKDOWN:
-header
-BIG header text with the book club's name
-fun banner with the club leader's username
-currently reading book
-jump to discussion button that WILL eventually do the forums
-upcoming reads scrolly section
-past reads scrolly section
-
-
-
-*/
-
-
 
 const globalStyles = StyleSheet.create({
     container: {
@@ -102,49 +94,47 @@ const globalStyles = StyleSheet.create({
         padding: 16,
     },
     leaderBanner: {
-        flexDirection: "row",
-        width: "100%",
+        flexDirection: 'row',
+        width: '100%',
         height: 40,
-        backgroundColor: "#F7C76C", //easter yellow
-        fontFamily: "serif",
+        backgroundColor: '#F7C76C',
+        fontFamily: 'serif',
         fontSize: 30,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 15,
-
     },
     currentRead: {
-        flexDirection: "row",
-        justifyContent: "flex-start",
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
         padding: 15,
     },
     sideRead: {
-        flexDirection: "column",
+        flexDirection: 'column',
         width: 120,
         marginHorizontal: 20,
     },
     discBox: {
-        backgroundColor: "#E4D7C8", //cream
-        borderColor: "#193350",//second-to-darkest blue
+        backgroundColor: '#E4D7C8',
+        borderColor: '#193350',
         borderWidth: 4,
         borderRadius: 12,
         margin: 5,
         marginTop: 20,
         height: 120,
-        width: "120%",
+        width: '120%',
     },
     discButton: {
-        backgroundColor: "#629FAE", //teal
-        borderColor: "black",
+        backgroundColor: '#629FAE',
+        borderColor: 'black',
         borderWidth: 4,
         borderRadius: 12,
-        alignContent: "center",
-        justifyContent: "center",
-        textAlign: "center",
+        alignContent: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
         margin: 5,
         height: 45,
-        width: "120%",
-
+        width: '120%',
     },
     heading: {
         fontFamily: fonts.heading,
@@ -156,8 +146,8 @@ const globalStyles = StyleSheet.create({
         fontFamily: fonts.subheading,
         fontSize: 22,
         color: colors.midBlue,
-        alignContent: "center",
-        justifyContent: "center",
+        alignContent: 'center',
+        justifyContent: 'center',
         marginBottom: 6,
     },
     body: {
@@ -167,34 +157,32 @@ const globalStyles = StyleSheet.create({
         lineHeight: 22,
     },
     scrollContainer: {
-        overflowX: 'scroll',
-        overflowY: 'hidden',
-        /*whiteSpace: 'nowrap',*/
+        overflowX: 'scroll' as any, // RN web only; ignore on native
+        overflowY: 'hidden' as any,
         padding: 10,
     },
     scrollingWrapper: {
         flex: 1,
     },
     cardGroup: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "center",
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
         padding: 5,
         margin: 5,
     },
     card: {
         width: 120,
         height: 180,
-        backgroundColor: "teal",
-        borderColor: "black",
+        backgroundColor: 'teal',
+        borderColor: 'black',
         margin: 15,
     },
     cardFont: {
         fontFamily: Fonts.sans,
         color: colors.darkest,
         lineHeight: 22,
-        textAlign: "center",
-        textAlignVertical: "center",
-
+        textAlign: 'center',
+        textAlignVertical: 'center',
     },
 });

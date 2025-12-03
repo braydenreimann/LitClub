@@ -84,6 +84,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "afterChapter",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -777,6 +785,13 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1053,7 +1068,7 @@
             }
           },
           {
-            "name": "LibraryBookId",
+            "name": "libraryBookId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1516,7 +1531,7 @@
         ],
         "parameters": [
           {
-            "name": "ownerId",
+            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1525,14 +1540,6 @@
           },
           {
             "name": "libraryBookId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1645,6 +1652,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -1708,6 +1718,56 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/JoinLitClubBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitClubResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Leave"
+        ],
+        "parameters": [
+          {
+            "name": "litClubId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveLitClubBody"
               }
             }
           },
@@ -1840,6 +1900,68 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}/vote": {
+      "post": {
+        "tags": [
+          "ThreadVoteEndpoint"
+        ],
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadVoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -2715,14 +2837,32 @@
         },
         "additionalProperties": false
       },
+      "LeaveLitClubBody": {
+        "required": [
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LibraryBookResponse": {
         "required": [
+          "bookId",
           "id",
           "status"
         ],
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "bookId": {
             "type": "string",
             "nullable": true
           },
@@ -3123,6 +3263,34 @@
           },
           "isDeleted": {
             "type": "boolean"
+          },
+          "userVote": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ThreadVoteResponse": {
+        "required": [
+          "score",
+          "threadId",
+          "userVote"
+        ],
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "string",
+            "nullable": true
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userVote": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

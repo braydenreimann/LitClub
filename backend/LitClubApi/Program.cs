@@ -157,7 +157,7 @@ using (var scope = app.Services.CreateScope())
 
     string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
     string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
-    string exist = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "bookdata.csv");
+    string exist = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "bookdata.csv");
 
     List<Book> booklist = CSVParserInsert.Parse(exist);
 
@@ -173,7 +173,7 @@ using (var scope = app.Services.CreateScope())
             continue;
         }
 
-        string coverPathLoop = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", $"{b.CoverImageUrl}");
+        string coverPathLoop = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "BookCovers", $"{b.CoverImageUrl}");
 
         string blobNameLoop = $"{b.CoverImageUrl}";
         var blobClientLoop = blobContainer.GetBlobClient(blobNameLoop);
@@ -185,7 +185,7 @@ using (var scope = app.Services.CreateScope())
 
     }
 
-    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata", "BookCovers", "the-fault-in-our-stars.jpg");
+    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "BookCovers", "the-fault-in-our-stars.jpg");
 
     string blobName = "the-fault-in-our-stars.jpg";
     var blobClient = blobContainer.GetBlobClient(blobName);
@@ -195,7 +195,7 @@ using (var scope = app.Services.CreateScope())
         await blobClient.UploadAsync(stream, overwrite: true);
     }
 
-    coverPath = Path.Combine(litClubFolder, "LitClubApi", "bookdata",  "John-Green.png"); //Default profile image for John Green
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "John-Green.png"); //Default profile image for John Green
 
     blobName = "John-Green.png";
     blobClient = blobContainer.GetBlobClient(blobName);
@@ -246,21 +246,62 @@ using (var scope = app.Services.CreateScope())
         PasswordHash = "johngreenpw",
         Bio = "I'm just a Nerdfighter that loves reading and science",
         PreferredGenres = ["Fiction", "Science-Fiction", "Romance", "Drama", "Thriller"],
-        ProfilePhotoUrl = "John-Green.png"
+        ProfilePhotoUrl = "John-Green.png",
+        LitClubIds = ["1"]
+    };
+
+    LitClubUser litClubUser2 = new()
+    {
+        Id = "2",
+        FirstName = "Billy",
+        LastName = "Wayne",
+        UserName = "billywayne",
+        Email = "billywayne@gmail.com",
+        Bio = "I am a proud member of the LGBTQ+ MAGA community.",
+        PreferredGenres = ["Non-Fiction", "Science", "Podcasts", "Comedy"],
+        ProfilePhotoUrl = "John-Green.png",
+        PasswordHash = "billywaynepw",
+        LitClubIds = ["1"]
     };
 
     LitClub litClub = new()
     {
-        Id = "1",
+        Id = "litclub-1",
         Name = "Fans of John Green",
         OwnerUserId = "1",
         Description = "We love all of John Green's books. And some of Hank's too.",
         MemberUserIds = ["1"],
     };
 
+    LitClub litClub2 = new()
+    {
+        Id = "litclub-2",
+        Name = "LGBTQ+ MAGA Readers",
+        OwnerUserId = "2",
+        Description = "A safe space for LGBTQ+ MAGA members to discuss their favorite books.",
+        MemberUserIds = ["1", "2"],
+    };
+
     Library library = new()
     {
         OwnerId = "1",
+        LibraryBooks =
+        [
+            new LibraryBook()
+            {
+                BookId = "1",
+                Status = ShelfStatus.currentlyReading,
+                StartedReading = DateOnly.Parse("October 11, 2025"),
+                CurrentPage = 114,
+                PercentComplete = 22,
+                OnPedastal = false
+            }
+        ]
+    };
+
+    Library library2 = new()
+    {
+        OwnerId = "2",
         LibraryBooks =
         [
             new LibraryBook()
@@ -321,8 +362,11 @@ using (var scope = app.Services.CreateScope())
 
     await books.UpsertItemAsync(book, new PartitionKey(book.Id));
     await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
+    await users.UpsertItemAsync(litClubUser2, new PartitionKey(litClubUser2.Id));
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
+    await clubs.UpsertItemAsync(litClub2, new PartitionKey(litClub2.Id));
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
+    await libs.UpsertItemAsync(library2, new PartitionKey(library2.OwnerId));
 
     await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
 }

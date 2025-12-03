@@ -1,14 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Pressable } from 'react-native';
-import { Link, router, useFocusEffect } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { Image } from 'expo-image';
 import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
 import ReadingList from '../../components/ReadingList';
-import TopThreeBooks from '../../components/TopThreeBooks';
-import { View, Text, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
@@ -18,9 +16,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
-import { useLitClubs } from '../../LitClubImport/LitClubContext';
-import { getUriRead } from '../../services/imagesService';
-import { getUserFromId } from '../../services/usersService'
+import { useLitClubs } from '../../context/LitClubsContext';
+import { getUriRead } from '../../api/services/imagesService';
+import { getUserFromId } from '../../api/services/usersService';
 
 function EditButton() {
     return (
@@ -39,9 +37,7 @@ function SignOutButton() {
 
 function SettingsButton() {
     return (
-        <Link href="/settingsPage">
-            <EvilIcons name="gear" size={30} color={colors.darkest} />
-        </Link>
+        <EvilIcons name="gear" size={30} color={colors.darkest} />
     );
 }
 function StatsButton() {
@@ -55,7 +51,7 @@ function StatsButton() {
 export default function ProfileScreen() {
     /*for the sake of the litclubs
       WITH BACKEND: implement this as a linked list of a users' joined book clubs */
-        
+
     const [fontsLoaded] = useFonts({
         Fraunces_700Bold,
         ChivoMono_500Medium,
@@ -66,16 +62,16 @@ export default function ProfileScreen() {
     }, [fontsLoaded]);
 
     useEffect(() => {
-    const loadArchivedClubs = async () => {
-      const saved = await AsyncStorage.getItem('archivedClubs');
-      if (saved) {
-        setArchivedClubIds(JSON.parse(saved));
-      }
-    };
-    loadArchivedClubs();
-  }, []);
+        const loadArchivedClubs = async () => {
+            const saved = await AsyncStorage.getItem('archivedClubs');
+            if (saved) {
+                setArchivedClubIds(JSON.parse(saved));
+            }
+        };
+        loadArchivedClubs();
+    }, []);
 
-   useEffect(() => {
+    useEffect(() => {
         // Define an async function inside useEffect
         const loadSession = async () => {
             try {
@@ -95,11 +91,11 @@ export default function ProfileScreen() {
     const [user, setUser] = useState<User | null>(null);
     const pronouns =
         user?.pronouns && user.pronouns.length > 0
-        ? user.pronouns.join('/')
-        : '';
+            ? user.pronouns.join('/')
+            : '';
     const { litClubs, loading, error } = useLitClubs();
     const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
-    
+
     const [profileUri, setProfileUri] = useState<string>("");
 
     useEffect(() => {
@@ -188,7 +184,7 @@ export default function ProfileScreen() {
                         <EditButton />
                         <StatsButton />
                         <SignOutButton />
-                        
+
                     </View>
                 </View>
 
@@ -221,12 +217,11 @@ export default function ProfileScreen() {
 
                 {/* Books Section */}
                 <View>
-                    <TopThreeBooks />
-                    <Text style={[globalStyles.subheading, {marginLeft: 10}]}>Currently Reading</Text>
+                    <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Currently Reading</Text>
                     <ReadingList status={1} />
-                    <Text style={[globalStyles.subheading, {marginLeft: 10}]}>Future Reads</Text>
+                    <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Future Reads</Text>
                     <ReadingList status={2} />
-                    <Text style={[globalStyles.subheading, {marginLeft: 10}]}>Past Reads</Text>
+                    <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Past Reads</Text>
                     <ReadingList status={0} />
                 </View>
 

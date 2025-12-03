@@ -1,21 +1,16 @@
-import React, { useEffect, useState, type PropsWithChildren } from 'react';
-import { Pressable, ActivityIndicator } from 'react-native';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { Image } from 'expo-image';
-import Header from '../components/headerWithSearch';
-import { colors, fonts } from '../theme';
-import { View, Text, FlatList, ScrollView, StyleSheet, Alert, Dimensions } from 'react-native';
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+/* begin tableOfContents.tsx */
 
-import BookStatusDropdown from '@/components/BookStatusDropdown';
-import HiddenStatusDropdown from '@/components/HiddenStatusDropdown'
-import { Entypo, Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { Pressable, ActivityIndicator } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { colors } from '../theme';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+
+import { Ionicons } from '@expo/vector-icons';
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book } from '../domain/models';
-import { getBook } from '../services/booksService';
-import { getUriRead } from '@/services/imagesService';
+import { getBook } from '../api/services/booksService';
 import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -31,22 +26,22 @@ const CustomCheckbox = ({ value, onChange }: { value: boolean; onChange: () => v
 );
 
 function BackButton() {
-    const router = useRouter(); // Initialize the router hook
+  const router = useRouter(); // Initialize the router hook
 
-    const handlePress = () => {
-        router.back(); // Call the back function
-    };
+  const handlePress = () => {
+    router.back(); // Call the back function
+  };
 
-    return (
-        <Pressable onPress={handlePress}>
-        <EvilIcons
-            name="chevron-left"
-            size={50}
-            color="#193350"
-            style={{ marginLeft: 20, marginBottom: 10, marginTop: 15 }} // Use style object for multiple styles
-        />
-        </Pressable>
-    );
+  return (
+    <Pressable onPress={handlePress}>
+      <EvilIcons
+        name="chevron-left"
+        size={50}
+        color="#193350"
+        style={{ marginLeft: 20, marginBottom: 10, marginTop: 15 }} // Use style object for multiple styles
+      />
+    </Pressable>
+  );
 }
 
 export default function TableOfContents() {
@@ -54,7 +49,7 @@ export default function TableOfContents() {
   const [book, setBook] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [checkedChapters, setCheckedChapters] = useState<{ [key: number]: boolean}>({});
+  const [checkedChapters, setCheckedChapters] = useState<{ [key: number]: boolean }>({});
 
 
   useEffect(() => {
@@ -119,32 +114,32 @@ export default function TableOfContents() {
   const totalChapters = book?.totalChapters ?? 0;
 
   const checkboxes = (chapterNumber: number) => {
-  setCheckedChapters(prev => {
-    const newChecked: { [key: number]: boolean } = { ...prev };
-    const currentlyChecked = !!prev[chapterNumber];
+    setCheckedChapters(prev => {
+      const newChecked: { [key: number]: boolean } = { ...prev };
+      const currentlyChecked = !!prev[chapterNumber];
 
-    if (currentlyChecked) {
-      // Unchecking: uncheck this chapter and all after it
-      for (let i = chapterNumber; i <= totalChapters; i++) {
-        newChecked[i] = false;
+      if (currentlyChecked) {
+        // Unchecking: uncheck this chapter and all after it
+        for (let i = chapterNumber; i <= totalChapters; i++) {
+          newChecked[i] = false;
+        }
+      } else {
+        // Checking: check this chapter and all previous
+        for (let i = 1; i <= chapterNumber; i++) {
+          newChecked[i] = true;
+        }
       }
-    } else {
-      // Checking: check this chapter and all previous
-      for (let i = 1; i <= chapterNumber; i++) {
-        newChecked[i] = true;
-      }
-    }
 
-    return newChecked;
-  });
-};
+      return newChecked;
+    });
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.yellow }}>
       <ScrollView>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16, marginTop: 16 }}>
           <BackButton />
-          <Text style={[globalStyles.heading, { color: colors.midBlue, fontSize: 24, marginBottom: 16, marginTop: 16, marginLeft: 10}]}>
+          <Text style={[globalStyles.heading, { color: colors.midBlue, fontSize: 24, marginBottom: 16, marginTop: 16, marginLeft: 10 }]}>
             {book?.title ?? "Untitled Book"}
           </Text>
         </View>
@@ -163,7 +158,6 @@ export default function TableOfContents() {
                 onPress={() => {
                   router.push(`/threads/thread-${chapterNumber}`)
                 }}
-                //router.push("/threads/thread-1");
               >
                 <Text style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest }]}>
                   Chapter {chapterNumber}
@@ -196,17 +190,19 @@ const styles = StyleSheet.create({
     //marginVertical: 4,
   },
   forumBox: {
-        backgroundColor: colors.sage,
-        borderWidth: 4,
-        borderRightWidth: 20,
-        borderColor: colors.darkest,
-        borderRadius: 12,
-        padding: 12,
-        textAlign: "center",
-        marginVertical: 10,
-        marginHorizontal: 10,
-    },
-    checkbox: {
+    backgroundColor: colors.sage,
+    borderWidth: 4,
+    borderRightWidth: 20,
+    borderColor: colors.darkest,
+    borderRadius: 12,
+    padding: 12,
+    textAlign: "center",
+    marginVertical: 10,
+    marginHorizontal: 10,
+  },
+  checkbox: {
     marginLeft: 8,
   },
 });
+
+/* end tableOfContents.tsx */

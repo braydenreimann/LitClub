@@ -6,7 +6,8 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks
     {
         public static LibraryBookResponse ToResponse(this LibraryBook librarybook) => new()
         {
-            Id = librarybook.BookId,
+            Id = librarybook.Id,
+            BookId = librarybook.BookId,
             Status = librarybook.Status.ToContract(),
             StartedReading = librarybook.StartedReading,
             FinishedReading = librarybook.FinishedReading,
