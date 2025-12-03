@@ -1,12 +1,12 @@
-﻿// using LitClubApi.Domain;
+﻿using LitClubApi.Domain;
 
-// namespace LitClubApi.Endpoints.Libraries.AddLibrary
-// {
-//     public static class AddLibraryMapper
-//     {
-//         public static Library ToDomain(this AddLibraryRequest request) => new()
-//         {
-//             OwnerId = request.UserId,
-//         };
-//     }
-// }
+namespace LitClubApi.Endpoints.Libraries.AddLibrary
+{
+    public static class AddLibraryMapper
+    {
+        public static Library ToDomain(this AddLibraryRequest request) => new()
+        {
+            OwnerId = request.OwnerId,
+        };
+    }
+}

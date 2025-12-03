@@ -1,7 +1,7 @@
-﻿// namespace LitClubApi.Endpoints.Libraries.AddLibrary
-// {
-//     public class AddLibraryRequest
-//     {
-//         public required string UserId { get; init; }
-//     }
-// }
+﻿namespace LitClubApi.Endpoints.Libraries.AddLibrary
+{
+    public class AddLibraryRequest
+    {
+        public required string OwnerId { get; init; }
+    }
+}
