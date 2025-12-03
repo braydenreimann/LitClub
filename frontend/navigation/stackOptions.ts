@@ -15,7 +15,7 @@ export const createStackScreenOptions = (
     headerTitleAlign: 'center',
     headerTintColor: palette.text,
     headerBackTitle: 'Back',
-    headerBackTitleVisible: Platform.OS === 'ios',
+    headerBackVisible: Platform.OS === 'ios',
     headerStyle: { backgroundColor: palette.background },
     headerTitleStyle: {
       fontFamily: fonts.heading,

@@ -8,7 +8,7 @@ import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
-import { useLitClubs } from '@/context/LitClubsContext';
+import { useLitClubs } from '@/context/litClubsContext';
 import { colors } from '@/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '@/domain/models';

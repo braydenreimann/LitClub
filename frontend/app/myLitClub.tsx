@@ -17,7 +17,7 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLitClubs } from '@/context/LitClubsContext';
+import { useLitClubs } from '@/context/litClubsContext';
 import type { Book, User } from '@/domain/models';
 import { client } from '@/api/client';
 import { leaveLitClub } from '@/api/services/litClubsService';
@@ -189,6 +189,11 @@ export default function LitClubScreen() {
             return;
         }
 
+        if (!club) {
+            Alert.alert('Error', 'Club not found.');
+            return;
+        }
+
         Alert.alert('Leave Club', 'Are you sure you want to leave this club?', [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -209,7 +214,7 @@ export default function LitClubScreen() {
                         }
 
                         await fetchLitClubs();
-                        router.replace('/lit-clubs');
+                        router.replace('/litClubs');
                     } catch (error) {
                         Alert.alert('Error leaving club', (error as Error).message);
                     } finally {
@@ -222,6 +227,10 @@ export default function LitClubScreen() {
 
     // Delete a club (for owners) via client.DELETE
     async function handleDeleteClub() {
+        if (!club) {
+            Alert.alert('Error', 'Club not found.');
+            return;
+        }
         Alert.alert(
             'Delete Club',
             'Are you sure you want to delete this club? It will be deleted for all members.',

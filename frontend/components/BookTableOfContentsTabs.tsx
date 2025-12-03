@@ -209,39 +209,6 @@ function BookTableOfContentsTabs({
         loadUser();
     }, []);
 
-    // Load bookshelf status for this book (for the current owner context)
-    useEffect(() => {
-        if (!book || !ownerForStatus) {
-            setStatusLoading(false);
-            return;
-        }
-
-        let alive = true;
-        setStatusLoading(true);
-        setStatusError(null);
-
-        (async () => {
-            try {
-                const existing = await getLibraryBookForBook(ownerForStatus, book.id);
-                if (!alive) return;
-                setStatusByOwner((prev) => ({
-                    ...prev,
-                    [ownerForStatus]: (existing?.status ?? null) as ShelfStatus | null,
-                }));
-            } catch (err) {
-                if (!alive) return;
-                console.error("Error loading shelf status:", err);
-                setStatusError("Unable to load bookshelf status right now.");
-            } finally {
-                if (!alive) return;
-                setStatusLoading(false);
-            }
-        })();
-
-        return () => {
-            alive = false;
-        };
-    }, [ownerForStatus, book?.id]);
 
     useEffect(() => {
         setStatusMenuOpen(false);
@@ -286,7 +253,9 @@ function BookTableOfContentsTabs({
                 setAvailableLitClubs(memberships);
 
                 if (!selectedLitClubId && memberships.length > 0) {
-                    setSelectedLitClubId(memberships[0].id);
+                    if (memberships[0]) {
+                        setSelectedLitClubId(memberships[0].id);
+                    }
                 }
             } catch (err) {
                 if (!alive) return;
@@ -529,6 +498,41 @@ function BookTableOfContentsTabs({
                 : availableLitClubs.length === 0
                     ? "No LitClubs found"
                     : "Select a LitClub";
+
+
+    // Load bookshelf status for this book (for the current owner context)
+    useEffect(() => {
+        if (!book || !ownerForStatus) {
+            setStatusLoading(false);
+            return;
+        }
+
+        let alive = true;
+        setStatusLoading(true);
+        setStatusError(null);
+
+        (async () => {
+            try {
+                const existing = await getLibraryBookForBook(ownerForStatus, book.id);
+                if (!alive) return;
+                setStatusByOwner((prev) => ({
+                    ...prev,
+                    [ownerForStatus]: (existing?.status ?? null) as ShelfStatus | null,
+                }));
+            } catch (err) {
+                if (!alive) return;
+                console.error("Error loading shelf status:", err);
+                setStatusError("Unable to load bookshelf status right now.");
+            } finally {
+                if (!alive) return;
+                setStatusLoading(false);
+            }
+        })();
+
+        return () => {
+            alive = false;
+        };
+    }, [ownerForStatus, book?.id]);
 
     return (
         <View style={styles.container}>

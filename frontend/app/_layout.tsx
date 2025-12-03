@@ -4,7 +4,7 @@ import 'react-native-reanimated';
 import { SessionProvider } from '../context/AuthContext';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { LitClubProvider } from '@/context/LitClubsContext';
+import { LitClubProvider } from '@/context/litClubsContext';
 import React, { useMemo } from 'react';
 import { createStackScreenOptions } from '@/navigation/stackOptions';
 import { HeaderBackButton } from '@/navigation/HeaderBackButton';

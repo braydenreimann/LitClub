@@ -6,11 +6,11 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import SearchBar from '@/components/SearchBar';
+//import SearchBar from '@/components/SearchBar';
 import Header from '@/components/headerWithSearch';
 import { colors, fonts } from '@/theme';
 import ReadingList from '@/components/ReadingList'; 
-import TopThreeBooks from '@/components/TopThreeBooks';
+//import TopThreeBooks from '@/components/TopThreeBooks';
 import { View, Text, FlatList, ScrollView, StyleSheet, Alert,Dimensions } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '@/constants/theme';
@@ -22,12 +22,11 @@ import * as SplashScreen from 'expo-splash-screen';
 // Update the import path to the correct location of profileService
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '@/styles/globalStyles';
-import { useLitClubs } from '@/LitClubImport/LitClubContext';
+import { useLitClubs } from '@/context/litClubsContext';
 import Constants from 'expo-constants';
 import { Book, User } from '@/domain/models';
-import { useSession } from '@/auth/authContext';
+import { useSession } from '@/context/AuthContext';
 import { GenresSelector } from '@/components/genresSelector';
-import { getBook, getBooks } from '@/services/booksService';
 import { isPromise } from 'formik';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -41,7 +40,7 @@ function BackButton() {
     const router = useRouter();
     return (
         <Pressable>
-            <Link href="/bookclubs" onPress={() => router.back()}>
+            <Link href="/litClubs" onPress={() => router.back()}>
                 <EvilIcons name="chevron-left" size={50} color="#193350" style={{marginLeft: 0}}/>
             </Link>
         </Pressable>
@@ -176,7 +175,7 @@ export default function CreateLitClub() {
             await AsyncStorage.removeItem('createLitClubForm');
 
             Alert.alert('Success', `${name} club created successfully!`);
-            router.push('/bookclubs');
+            router.push('/litClubs');
             //setTimeout(() => router.push('/bookclubs'), 300);
         } catch (error: any) {
             console.error('Error creating club:', error);

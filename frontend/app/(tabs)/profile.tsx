@@ -16,9 +16,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
-import { useLitClubs } from '../../context/LitClubsContext';
+import { useLitClubs } from '../../context/litClubsContext';
 import { getUriRead } from '../../api/services/imagesService';
 import { getUserFromId } from '../../api/services/usersService';
+import { FontAwesome } from '@expo/vector-icons';
 
 function EditButton() {
     return (
