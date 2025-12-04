@@ -5,7 +5,7 @@ namespace LitClubApi.Domain;
 public class LitClub
 {
     [JsonProperty(PropertyName = "id")]
-    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public string Id { get; init; } = Guid.NewGuid().ToString()[..6];
     public required string Name { get; set; }
     public required string OwnerUserId { get; set; }
     public string? Description { get; set; }
