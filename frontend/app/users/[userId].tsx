@@ -22,7 +22,7 @@ import { getUserFromId } from '../../api/services/usersService';
 import { FontAwesome } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 
-//THIS IS SO OVERWHELMINGLY SCUFFED, JUST REUSING PROFILE CODE AND EDITING TO GENERALIZE FOR ROUTING
+//THIS IS SO OVERWHELMINGLY SCUFFED, JUST REUSING PROFILE CODE AND EDITING TO GENERALIZE FOR ROUTING. Reading list does not link properly,
 export default function ProfileScreen() {
     /*for the sake of the litclubs
       WITH BACKEND: implement this as a linked list of a users' joined book clubs */

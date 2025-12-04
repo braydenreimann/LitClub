@@ -104,7 +104,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
                                         onPress={() => handleUserPress(item.id)}
                                     >
                                         <Text style={styles.title} numberOfLines={1}>
-                                            {item.firstName}
+                                            {item.firstName + " " + item.lastName}
                                         </Text>
                                     </Pressable>
                                 )}
