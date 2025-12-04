@@ -10,6 +10,7 @@ type LitClubResponse = components['schemas']['LitClubResponse'];
 export type AddLitClubInput = {
     name: string;
     ownerUserId: string;
+    ownerUserName: string;
     description: string;
     preferredGenres: string[] | null;
     privateClub: boolean;
@@ -21,6 +22,7 @@ export function toAddLitClubRequest(input: AddLitClubInput): AddLitClubRequest {
     return {
         name: input.name,
         ownerUserId: input.ownerUserId,
+        ownerUserName: input.ownerUserName,
         description: input.description,
         preferredGenres: input.preferredGenres,
         privateClub: input.privateClub,
@@ -35,6 +37,7 @@ export function toDomainLitClub(dto: LitClubResponse): LitClub {
         id: dto.id!,
         name: dto.name!,
         ownerUserId: dto.ownerUserId!,
+        ownerUserName: dto.ownerUserName!,
         description: dto.description ?? '',
         preferredGenres: dto.preferredGenres ?? [],
         privateClub: dto.privateClub ?? false,

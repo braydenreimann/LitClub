@@ -286,7 +286,7 @@ export default function LitClubScreen() {
         <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}>
             <View style={{ flexDirection: 'row', paddingTop: 25 }}>
                 <BackButton />
-                <Text style={[globalStyles.heading, { paddingTop: 0 }]}>
+                <Text style={[globalStyles.heading, { paddingTop: 7, fontSize: 20}]}>
                     {club.name}
                 </Text>
             </View>
@@ -451,8 +451,8 @@ export default function LitClubScreen() {
                     Current Members
                 </Text>
                 <ClubMembers
-                    memberUserIds={club.memberUserIds ?? []}
                     ownerUserId={club.ownerUserId}
+                    memberUserIds={club.memberUserIds ?? []}
                 />
             </View>
 
@@ -499,6 +499,20 @@ export default function LitClubScreen() {
                     {isArchived ? 'Unarchive Club' : 'Archive Club'}
                 </Text>
             </Pressable>
+
+            {isOwner && (
+                <View style={{ marginHorizontal: 30 }}>
+                    <Text style={[globalStyles.subheading, { marginBottom: 10 }]}>
+                        Invite Code
+                    </Text>
+
+                    <View style={litStyles.invite}>
+                        <Text style={[globalStyles.body, { fontSize: 16 }]}>
+                            {club.id}
+                        </Text>
+                    </View>
+                </View>
+            )}
         </ScrollView>
     );
 }
@@ -599,6 +613,14 @@ const litStyles = StyleSheet.create({
         marginHorizontal: 30,
         padding: 15,
         borderRadius: 12,
+        marginBottom: 20,
+    },
+    invite: {
+        backgroundColor: colors.cream,
+        padding: 12,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: colors.darkest,
         marginBottom: 40,
     },
 });

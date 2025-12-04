@@ -21,6 +21,18 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         LitClub litClub = LitClubMapper.ToDomain(request);
+        
+        //set owneruserid
+        if (litClub.MemberUserIds == null || !litClub.MemberUserIds.Any())
+        {
+            litClub.MemberUserIds = new List<string>{ litClub.OwnerUserId };
+        }
+        else if (!litClub.MemberUserIds.Contains(litClub.OwnerUserId))
+        {
+            litClub.MemberUserIds.Insert(0, litClub.OwnerUserId);
+        }
+
+
         var partitionKey = new PartitionKey(litClub.Id);
 
         try

@@ -12,9 +12,11 @@ public static class LitClubMapper
         {
             Name = request.Name,
             OwnerUserId = request.OwnerUserId,
+            OwnerUserName = request.OwnerUserName,
             Description = request.Description,
             PreferredGenres = request.PreferredGenres?.ToList() ?? [],
             PrivateClub = request.PrivateClub,
+            MemberUserIds = new List<string> { request.OwnerUserId }
         };
     }
 
@@ -58,6 +60,7 @@ public static class LitClubMapper
         Id = litClub.Id,
         Name = litClub.Name,
         OwnerUserId = litClub.OwnerUserId,
+        OwnerUserName = litClub.OwnerUserName,
         Description = litClub.Description,
         PreferredGenres = litClub.PreferredGenres.ToArray(),
         PrivateClub = litClub.PrivateClub,

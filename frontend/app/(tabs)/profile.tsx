@@ -21,6 +21,8 @@ import { getUriRead } from '../../api/services/imagesService';
 import { getUserFromId } from '../../api/services/usersService';
 import { FontAwesome } from '@expo/vector-icons';
 
+
+
 function EditButton() {
     return (
         <Pressable onPress={() => router.push('/editProfile')}>
@@ -174,7 +176,7 @@ export default function ProfileScreen() {
                 {/* Name + action icons row */}
                 <View style={profStyles.nameRow}>
                     <View style={profStyles.nameSection}>
-                        <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
+                        <Text style={[globalStyles.heading, {fontSize: 25}]} numberOfLines={1} ellipsizeMode="tail">
                             {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
                         </Text>
                         {/*<Text style={globalStyles.body}>he/him</Text>*/}
@@ -183,7 +185,7 @@ export default function ProfileScreen() {
                     <View style={profStyles.iconRow}>
                         {/*<SettingsButton />*/}
                         <EditButton />
-                        <StatsButton />
+                        {/*<StatsButton />*/}
                         <SignOutButton />
 
                     </View>
@@ -198,7 +200,7 @@ export default function ProfileScreen() {
                         style={profStyles.profileImage}
                     />
 
-                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
+                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%', marginLeft: 15, marginTop: 10 }]}>
                         <Text style={globalStyles.subheading}>
                             {user ? `@${user.userName}` : 'Loading...'}
                             {pronouns ? <Text style={globalStyles.body}>{`  ${pronouns}`}</Text> : null}
@@ -215,6 +217,13 @@ export default function ProfileScreen() {
                 </View>
                 {/* ⬆️ close the header row here so the rest stacks vertically */}
 
+                {/* Pedestal Section */}
+                <View style={[profStyles.pedestalContainer, {marginTop: 20, marginBottom: 30}]}>
+                    <Text style={[globalStyles.subheading, { color: colors.cream, marginLeft: 10, marginBottom: 20 }]}>Pedestal</Text>
+                    <ReadingList status={4} />
+
+                </View>
+                
 
                 {/* Books Section */}
                 <View>
@@ -424,4 +433,9 @@ const profStyles = StyleSheet.create({
         gap: 10,
         flexShrink: 0,
     },
+    pedestalContainer: {
+        backgroundColor: colors.midBlue,
+        paddingVertical: 10,
+        marginBottom: 10,
+    }
 });

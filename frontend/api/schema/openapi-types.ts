@@ -1511,6 +1511,7 @@ export interface components {
         AddLitClubRequest: {
             name: string | null;
             ownerUserId: string | null;
+            ownerUserName: string | null;
             description?: string | null;
             preferredGenres?: string[] | null;
             privateClub?: boolean;
@@ -1626,6 +1627,7 @@ export interface components {
         EditLitClubBody: {
             name?: string | null;
             ownerUserId?: string | null;
+            ownerUserName?: string | null;
             description?: string | null;
             preferredGenres?: string[] | null;
             privateClub?: boolean | null;
@@ -1726,6 +1728,7 @@ export interface components {
             id: string | null;
             name: string | null;
             ownerUserId: string | null;
+            ownerUserName: string | null;
             description?: string | null;
             preferredGenres?: string[] | null;
             privateClub?: boolean;
@@ -1759,7 +1762,7 @@ export interface components {
          * Format: int32
          * @enum {integer}
          */
-        ShelfStatusContract: 0 | 1 | 2 | 3;
+        ShelfStatusContract: 0 | 1 | 2 | 3 | 4;
         ThreadResponse: {
             id: string | null;
             author: components["schemas"]["Author"];
