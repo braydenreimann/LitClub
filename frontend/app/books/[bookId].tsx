@@ -41,6 +41,7 @@ export default function BookInfoScreen() {
         const fetchBook = async () => {
             setLoading(true);
             try {
+                if (!bookId) throw new Error("No bookId provided.");
                 const data = await getBook(bookId);
                 setBook(data);
             } catch (err: any) {
