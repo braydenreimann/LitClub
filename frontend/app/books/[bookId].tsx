@@ -134,10 +134,6 @@ return (
                 <View style={{ height: 4, backgroundColor: colors.darkest }} />
                 {book && (
                     <View style={infoStyle.bookStatsContainer}>
-                        <View style={infoStyle.bookStat}>
-                            <Text style={infoStyle.bookStatLabel}>Pages</Text>
-                            <Text style={infoStyle.bookStatValue}>{'313'}</Text>
-                        </View>
 
                         <View style={infoStyle.bookStat}>
                             <Text style={infoStyle.bookStatLabel}>Chapters</Text>
