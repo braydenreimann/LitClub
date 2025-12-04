@@ -2,7 +2,8 @@ import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 
 import { Link } from 'expo-router';
-import SearchBar from '@/components/temp/SearchBar';
+//import SearchBar from '@/components/temp/SearchBar';
+import SearchBar from '@/components/SearchBar';
 
 export default function Header() {
   return (
