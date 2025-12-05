@@ -18,11 +18,6 @@ import index from '..';
 
 export default function AllLitClubs() {
   // Example data
-  const [fontsLoaded] = useFonts({
-    Fraunces_700Bold,
-    ChivoMono_500Medium,
-    NotoSansMono_400Regular,
-  });
 
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false); //create/join club
@@ -36,13 +31,15 @@ export default function AllLitClubs() {
     }, [fetchLitClubs])
   )
 
-  const toggleMenu = () => {
-      setMenuOpen((prev) => !prev);
-  };
-
+  const [fontsLoaded] = useFonts({
+    Fraunces_700Bold,
+    ChivoMono_500Medium,
+    NotoSansMono_400Regular,
+  });
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
+
 
   useEffect(() => {
     const loadArchivedClubs = async () => {
@@ -74,6 +71,15 @@ export default function AllLitClubs() {
     loadSession();
   }, []);
 
+  const toggleMenu = () => {
+      setMenuOpen((prev) => !prev);
+  };
+
+  const userId = user?.id ?? '';
+  const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId) && !archivedClubIds.includes(c.id));
+  const leaderClubs = litClubs.filter(c => c.ownerUserId === userId && !archivedClubIds.includes(c.id));
+  const archivedClubs = litClubs.filter(c => archivedClubIds.includes(c.id)); // example filter
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -96,11 +102,6 @@ export default function AllLitClubs() {
       </View>
     );
   }
-
-  const userId = user?.id ?? '';
-  const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId) && !archivedClubIds.includes(c.id));
-  const leaderClubs = litClubs.filter(c => c.ownerUserId === userId && !archivedClubIds.includes(c.id));
-  const archivedClubs = litClubs.filter(c => archivedClubIds.includes(c.id)); // example filter
 
 
   return (

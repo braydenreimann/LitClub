@@ -76,10 +76,6 @@ export default function LitClubScreen() {
         NotoSansMono_400Regular,
     });
 
-    useEffect(() => {
-        if (fontsLoaded) SplashScreen.hideAsync();
-    }, [fontsLoaded]);
-
     const { id } = useLocalSearchParams<{ id?: string }>();
     const router = useRouter();
     const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
@@ -90,6 +86,10 @@ export default function LitClubScreen() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [currentBook, setCurrentBook] = useState<Book | null>(null);
     const [upcomingBooks, setUpcomingBooks] = useState<Book[]>([]); // still loaded, not yet rendered
+
+    useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
 
     // Load archived clubs from local storage
     useEffect(() => {
@@ -159,6 +159,24 @@ export default function LitClubScreen() {
 
     const club = litClubs.find((c) => c.id === id);
 
+    useEffect(() => {
+        if (!club?.ownerUserId) return;
+
+        const fetchOwner = async () => {
+            const user = await getUserFromId(club.ownerUserId);
+            setOwnerUser(user);
+        };
+
+        fetchOwner();
+    }, [club?.ownerUserId]);
+
+    const currentUserId = user?.id ?? '';
+    const isOwner = club ? club.ownerUserId === currentUserId : false;
+    const isArchived = club ? archivedClubIds.includes(club.id) : false;
+
+    const [ownerUser, setOwnerUser] = useState<User | null>(null);
+    
+
     if (loading) {
         return <ActivityIndicator style={{ flex: 1 }} />;
     }
@@ -174,27 +192,9 @@ export default function LitClubScreen() {
     if (!litClubs.length) {
         return <Text style={{ padding: 20 }}>No LitClubs found.</Text>;
     }
-
     if (!club) {
         return <Text style={{ padding: 20 }}>Club not found.</Text>;
     }
-
-    const currentUserId = user?.id ?? '';
-    const isOwner = club.ownerUserId === currentUserId;
-    const isArchived = archivedClubIds.includes(club.id);
-
-    const [ownerUser, setOwnerUser] = useState<User | null>(null);
-
-    useEffect(() => {
-        if (!club?.ownerUserId) return;
-
-        const fetchOwner = async () => {
-            const user = await getUserFromId(club.ownerUserId);
-            setOwnerUser(user);
-        };
-
-        fetchOwner();
-    }, [club?.ownerUserId]);
 
     // Leave a club (for non-owners)
     async function handleLeaveClub() {
