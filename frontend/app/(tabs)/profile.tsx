@@ -30,9 +30,10 @@ function EditButton() {
         </Pressable>
     );
 }
-function SignOutButton() {
+
+function SignOutButton({ onPress }: { onPress: () => void }) {
     return (
-        <Pressable onPress={() => router.push('/')}>
+        <Pressable onPress={onPress}>
             <FontAwesome name="sign-out" size={20} color={colors.darkest} />
         </Pressable>
     );
@@ -137,6 +138,18 @@ export default function ProfileScreen() {
         };
     }, []);
 
+    const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
+    const confirmLogout = () => {
+        setLogoutModalVisible(true);
+    };
+
+    const handleLogout = async () => {
+        await AsyncStorage.removeItem('session');
+        setLogoutModalVisible(false);
+        router.replace('/');
+    };
+
     const userId = user?.id ?? '';
     const safeClubs = Array.isArray(litClubs) ? litClubs : [];
 
@@ -186,7 +199,7 @@ export default function ProfileScreen() {
                         {/*<SettingsButton />*/}
                         <EditButton />
                         {/*<StatsButton />*/}
-                        <SignOutButton />
+                        <SignOutButton onPress={confirmLogout} />
 
                     </View>
                 </View>
@@ -316,6 +329,35 @@ export default function ProfileScreen() {
                     )}
                 </View>
             </ScrollView>
+
+            {logoutModalVisible && (
+                <View style={profStyles.modalOverlay}>
+                    <View style={profStyles.modalContainer}>
+                        <Text style={profStyles.modalTitle}>Log Out?</Text>
+                        <Text style={profStyles.modalText}>
+                            Are you sure you want to log out?
+                        </Text>
+
+                        <View style={profStyles.modalButtons}>
+                            <Pressable
+                                style={[profStyles.modalButton, profStyles.confirmButton]}
+                                onPress={handleLogout}
+                            >
+                                <Text style={profStyles.modalButtonText}>Yes</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={[profStyles.modalButton, profStyles.cancelButton]}
+                                onPress={() => setLogoutModalVisible(false)}
+                            >
+                                <Text style={profStyles.modalButtonText}>No</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            )}
+
+
         </View>
     );
 }
@@ -437,5 +479,74 @@ const profStyles = StyleSheet.create({
         backgroundColor: colors.midBlue,
         paddingVertical: 10,
         marginBottom: 10,
-    }
+    },
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.45)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+    },
+
+    modalContainer: {
+        width: '85%',
+        backgroundColor: colors.cream,
+        borderRadius: 16,
+        padding: 20,
+        borderWidth: 3,
+        borderColor: colors.midBlue,
+        shadowColor: colors.darkest,
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 6,
+    },
+
+    modalTitle: {
+        fontSize: 22,
+        fontFamily: fonts.subheading,
+        color: colors.darkest,
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+
+    modalText: {
+        fontSize: 16,
+        fontFamily: fonts.body,
+        color: colors.darkest,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+    },
+
+    modalButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 25,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: colors.darkest,
+    },
+
+    confirmButton: {
+        backgroundColor: colors.sage,
+    },
+
+    cancelButton: {
+        backgroundColor: colors.midBlue,
+    },
+
+    modalButtonText: {
+        fontSize: 16,
+        fontFamily: fonts.body,
+        color: colors.darkest,
+        textAlign: 'center',
+    },
+
 });
