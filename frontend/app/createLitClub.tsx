@@ -41,10 +41,6 @@ export default function CreateLitClub() {
         NotoSansMono_400Regular,
     });
 
-    React.useEffect(() => {
-        if (fontsLoaded) SplashScreen.hideAsync();
-    }, [fontsLoaded]);
-
     const router = useRouter();
     const params = useLocalSearchParams();
     const { addLitClub } = useLitClubs();
@@ -81,6 +77,10 @@ export default function CreateLitClub() {
 
     //const [selectedBooks, setSelectedBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(false);
+
+    React.useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
 
     // ---- Load current user from session (via usersService) ----
     useEffect(() => {
