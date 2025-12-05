@@ -3,6 +3,8 @@ using LitClubApi.Configuration;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.Blobs;
 using LitClubApi.Endpoints.Books.AddBook;
+using LitClubApi.Endpoints.LitClubs.AddLitClub;
+using LitClubApi.Endpoints.Users.AddUser;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
@@ -158,7 +160,7 @@ using (var scope = app.Services.CreateScope())
     string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
     string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
     string exist = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "bookdata.csv");
-
+  
     List<Book> booklist = CSVParserInsert.Parse(exist);
 
     foreach (Book b in booklist)
@@ -371,6 +373,48 @@ using (var scope = app.Services.CreateScope())
     await libs.UpsertItemAsync(library2, new PartitionKey(library2.OwnerId));
 
     await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
+
+    // Base paths for Seeder folder
+    string usersCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Users", "users.csv");
+    string litClubsCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "LitClubs", "litclubs.csv");
+
+    // Parse Users CSV
+    List<LitClubUser> csvUsers = CSVParserUsers.Parse(usersCsvPath);
+    foreach (var user in csvUsers)
+    {
+        try
+        {
+            await users.UpsertItemAsync(user, new PartitionKey(user.Id));
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            // Skip duplicates
+            continue;
+        }
+    }
+
+    // Parse LitClubs CSV
+    List<LitClub> csvClubs = CSVParserLitClubs.Parse(litClubsCsvPath);
+    foreach (var club in csvClubs)
+    {
+        // Ensure owner is a valid user
+        if (!csvUsers.Any(u => u.Id == club.OwnerUserId))
+        {
+            Console.WriteLine($"Skipping club {club.Name}: ownerUserId {club.OwnerUserId} does not exist");
+            continue;
+        }
+
+        try
+        {
+            await clubs.UpsertItemAsync(club, new PartitionKey(club.Id));
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            // Skip duplicates
+            continue;
+        }
+    }
+
 }
 
 var updateSpec = args.Contains("--updateSpec");
