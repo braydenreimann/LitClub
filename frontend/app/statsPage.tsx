@@ -81,6 +81,7 @@ export default function StatsScreen() {
                     <Text style={globalStyles.subheading}>Past Reads</Text>
                     {/* 0 = Past Reads */}
                     <ReadingList status={0} />
+                    
                 </View>
             </ScrollView>
         </View>
