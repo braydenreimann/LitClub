@@ -4,7 +4,7 @@ using LitClubApi.Domain;
 using LitClubApi.Endpoints.Blobs;
 using LitClubApi.Endpoints.Books.AddBook;
 using LitClubApi.Endpoints.LitClubs.AddLitClub;
-using LitClubApi.Endpoints.Users.AddUser;
+using LitClubApi.Endpoints.LitClubUsers.AddUser;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
