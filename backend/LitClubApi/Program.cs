@@ -303,6 +303,23 @@ using (var scope = app.Services.CreateScope())
         ]
     };
 
+    Library litClubLibrary = new()
+    {
+        OwnerId = "litclub-1",
+        LibraryBooks =
+        [
+            new LibraryBook()
+            {
+                BookId = "1",
+                Status = ShelfStatus.currentlyReading,
+                StartedReading = DateOnly.Parse("October 11, 2025"),
+                CurrentPage = 114,
+                PercentComplete = 22,
+                OnPedastal = false
+            }
+        ]
+    };
+
     Library library2 = new()
     {
         OwnerId = "2",
@@ -371,6 +388,7 @@ using (var scope = app.Services.CreateScope())
     await clubs.UpsertItemAsync(litClub2, new PartitionKey(litClub2.Id));
     await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
     await libs.UpsertItemAsync(library2, new PartitionKey(library2.OwnerId));
+    await libs.UpsertItemAsync(litClubLibrary, new PartitionKey(litClubLibrary.OwnerId));
 
     await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
 
