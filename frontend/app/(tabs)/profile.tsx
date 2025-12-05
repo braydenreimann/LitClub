@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useCallback, useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Pressable } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link, router, useFocusEffect } from 'expo-router';
 import { Image } from 'expo-image';
 import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
@@ -20,6 +20,9 @@ import { useLitClubs } from '../../context/litClubsContext';
 import { getUriRead } from '../../api/services/imagesService';
 import { getUserFromId } from '../../api/services/usersService';
 import { FontAwesome } from '@expo/vector-icons';
+import { getBooksOnPedestal } from '@/api/services/librariesService';
+import { DisplayBook } from '@/domain/models';
+import index from '..';
 
 
 
@@ -102,6 +105,9 @@ export default function ProfileScreen() {
 
     const [profileUri, setProfileUri] = useState<string>("");
 
+    const [pedestalBooks, setPedestalBooks] = useState<DisplayBook[]>([]);
+    const [pedestalLoading, setPedestalLoading] = useState(false);
+
     useEffect(() => {
         let alive = true; // to prevent state updates after unmount
 
@@ -149,6 +155,26 @@ export default function ProfileScreen() {
         setLogoutModalVisible(false);
         router.replace('/');
     };
+    useFocusEffect(
+        useCallback(() => {
+            const fetchPedestalBooks = async () => {
+                if (!user?.id) return;
+                setPedestalLoading(true);
+                try {
+                    const books = await getBooksOnPedestal(user.id);
+                    setPedestalBooks(books ?? []);
+                } catch (err) {
+                    console.error('Error loading pedestal books:', err);
+                } finally {
+                    setPedestalLoading(false);
+                }
+            };
+
+            if (user?.id) {
+                fetchPedestalBooks();
+            }
+        }, [user?.id])
+    );
 
     const userId = user?.id ?? '';
     const safeClubs = Array.isArray(litClubs) ? litClubs : [];
@@ -180,6 +206,66 @@ export default function ProfileScreen() {
             </View>
         );
     }
+
+    const renderPedestalBooks = () => {
+        if (pedestalLoading) {
+            return <Text>Loading pedestal books...</Text>;
+        }
+
+        if (pedestalBooks.length === 0) {
+            return <Text style={[globalStyles.body, { paddingLeft: 15 }]}>No books on your pedestal yet.</Text>;
+        }
+        
+        return (
+            <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 10, gap: 12 }}
+            >
+                {pedestalBooks.map((book) => (
+                    <PedestalBookCard key={book.id} book={book} />
+                ))}
+            </ScrollView>
+        );
+    };
+
+    function PedestalBookCard({ book }: { book: DisplayBook }) {
+        const [coverUri, setCoverUri] = useState<string>('');
+        
+        useEffect(() => {
+            let alive = true;
+            (async () => {
+                const uri = await getUriRead(book.coverImageUrl);
+                if (alive) setCoverUri(uri || '');
+            })();
+            return () => { alive = false; };
+        }, [book.coverImageUrl]);
+        
+        return (
+        <Link href={`/books/${book.id}`} asChild>
+            <Pressable style={profStyles.pedestalBook}>
+                <Image
+                    source={
+                        coverUri
+                            ? { uri: coverUri }
+                            : require('@/assets/images/turkstra.jpg')
+                    }
+                    style={profStyles.pedestalBookImage}
+                    contentFit="cover"
+                />
+                <Text 
+                    style={profStyles.pedestalBookTitle} 
+                    numberOfLines={2} 
+                    ellipsizeMode="tail"
+                >
+                    {book.title}
+                </Text>
+            </Pressable>
+        </Link>
+    );
+}
+
+
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
@@ -233,8 +319,7 @@ export default function ProfileScreen() {
                 {/* Pedestal Section */}
                 <View style={[profStyles.pedestalContainer, {marginTop: 20, marginBottom: 30}]}>
                     <Text style={[globalStyles.subheading, { color: colors.cream, marginLeft: 10, marginBottom: 20 }]}>Pedestal</Text>
-                    <ReadingList status={4} />
-
+                    {renderPedestalBooks()}
                 </View>
                 
 
@@ -256,9 +341,9 @@ export default function ProfileScreen() {
                     ) : error ? (
                         <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
                     ) : userClubs.length ? (
-                        userClubs.map((club) => (
+                        userClubs.map((club, index) => (
                             <Pressable
-                                key={club.id}
+                                key={`${club.id}-${index}`}
                                 style={profStyles.litclubCard}
                             >
                                 <Link
@@ -280,9 +365,9 @@ export default function ProfileScreen() {
                 <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
                 <View style={globalStyles.cardGroup}>
                     {leaderClubs.length ? (
-                        leaderClubs.map((club) => (
+                        leaderClubs.map((club, index) => (
                             <Pressable
-                                key={club.id}
+                                key={`${club.id}-${index}`}
                                 style={profStyles.litclubCard}
                                 onPress={() => Alert.alert(`Opening ${club.name}`)}
                             >
@@ -477,7 +562,7 @@ const profStyles = StyleSheet.create({
     },
     pedestalContainer: {
         backgroundColor: colors.midBlue,
-        paddingVertical: 10,
+        paddingVertical: 15,
         marginBottom: 10,
     },
     modalOverlay: {
@@ -549,4 +634,22 @@ const profStyles = StyleSheet.create({
         textAlign: 'center',
     },
 
+    pedestalBook: {
+        width: 120,
+        alignItems: 'center',
+    },
+    pedestalBookImage: {
+        width: 100,
+        height: 150,
+        borderRadius: 8,
+        backgroundColor: colors.teal,
+    },
+    pedestalBookTitle: {
+        fontFamily: fonts.body,
+        fontSize: 12,
+        color: colors.cream,
+        textAlign: 'center',
+        marginTop: 6,
+        width: 100,
+    },
 });

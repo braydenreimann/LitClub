@@ -13,6 +13,7 @@ import { colors } from '@/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '@/domain/models';
 import { useRouter } from "expo-router";
+import index from '..';
 
 
 export default function AllLitClubs() {
@@ -143,10 +144,10 @@ export default function AllLitClubs() {
 
         <View style={globalStyles.cardGroup}>
           {leaderClubs.length ? (
-            leaderClubs.map((club) => (
+            leaderClubs.map((club, index) => (
 
               <Pressable
-                key={club.id}
+                key={`${club.id}-${index}`}
                 style={globalStyles.litclubCard}            >
                 <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >
                   <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
@@ -162,9 +163,9 @@ export default function AllLitClubs() {
 
         <View style={globalStyles.cardGroup}>
           {userClubs.length ? (
-            userClubs.map((club) => (
+            userClubs.map((club, index) => (
               <Pressable
-                key={club.id}
+                key={`${club.id}-${index}`}
                 style={globalStyles.litclubCard}
               >
                 <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >

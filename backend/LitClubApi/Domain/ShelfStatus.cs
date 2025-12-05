@@ -6,7 +6,6 @@
         currentlyReading,
         futureReads,
         pastReads,
-        pedestal
     }
 
 }

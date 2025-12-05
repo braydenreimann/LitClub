@@ -10,5 +10,4 @@ public enum ShelfStatusContract
     currentlyReading,
     futureReads,
     pastReads,
-    pedestal
 }

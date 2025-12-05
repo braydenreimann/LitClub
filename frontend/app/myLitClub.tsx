@@ -526,16 +526,17 @@ export default function LitClubScreen() {
                 </Text>
             </Pressable>
 
-            {isOwner && (
-                <View style={{ marginHorizontal: 30 }}>
+
+            {(isOwner || (!club.privateClub && club.memberUserIds?.includes(currentUserId))) && (
+                <View style={{ marginHorizontal: 30, marginBottom: 40 }}>
                     <Text style={[globalStyles.subheading, { marginBottom: 10 }]}>
-                        Invite Code
+                        {isOwner ? 'Invite Code' : 'Club Invite Code'}
                     </Text>
 
                     <View style={litStyles.invite}>
                         <Text style={[globalStyles.body, { fontSize: 16 }]}>
                             {club.id}
-                        </Text>
+                        </Text> 
                     </View>
                 </View>
             )}
