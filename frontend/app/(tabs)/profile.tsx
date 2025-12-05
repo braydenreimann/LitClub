@@ -220,8 +220,7 @@ export default function ProfileScreen() {
                 {/* Pedestal Section */}
                 <View style={[profStyles.pedestalContainer, {marginTop: 20, marginBottom: 30}]}>
                     <Text style={[globalStyles.subheading, { color: colors.cream, marginLeft: 10, marginBottom: 20 }]}>Pedestal</Text>
-                    <ReadingList status={4} />
-
+                    
                 </View>
                 
 

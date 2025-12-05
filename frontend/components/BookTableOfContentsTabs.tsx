@@ -56,10 +56,6 @@ const shelfStatusOptions: ShelfStatusOption[] = [
         value: 0,
     },
     {
-        label: "Pedestal",
-        value: 4,
-    },
-    {
         label: "Remove from Bookshelf",
         value: "remove",
     },
@@ -75,8 +71,6 @@ function mapStatusToLabel(status: ShelfStatus | null): string {
             return "Past Reads";
         case 2:
             return "On Hiatus";
-        case 4:
-            return "Pedestal";
         default:
             return "Add to Bookshelf";
     }
