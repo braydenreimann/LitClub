@@ -27,8 +27,8 @@ export default function AllLitClubs() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchLitClubs();
-    }, [fetchLitClubs])
+      if (!litClubs.length) fetchLitClubs();
+    }, [fetchLitClubs, litClubs])
   )
 
   const [fontsLoaded] = useFonts({

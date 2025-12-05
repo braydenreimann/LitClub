@@ -168,7 +168,7 @@ export default function CreateLitClub() {
             // - Create LibraryBooks for each selected book ID
             //   using a librariesService method.
 
-            Alert.alert('Success', `${trimmedName} club created successfully!`);
+            //Alert.alert('Success', `${trimmedName} club created successfully!`);
             router.push('/litClubs');
         } catch (error: any) {
             console.error('Error creating club:', error);
