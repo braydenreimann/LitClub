@@ -54,7 +54,6 @@ export default function ClubMembers({ memberUserIds, ownerUserId }: ClubMembersP
   }, [memberUserIds]);
 
 
-
   if (loading) {
       return <ActivityIndicator style={{ marginVertical: 20 }} />;
   }

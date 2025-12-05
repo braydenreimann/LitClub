@@ -14,7 +14,7 @@ import { getUriRead } from '@/api/services/imagesService';
 import { pushBookDetail } from '@/navigation/routes';
 
 // Status from backend enum: 0 | 1 | 2 | 3
-type ShelfStatus = 0 | 1 | 2 | 3;
+type ShelfStatus = 0 | 1 | 2 | 3 | 4;
 
 interface ReadingListProps {
     status: ShelfStatus;

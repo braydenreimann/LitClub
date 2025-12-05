@@ -269,6 +269,7 @@ using (var scope = app.Services.CreateScope())
         Id = "litclub-1",
         Name = "Fans of John Green",
         OwnerUserId = "1",
+        OwnerUserName = "johngreen",
         Description = "We love all of John Green's books. And some of Hank's too.",
         MemberUserIds = ["1"],
     };
@@ -278,6 +279,7 @@ using (var scope = app.Services.CreateScope())
         Id = "litclub-2",
         Name = "LGBTQ+ MAGA Readers",
         OwnerUserId = "2",
+        OwnerUserName = "billywayne",
         Description = "A safe space for LGBTQ+ MAGA members to discuss their favorite books.",
         MemberUserIds = ["1", "2"],
     };
@@ -325,7 +327,7 @@ using (var scope = app.Services.CreateScope())
     int i = 0;
     foreach (Book b in booklist) //Default profile booklist for testing purposes
     {
-        ShelfStatus status = (ShelfStatus)(i % 4);
+        ShelfStatus status = (ShelfStatus)(i % 5);
         DateOnly? started = null;
         DateOnly? finished = null;
         int currentpage = 0;

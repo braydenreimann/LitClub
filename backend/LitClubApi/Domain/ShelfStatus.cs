@@ -5,7 +5,8 @@
         notInYourLibrary,
         currentlyReading,
         futureReads,
-        pastReads
+        pastReads,
+        pedestal
     }
 
 }

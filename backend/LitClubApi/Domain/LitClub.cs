@@ -8,6 +8,7 @@ public class LitClub
     public string Id { get; init; } = Guid.NewGuid().ToString()[..6];
     public required string Name { get; set; }
     public required string OwnerUserId { get; set; }
+    public required string OwnerUserName { get; set; }
     public string? Description { get; set; }
     public List<string> PreferredGenres { get; set; } = [];
     public bool PrivateClub { get; set; } = true;

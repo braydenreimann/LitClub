@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Pressable } from 'react-native';
 import { Link, router } from 'expo-router';
@@ -20,40 +20,16 @@ import { useLitClubs } from '../../context/litClubsContext';
 import { getUriRead } from '../../api/services/imagesService';
 import { getUserFromId } from '../../api/services/usersService';
 import { FontAwesome } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
 
-
-
-function EditButton() {
-    return (
-        <Pressable onPress={() => router.push('/editProfile')}>
-            <Foundation name="pencil" size={20} color={colors.darkest} />
-        </Pressable>
-    );
-}
-function SignOutButton() {
-    return (
-        <Pressable onPress={() => router.push('/')}>
-            <FontAwesome name="sign-out" size={20} color={colors.darkest} />
-        </Pressable>
-    );
-}
-
-function SettingsButton() {
-    return (
-        <EvilIcons name="gear" size={30} color={colors.darkest} />
-    );
-}
-function StatsButton() {
-    return (
-        <Link href="/statsPage">
-            <Foundation name="book-bookmark" size={30} color={colors.darkest} />
-        </Link>
-    );
-}
-
+//THIS IS SO OVERWHELMINGLY SCUFFED, JUST REUSING PROFILE CODE AND EDITING TO GENERALIZE FOR ROUTING. Reading list does not link properly,
 export default function ProfileScreen() {
     /*for the sake of the litclubs
       WITH BACKEND: implement this as a linked list of a users' joined book clubs */
+
+    const params = useLocalSearchParams<{
+        userId: string;
+    }>();
 
     const [fontsLoaded] = useFonts({
         Fraunces_700Bold,
@@ -78,11 +54,10 @@ export default function ProfileScreen() {
         // Define an async function inside useEffect
         const loadSession = async () => {
             try {
-                const sessionString = await AsyncStorage.getItem('session');
+                const sessionString = await getUserFromId(params.userId);
                 if (!sessionString) return; // no session stored
 
-                const session: User = JSON.parse(sessionString);
-                setUser(session); // update state
+                setUser(sessionString); // update state
             } catch (error) {
                 console.error('Error loading session:', error);
             }
@@ -106,14 +81,8 @@ export default function ProfileScreen() {
 
         const loadUser = async () => {
             try {
-                // Load session from AsyncStorage
-                const sessionString = await AsyncStorage.getItem('session');
-                if (!sessionString) return;
-
-                const session: User = JSON.parse(sessionString);
-
                 // Fetch fresh user from backend using ID
-                const freshUser = await getUserFromId(session.id);
+                const freshUser = await getUserFromId(params.userId);
                 if (!freshUser) return;
 
                 if (!alive) return;
@@ -176,18 +145,10 @@ export default function ProfileScreen() {
                 {/* Name + action icons row */}
                 <View style={profStyles.nameRow}>
                     <View style={profStyles.nameSection}>
-                        <Text style={[globalStyles.heading, {fontSize: 25}]} numberOfLines={1} ellipsizeMode="tail">
+                        <Text style={globalStyles.heading} numberOfLines={1} ellipsizeMode="tail">
                             {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
                         </Text>
                         {/*<Text style={globalStyles.body}>he/him</Text>*/}
-                    </View>
-
-                    <View style={profStyles.iconRow}>
-                        {/*<SettingsButton />*/}
-                        <EditButton />
-                        {/*<StatsButton />*/}
-                        <SignOutButton />
-
                     </View>
                 </View>
 
@@ -200,7 +161,7 @@ export default function ProfileScreen() {
                         style={profStyles.profileImage}
                     />
 
-                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%', marginLeft: 15, marginTop: 10 }]}>
+                    <View style={[profStyles.userBio, { flexShrink: 1, maxWidth: '90%' }]}>
                         <Text style={globalStyles.subheading}>
                             {user ? `@${user.userName}` : 'Loading...'}
                             {pronouns ? <Text style={globalStyles.body}>{`  ${pronouns}`}</Text> : null}
@@ -217,20 +178,13 @@ export default function ProfileScreen() {
                 </View>
                 {/* ⬆️ close the header row here so the rest stacks vertically */}
 
-                {/* Pedestal Section */}
-                <View style={[profStyles.pedestalContainer, {marginTop: 20, marginBottom: 30}]}>
-                    <Text style={[globalStyles.subheading, { color: colors.cream, marginLeft: 10, marginBottom: 20 }]}>Pedestal</Text>
-                    <ReadingList status={4} />
-
-                </View>
-                
 
                 {/* Books Section */}
                 <View>
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Currently Reading</Text>
                     <ReadingList status={1} />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Future Reads</Text>
-                    <ReadingList status={3} />
+                    <ReadingList status={2} />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Past Reads</Text>
                     <ReadingList status={0} />
                 </View>
@@ -284,7 +238,7 @@ export default function ProfileScreen() {
                             </Pressable>
                         ))
                     ) : (
-                        <Text>You're not leading any clubs yet.</Text>
+                        <Text>You&aposre not leading any clubs yet.</Text>
                     )}
                 </View>
 
@@ -433,9 +387,4 @@ const profStyles = StyleSheet.create({
         gap: 10,
         flexShrink: 0,
     },
-    pedestalContainer: {
-        backgroundColor: colors.midBlue,
-        paddingVertical: 10,
-        marginBottom: 10,
-    }
 });

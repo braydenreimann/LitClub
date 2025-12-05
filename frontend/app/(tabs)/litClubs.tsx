@@ -111,27 +111,35 @@ export default function AllLitClubs() {
       <ScrollView contentContainerStyle={{ padding: 16 }}>
 
         {/* New Club Button */}
-        <Link href="/createLitClub" asChild>
-          <Pressable
-            style={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              zIndex: 100,
-              borderRadius: 30,
-              width: 50,
-              height: 50,
-              justifyContent: 'center',
-              alignContent: 'center',
-              alignItems: 'center',
-              marginBottom: 16,
-            }}>
+        <Pressable 
+          style={styles.toggle}
+          onPress={toggleMenu}
+        >
             <EvilIcons name="plus" size={50} color={colors.midBlue} />
-          </Pressable>
-        </Link>
+        </Pressable>
+        
+
+        {menuOpen && (
+          <View style={[styles.dropdown, { zIndex: 100 }]}>
+            <Pressable
+              style={[styles.dropdownItem, { zIndex: 100 }]}
+              onPress={() => router.push("/createLitClub")}
+            >
+              <Text style = {globalStyles.body}>Create New LitClub</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.dropdownItem, { zIndex: 100 }]}
+              onPress={() => router.push("/JoinLitClub")}
+            >
+              <Text style = {globalStyles.body}>Join a LitClub</Text>
+            </Pressable>
+
+          </View>
+        )}
 
         {/* MAIN HEADING */}
-        <Text style={globalStyles.heading}>My LitClubs</Text>
+        <Text style={[globalStyles.heading, {paddingTop: 20}]}>My LitClubs</Text>
 
         <View style={globalStyles.cardGroup}>
           {leaderClubs.length ? (

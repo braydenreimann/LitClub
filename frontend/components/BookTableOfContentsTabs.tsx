@@ -35,7 +35,7 @@ import {
 } from "@/api/services/librariesService";
 
 // Backend enum: 0 | 1 | 2 | 3
-type ShelfStatus = 0 | 1 | 2 | 3;
+type ShelfStatus = 0 | 1 | 2 | 3 | 4;
 
 type ShelfStatusOption = {
     label: string;
@@ -56,6 +56,10 @@ const shelfStatusOptions: ShelfStatusOption[] = [
         value: 0,
     },
     {
+        label: "Pedestal",
+        value: 4,
+    },
+    {
         label: "Remove from Bookshelf",
         value: "remove",
     },
@@ -71,6 +75,8 @@ function mapStatusToLabel(status: ShelfStatus | null): string {
             return "Past Reads";
         case 2:
             return "On Hiatus";
+        case 4:
+            return "Pedestal";
         default:
             return "Add to Bookshelf";
     }

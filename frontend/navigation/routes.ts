@@ -34,3 +34,26 @@ export const pushBookDetail = (
 ) => {
   router.push(bookDetailHref(bookId, litClubId, litClubName, litClubOwnerId));
 };
+
+type UserHref = {
+    pathname: '/users/[userId]';
+    params: {
+        userId: string;
+    };
+};
+
+export const userDetailHref = (
+    userId: string,
+): UserHref => ({
+    pathname: '/users/[userId]',
+    params: {
+        userId
+    },
+});
+
+export const pushUserDetail = (
+    router: Router,
+    userId: string,
+) => {
+    router.push(userDetailHref(userId));
+};
