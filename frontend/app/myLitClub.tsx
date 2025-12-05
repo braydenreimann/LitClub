@@ -23,6 +23,7 @@ import { client } from '@/api/client';
 import { leaveLitClub } from '@/api/services/litClubsService';
 import { pushBookDetail } from '@/navigation/routes';
 import { useFocusEffect } from 'expo-router';
+import { getUserFromId } from '@/api/services/usersService';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -182,6 +183,19 @@ export default function LitClubScreen() {
     const isOwner = club.ownerUserId === currentUserId;
     const isArchived = archivedClubIds.includes(club.id);
 
+    const [ownerUser, setOwnerUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        if (!club?.ownerUserId) return;
+
+        const fetchOwner = async () => {
+            const user = await getUserFromId(club.ownerUserId);
+            setOwnerUser(user);
+        };
+
+        fetchOwner();
+    }, [club?.ownerUserId]);
+
     // Leave a club (for non-owners)
     async function handleLeaveClub() {
         if (!currentUserId) {
@@ -286,14 +300,10 @@ export default function LitClubScreen() {
         <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}>
             <View style={{ flexDirection: 'row', paddingTop: 25 }}>
                 <BackButton />
-                <Text style={[globalStyles.heading, { paddingTop: 7, fontSize: 20}]}>
+                <Text style={[globalStyles.heading, { paddingTop: 6, fontSize: 24 }]}>
                     {club.name}
                 </Text>
             </View>
-
-            <Text style={[globalStyles.body, { margin: 20 }]}>
-                {club.description}
-            </Text>
 
             <View style={litStyles.leaderBanner}>
                 <Foundation
@@ -302,8 +312,14 @@ export default function LitClubScreen() {
                     color="#193350"
                     style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}
                 />
-                <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
-                <Text style={globalStyles.subheading}>@{club.ownerUserId}</Text>
+                    <Text style={[globalStyles.subheading, {fontSize: 16}]}> CLUB LEADER: </Text>
+                    <Text style={[globalStyles.subheading, {fontSize: 16}]}>
+                        {ownerUser ? ownerUser.firstName : "Loading..."}
+                         {' '}
+                        {ownerUser ? ownerUser.lastName : "Loading..."}
+                        {' | '}
+                        @{ownerUser ? ownerUser.userName : "Loading..."}
+                    </Text>
                 <Foundation
                     name="crown"
                     size={30}
@@ -311,9 +327,13 @@ export default function LitClubScreen() {
                     style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}
                 />
             </View>
+            <Text style={[globalStyles.body, { margin: 20 }]}>
+                {club.description}
+            </Text>
 
             {/* Currently reading section */}
-            <View style={litStyles.currentRead}>
+            { /*
+                <View style={litStyles.currentRead}>
                 <View style={litStyles.sideRead}>
                     <View style={globalStyles.card}>
                         {currentBook ? (
@@ -364,13 +384,14 @@ export default function LitClubScreen() {
                     </View>
                     <Jump2discButton />
                 </View>
-            </View>
+            </View> */}
 
             <View>
                 {/* Preferred Genres */}
-                <Text style={[globalStyles.subheading, { margin: 20 }]}>
+                <Text style={litStyles.sectionHeader}>
                     Preferred Genres
                 </Text>
+
                 <View
                     style={{
                         flexDirection: 'row',
@@ -379,21 +400,32 @@ export default function LitClubScreen() {
                     }}
                 >
                     {(club.preferredGenres || []).map((genre, idx) => (
-                        <Text
+                        <View
                             key={idx}
-                            style={[globalStyles.body, { marginRight: 10 }]}
+                            style={{
+                                backgroundColor: colors.sage,
+                                paddingVertical: 6,
+                                paddingHorizontal: 12,
+                                borderRadius: 20,
+                                marginRight: 8,
+                                marginBottom: 8,
+                            }}
                         >
-                            #{genre}
-                        </Text>
+                            <Text
+                                style={[
+                                    globalStyles.body,
+                                    { color: colors.darkest },
+                                ]}
+                            >
+                                {genre}
+                            </Text>
+                        </View>
                     ))}
                 </View>
 
                 {/* Club Library reading lists */}
                 <Text
-                    style={[
-                        globalStyles.subheading,
-                        { paddingTop: 25, paddingHorizontal: 20 },
-                    ]}
+                    style={litStyles.sectionHeader}
                 >
                     Currently Reading
                 </Text>
@@ -409,10 +441,7 @@ export default function LitClubScreen() {
                 </View>
 
                 <Text
-                    style={[
-                        globalStyles.subheading,
-                        { paddingTop: 25, paddingHorizontal: 20 },
-                    ]}
+                    style={litStyles.sectionHeader}
                 >
                     Future Reads
                 </Text>
@@ -428,10 +457,7 @@ export default function LitClubScreen() {
                 </View>
 
                 <Text
-                    style={[
-                        globalStyles.subheading,
-                        { paddingTop: 25, paddingHorizontal: 20 },
-                    ]}
+                    style={litStyles.sectionHeader}
                 >
                     Past Reads
                 </Text>
@@ -447,7 +473,7 @@ export default function LitClubScreen() {
                 </View>
 
                 {/* Members */}
-                <Text style={[globalStyles.subheading, { margin: 20 }]}>
+                <Text style={litStyles.sectionHeader}>
                     Current Members
                 </Text>
                 <ClubMembers
@@ -623,4 +649,12 @@ const litStyles = StyleSheet.create({
         borderColor: colors.darkest,
         marginBottom: 40,
     },
+    sectionHeader: {
+        paddingLeft: 20,
+        marginBottom: 10,
+        marginTop: 10,
+        fontSize: 20,
+        fontFamily: fonts.subheading,
+        color: colors.midBlue
+    }
 });
