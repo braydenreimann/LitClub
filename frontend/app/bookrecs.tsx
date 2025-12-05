@@ -43,20 +43,31 @@ export default function BookRecs() {
         return () => clearTimeout(timeout);
     }, [query]);
 
-  useEffect(() => {
-    const loadBooks = async () => {
-      try {
-        const { books: fetchedBooks } = await getBooks();
-        setBooks(fetchedBooks);
-      } catch (err) {
-        console.error('Error loading book recommendations:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        const loadBooks = async () => {
+            try {
+            let all: Book[] = [];
+            let token: string | null | undefined = undefined;
 
-    loadBooks();
-  }, []);
+            while (true) {
+                const { books, continuationToken } = await getBooks(token);
+                all = [...all, ...books];
+
+                if (!continuationToken) break; // Done
+                token = continuationToken;
+            }
+
+            const sorted = all.sort((a, b) => a.title.localeCompare(b.title));
+            setBooks(sorted);
+            } catch (err) {
+            console.error("Error loading books:", err);
+            } finally {
+            setLoading(false);
+            }
+        };
+
+        loadBooks();
+        }, []);
 
     const visible = query.trim() ? bookResults : books; 
 
@@ -120,7 +131,7 @@ export default function BookRecs() {
                         <TextInput
                             style={styles.searchBar}
                             placeholder="Search"
-                            placeholderTextColor="#224B6F"
+                            placeholderTextColor={colors.midBlue}
                             value={searchInput}
                             onChangeText={(text) => {
                                 setSearchInput(text);

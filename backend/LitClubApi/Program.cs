@@ -257,7 +257,7 @@ using (var scope = app.Services.CreateScope())
         LastName = "Wayne",
         UserName = "billywayne",
         Email = "billywayne@gmail.com",
-        Bio = "I am a proud member of the LGBTQ+ MAGA community.",
+        Bio = "I am a proud member of the LGBTQ+ community.",
         PreferredGenres = ["Non-Fiction", "Science", "Podcasts", "Comedy"],
         ProfilePhotoUrl = "John-Green.png",
         PasswordHash = "billywaynepw",
@@ -277,10 +277,10 @@ using (var scope = app.Services.CreateScope())
     LitClub litClub2 = new()
     {
         Id = "litclub-2",
-        Name = "LGBTQ+ MAGA Readers",
+        Name = "Queer Literature Club",
         OwnerUserId = "2",
         OwnerUserName = "billywayne",
-        Description = "A safe space for LGBTQ+ MAGA members to discuss their favorite books.",
+        Description = "Reading classical and contemporary literature through a queer lens.",
         MemberUserIds = ["1", "2"],
     };
 
