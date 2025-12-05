@@ -123,6 +123,152 @@ export async function createLibraryBook(
     }
 }
 
+//check if a book is on pedestal
+export async function checkIfBookOnPedestal(
+    ownerId: string,
+    bookId: string
+) : Promise<boolean> {
+    try {
+        const libraryBook = await getLibraryBookForBook(ownerId, bookId);
+        return libraryBook ? libraryBook.onPedastal : false;
+    } catch (err) {
+        console.error('Error checking if book is on pedestal:', err);
+        return false;
+    }
+} 
+
+//add book to pedestal
+export async function addBookToPedestal(
+    ownerId: string,
+    bookId: string
+): Promise<LibraryBook | null> {
+    try {
+        const existing = await getLibraryBookForBook(ownerId, bookId);
+        
+        if (!existing) {
+            console.error('LibraryBook does not exist. Cannot add to pedestal.');
+            return null;
+        }
+        
+        const body: EditLibraryBookBody = {
+            status: existing.status as ShelfStatus,
+            startedReading: null,
+            finishedReading: null,
+            currentPage: null,
+            percentComplete: null,
+            onPedastal: true,
+        };
+
+        const { data, error } = await client.PATCH(
+            '/libraries/{userId}/libraryBooks/{libraryBookId}',
+            {
+                params: {
+                    path: {
+                        userId: ownerId,
+                        libraryBookId: existing.id,
+                    },
+                },
+                body,
+            }
+        );
+
+        if (error || !data) {
+            console.error('Failed to add book to pedestal', error);
+            return null;
+        }
+
+        return toDomainLibraryBook(data);
+    } catch (err) {
+        console.error('Error adding book to pedestal:', err);
+        return null;
+    }
+}
+
+//remove book from pedestal
+export async function removeBookFromPedestal(
+    ownerId: string,
+    bookId: string
+): Promise<LibraryBook | null> {
+    try {
+        const existing = await getLibraryBookForBook(ownerId, bookId);
+        
+        if (!existing) {
+            console.error('LibraryBook does not exist. Cannot remove from pedestal.');
+            return null;
+        }
+        
+        const body: EditLibraryBookBody = {
+            status: existing.status as ShelfStatus,
+            startedReading: null,
+            finishedReading: null,
+            currentPage: null,
+            percentComplete: null,
+            onPedastal: false,
+        };
+
+        const { data, error } = await client.PATCH(
+            '/libraries/{userId}/libraryBooks/{libraryBookId}',
+            {
+                params: {
+                    path: {
+                        userId: ownerId,
+                        libraryBookId: existing.id,
+                    },
+                },
+                body,
+            }
+        );
+
+        if (error || !data) {
+            console.error('Failed to remove book from pedestal', error);
+            return null;
+        }
+
+        return toDomainLibraryBook(data);
+    } catch (err) {
+        console.error('Error removing book from pedestal:', err);
+        return null;
+    }
+}
+
+//get all books on pedestal
+export async function getBooksOnPedestal(
+    ownerId: string
+): Promise<DisplayBook[] | null> {
+    try {
+        const libraryBooks = await getLibraryBooks(ownerId);
+        const pedestalBooks = libraryBooks.filter((b) => b.onPedastal);
+
+        const fullBooks: (Book | null)[] = await Promise.all(
+            pedestalBooks.map(async (libBook) => {
+                if (!libBook.bookId) {
+                    return null;
+                }
+                try {
+                    const book = await getBook(libBook.bookId);
+                    return book;
+                } catch (err) {
+                    console.error(`Failed to fetch book ${libBook.bookId}`, err);
+                    return null;
+                }
+            })
+        );
+
+        const displayBooks: DisplayBook[] = fullBooks
+            .filter((b): b is Book => b !== null)
+            .map((b) => ({
+                id: b.id,
+                title: b.title,
+                coverImageUrl: b.coverImageUrl,
+            }));
+
+        return displayBooks;
+    } catch (error) {
+        console.error('Error fetching books on pedestal:', error);
+        return null;
+    }
+}
+
 /**
  * Edit the status of an existing LibraryBook.
  * PATCH /libraries/{userId}/libraryBooks/{libraryBookId}
