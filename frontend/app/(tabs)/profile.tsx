@@ -22,6 +22,7 @@ import { getUserFromId } from '../../api/services/usersService';
 import { FontAwesome } from '@expo/vector-icons';
 import { getBooksOnPedestal } from '@/api/services/librariesService';
 import { DisplayBook } from '@/domain/models';
+import index from '..';
 
 
 
@@ -328,9 +329,9 @@ export default function ProfileScreen() {
                     ) : error ? (
                         <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
                     ) : userClubs.length ? (
-                        userClubs.map((club) => (
+                        userClubs.map((club, index) => (
                             <Pressable
-                                key={club.id}
+                                key={`${club.id}-${index}`}
                                 style={profStyles.litclubCard}
                             >
                                 <Link
@@ -352,9 +353,9 @@ export default function ProfileScreen() {
                 <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
                 <View style={globalStyles.cardGroup}>
                     {leaderClubs.length ? (
-                        leaderClubs.map((club) => (
+                        leaderClubs.map((club, index) => (
                             <Pressable
-                                key={club.id}
+                                key={`${club.id}-${index}`}
                                 style={profStyles.litclubCard}
                                 onPress={() => Alert.alert(`Opening ${club.name}`)}
                             >
