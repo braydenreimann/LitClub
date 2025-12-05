@@ -183,7 +183,7 @@ export default function ProfileScreen() {
                     <View style={profStyles.iconRow}>
                         {/*<SettingsButton />*/}
                         <EditButton />
-                        <StatsButton />
+                        {/*<StatsButton >*/}
                         <SignOutButton />
 
                     </View>
