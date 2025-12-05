@@ -374,8 +374,8 @@ using (var scope = app.Services.CreateScope())
 
     await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
 
-    string usersCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Users", "users.csv");
-    string litClubsCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "LitClubs", "litclubs.csv");
+    //string usersCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Users", "users.csv");
+    //string litClubsCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "LitClubs", "litclubs.csv");
     // --------------------
     // Seed Users
     // --------------------
