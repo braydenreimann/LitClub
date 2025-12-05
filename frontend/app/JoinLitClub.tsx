@@ -29,12 +29,16 @@ import { useSession } from '@/context/AuthContext';
 import { GenresSelector } from '@/components/genresSelector';
 import { isPromise } from 'formik';
 import { useFocusEffect } from '@react-navigation/native';
+import { joinLitClub } from '@/api/services/litClubsService';
+import { getUser } from '@/api/services/usersService';
 
 
 const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
 const LAN_IP = hostFromExpo ?? '10.0.0.252'
 const API_BASE_URL = `http://${LAN_IP}:5112`
 const apiUrl = `${API_BASE_URL}/litclubs`;
+
+SplashScreen.preventAutoHideAsync();
 
 function BackButton() {
     const router = useRouter();
@@ -48,7 +52,7 @@ function BackButton() {
 }
 
 // Define user state
-export default function CreateLitClub() {
+export default function JoinLitClub() {
     const [fontsLoaded] = useFonts({
             Fraunces_700Bold,
             ChivoMono_500Medium,
@@ -63,133 +67,68 @@ export default function CreateLitClub() {
     //const preselectedBooks = params?.selectedBooks ? JSON.parse(params.selectedBooks as string) : [];
     const { addLitClub } = useLitClubs();
     const { session } = useSession();
-    const [user, setUser] = useState<User | null>(null);
-
-    // club form inputs
-    const [name, setName] = useState<string>(
-        Array.isArray(params.name) 
-        ? params.name[0] ?? '' 
-        : params.name ?? ''
-    );
-    const [description, setDescription] = useState<string>(
-        Array.isArray(params.description)
-            ? params.description[0] ?? ''
-            : params.description ?? ''
-    );
-    //const [name, setName] = useState(params.name ?? '');
-    //const [description, setDescription] = useState(params.description ?? '');
-    const [preferredGenres, setPreferredGenres] = useState(params.genres ?? '');
-    const [privateClub, setPrivateClub] = useState(params.isPrivate === 'true');
-    const [selectedBooks, setSelectedBooks ] = useState<Book[]>([]);
+    const [ inviteCode, setInviteCode ] = useState('')
     const [loading, setLoading] = useState(false);
+    const [ user, setUser ] = useState<User | null>(null);
 
-    //load user session
-    useEffect(() => { //from profile.tsx
-        const loadSession = async () => {
-            try {
-                const sessionString = await AsyncStorage.getItem('session');
-                if (!sessionString) return; // no session stored
+    // ---- Load current user from session (via usersService) ----
+        useEffect(() => {
+            const loadUser = async () => {
+                try {
+                    const sessionUser = await getUser();
+                    if (sessionUser) {
+                        setUser(sessionUser);
+                    }
+                } catch (error) {
+                    console.error('Error loading user from session:', error);
+                }
+            };
+    
+            loadUser();
+        }, []);
 
-                const session: User = JSON.parse(sessionString);
-                setUser(session); // update state
-            } catch (error) {
-                console.error('Error loading session:', error);
-            }
-        };
-        loadSession();
-    }, []);
-
-    useEffect(() => {
-        if (params.selectedBooks) {
-            try {
-                const books: Book[] = JSON.parse(params.selectedBooks as string);
-                setSelectedBooks(books);
-            } catch (err) {
-                console.error('Error parsing selectedBooks:', err);
-            }
-        }
-    }, [params.selectedBooks]);
-
-    const handleFindBooks = async () => {
-        router.push({
-            pathname: '/bookPicksForClub',
-            params: {preselected: JSON.stringify(selectedBooks) }
-        })
-    };
-
-    //handle create club
-    const handleCreateClub = async () => {
-        if (!(typeof name === 'string' ? name.trim() : String(name).trim())) {
-            Alert.alert('Validation Error', 'Club name cannot be empty.');
-            return;
-        }
-        if (selectedBooks.length === 0 ) {
-            Alert.alert('Error', 'Please select at least one book');
+    const handleJoinLitClub = async () => {
+        if (!inviteCode.trim()) {
+            Alert.alert('Error', 'Please enter a valid invite code.');
             return;
         }
 
         if (!user?.id) {
-            Alert.alert('Error', 'User not logged in.');
-            return;
-        }
-
-        //const isPrivate = String(privateClub) === 'true';
-
-        const payload = {
-                name: name.trim(),
-                ownerUserId: user.id,
-                description: description.trim(),
-                preferredGenres,
-                privateClub,
-                memberUserIds: [user.id],
-                libraryId: '',
-                selectedBooks: selectedBooks.map((b) => b.id),
-        };
+                    Alert.alert('Error', 'User not logged in.');
+                    return;
+                }
 
         try {
             setLoading(true);
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+            const joinedClub = await joinLitClub({
+                litClubId: inviteCode.trim(),
+                userId: user?.id,
             });
 
-            //here you want to create library books with those book IDs you collected 
-
-            const createdClub = await response.json();
-
-            //get the ID of the created club
-            //with each selected book, the first book should be the 'up next'
-            //create library books with the 
-            //
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Server Error (${response.status}): ${errorText}`);
+            if (!joinedClub) {
+                Alert.alert('Error', 'Failed to join LitClub. Please check the invite code and try again.');
+                return;
             }
 
-            addLitClub(createdClub);
-            //await fetchLitClubs(); //refresh list
-            await AsyncStorage.removeItem('createLitClubForm');
-
-            Alert.alert('Success', `${name} club created successfully!`);
-            router.push('/litClubs');
-            //setTimeout(() => router.push('/bookclubs'), 300);
-        } catch (error: any) {
-            console.error('Error creating club:', error);
-            Alert.alert('Error', `Failed to create club: ${error.message}`);
-        } finally {
+            addLitClub(joinedClub);
+            Alert.alert('Success', `You have joined the LitClub: ${joinedClub.name}`);
+            router.replace('/litClubs');
+        }
+        catch (error) {
+            console.error('Error joining LitClub:', error);
+            Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+        }
+        finally {
             setLoading(false);
         }
-    };
+
+    }
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream, }}>
             <View style={{flexDirection:'row', paddingTop: 30, margin: 10} } >
                 <BackButton /> 
-                <Text style={[globalStyles.heading, {paddingTop: 0, paddingBottom: 10}]}>Join a LitClub</Text>
+                <Text style={[globalStyles.heading, {paddingTop: 7, paddingBottom: 10, fontSize: 20}]}>Join a LitClub</Text>
             </View>
             <ScrollView contentContainerStyle={styles.container}>
                 
@@ -199,20 +138,21 @@ export default function CreateLitClub() {
                     style={styles.input}
                     placeholder="Invite Code"
                     placeholderTextColor={'grey'}
-                    value={Array.isArray(name) ? name.join(', ') : name}
-                    onChangeText={setName}
+                    value={inviteCode}
+                    onChangeText={setInviteCode}
                 />
                 
                 {/* Join Button */}
                 <Pressable
-                    style={[styles.createButton, loading && { opacity: 0.6 }, { marginTop: 20, marginBottom: 40 }]}
+                    style={[styles.joinButton, loading && { opacity: 0.6 }, { marginTop: 20, marginBottom: 40 }]}
+                    onPress={handleJoinLitClub}
                     disabled={loading}
+
                 >
-                    <Text style={styles.createButtonText}>
-                        Join LitClub
+                    <Text style={styles.joinButtonText}>
+                        {loading ? "Joining..." : "Join LitClub"}
                     </Text>
                 </Pressable>
-            
             </ScrollView>
         </View>
     )
@@ -254,14 +194,14 @@ const styles = StyleSheet.create({
         fontFamily: fonts.body,
         fontSize: 16,
     },
-    createButton: {
+    joinButton: {
         marginTop: 20,
         backgroundColor: colors.sage,
         padding: 15,
         borderRadius: 12,
         alignItems: 'center',
     },
-    createButtonText: {
+    joinButtonText: {
         color: colors.darkest,
         fontFamily: fonts.body,
         fontSize: 18,

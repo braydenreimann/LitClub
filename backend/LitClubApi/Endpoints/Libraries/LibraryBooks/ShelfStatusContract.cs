@@ -9,5 +9,5 @@ public enum ShelfStatusContract
     notInYourLibrary,
     currentlyReading,
     futureReads,
-    pastReads
+    pastReads,
 }

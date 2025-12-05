@@ -3,6 +3,8 @@ using LitClubApi.Configuration;
 using LitClubApi.Domain;
 using LitClubApi.Endpoints.Blobs;
 using LitClubApi.Endpoints.Books.AddBook;
+using LitClubApi.Endpoints.LitClubs.AddLitClub;
+using LitClubApi.Endpoints.LitClubUsers.AddUser;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
@@ -158,7 +160,7 @@ using (var scope = app.Services.CreateScope())
     string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
     string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
     string exist = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "bookdata.csv");
-
+  
     List<Book> booklist = CSVParserInsert.Parse(exist);
 
     foreach (Book b in booklist)
@@ -257,7 +259,7 @@ using (var scope = app.Services.CreateScope())
         LastName = "Wayne",
         UserName = "billywayne",
         Email = "billywayne@gmail.com",
-        Bio = "I am a proud member of the LGBTQ+ MAGA community.",
+        Bio = "I am a proud member of the LGBTQ+ community.",
         PreferredGenres = ["Non-Fiction", "Science", "Podcasts", "Comedy"],
         ProfilePhotoUrl = "John-Green.png",
         PasswordHash = "billywaynepw",
@@ -269,6 +271,7 @@ using (var scope = app.Services.CreateScope())
         Id = "litclub-1",
         Name = "Fans of John Green",
         OwnerUserId = "1",
+        OwnerUserName = "johngreen",
         Description = "We love all of John Green's books. And some of Hank's too.",
         MemberUserIds = ["1"],
     };
@@ -276,9 +279,10 @@ using (var scope = app.Services.CreateScope())
     LitClub litClub2 = new()
     {
         Id = "litclub-2",
-        Name = "LGBTQ+ MAGA Readers",
+        Name = "Queer Literature Club",
         OwnerUserId = "2",
-        Description = "A safe space for LGBTQ+ MAGA members to discuss their favorite books.",
+        OwnerUserName = "billywayne",
+        Description = "Reading classical and contemporary literature through a queer lens.",
         MemberUserIds = ["1", "2"],
     };
 
@@ -325,7 +329,7 @@ using (var scope = app.Services.CreateScope())
     int i = 0;
     foreach (Book b in booklist) //Default profile booklist for testing purposes
     {
-        ShelfStatus status = (ShelfStatus)(i % 4);
+        ShelfStatus status = (ShelfStatus)(i % 5);
         DateOnly? started = null;
         DateOnly? finished = null;
         int currentpage = 0;
@@ -369,6 +373,71 @@ using (var scope = app.Services.CreateScope())
     await libs.UpsertItemAsync(library2, new PartitionKey(library2.OwnerId));
 
     await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
+
+    //string usersCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Users", "users.csv");
+    //string litClubsCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "LitClubs", "litclubs.csv");
+    // --------------------
+    // Seed Users
+    // --------------------
+    var allUsers = new LitClubUser[]
+    {
+        new() { Id="4", FirstName="Sofia", LastName="Hughes", UserName="sofghughes", Email="shughes@gmail.com", PasswordHash="sofghughespw", Bio="Hey!", PreferredGenres=new List<string>{"Fantasy","Romance"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="5", FirstName="firstever", LastName="user socool", UserName="socoolguy", Email="this@fake.com", PasswordHash="socoolguypw", Bio="Hi!", PreferredGenres=new List<string>{"Romance","Fiction"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="6", FirstName="Vidya", LastName="Madana", UserName="vidya", Email="vidya@fake.com", PasswordHash="vidyapw", Bio="Hello!", PreferredGenres=new List<string>{"Science-Fiction","Drama"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="7", FirstName="Kathleen", LastName="Lowe", UserName="katkit", Email="katkit@fake.com", PasswordHash="katkitpw", Bio="hiya", PreferredGenres=new List<string>{"Mystery","Non-Fiction"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="8", FirstName="Ben", LastName="Herrington", UserName="theben", Email="theben@fake.com", PasswordHash="thebenpw", Bio="how are you", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="9", FirstName="Brayden", LastName="Reimann", UserName="breimann", Email="breimann@fake.com", PasswordHash="breimannpw", Bio="bio", PreferredGenres=new List<string>{"Horror","Historical"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="10", FirstName="Domino", LastName="Pizza", UserName="pizzafan", Email="pizzafan@fake.com", PasswordHash="pizzafanpw", Bio="I love reading and science", PreferredGenres=new List<string>{"Fiction","Romance","Drama","Science-Fiction"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="11", FirstName="Pizza", LastName="Box", UserName="pepperoni", Email="pepperoni@fake.com", PasswordHash="pepperonipw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Young Adult"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="12", FirstName="Reader", LastName="Number 1", UserName="litclublover", Email="litclublover@fake.com", PasswordHash="litclubloverpw", Bio="No bio provided", PreferredGenres=new List<string>{"True Crime","Memoir"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="13", FirstName="Whale", LastName="Shark", UserName="whaleguy", Email="whaleguy@fake.com", PasswordHash="whaleguypw", Bio="No bio provided", PreferredGenres=new List<string>{"Historical","Poetry"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="14", FirstName="Crow", LastName="fella", UserName="crowfella", Email="crowfella@fake.com", PasswordHash="crowfellapw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance","Mystery"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="15", FirstName="Kitty", LastName="Cat", UserName="justacat", Email="justacat@fake.com", PasswordHash="justacatpw", Bio="No bio provided", PreferredGenres=new List<string>{"Horror","Poetry"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="16", FirstName="Magician", LastName="Dude", UserName="foreveralone", Email="foreveralone@fake.com", PasswordHash="foreveralonepw", Bio="No bio provided", PreferredGenres=new List<string>{"Memoir","Romance"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="17", FirstName="barbie", LastName="doll", UserName="barbiegirl", Email="barbiegirl@fake.com", PasswordHash="barbiegirlpw", Bio="No bio provided", PreferredGenres=new List<string>{"Young Adult","Biography"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="18", FirstName="just", LastName="ken", UserName="justken", Email="justken@fake.com", PasswordHash="justkenpw", Bio="No bio provided", PreferredGenres=new List<string>{"Science","Western Fiction"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="19", FirstName="Star", LastName="Celestial", UserName="starrynight", Email="starrynight@fake.com", PasswordHash="starrynightpw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="20", FirstName="Dino", LastName="Luvr", UserName="t-rex", Email="t-rex@fake.com", PasswordHash="t-rexpw", Bio="No bio provided", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="21", FirstName="Weevil", LastName="Fan", UserName="bugfan", Email="bugfan@fake.com", PasswordHash="bugfanpw", Bio="No bio provided", PreferredGenres=new List<string>{"Mystery"}, ProfilePhotoUrl="John-Green.png" },
+        new() { Id="22", FirstName="Alyssa", LastName="Collins", UserName="alyssa", Email="alyssa@fake.com", PasswordHash="alyssapw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Science Fiction"}, ProfilePhotoUrl="John-Green.png" }
+    };
+
+    foreach (var u in allUsers)
+    {
+        try { await users.UpsertItemAsync(u, new PartitionKey(u.Id)); }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict) { }
+    }
+
+    // --------------------
+    // Seed LitClubs
+    // --------------------
+    var allClubs = new LitClub[]
+    {
+        new() { Id="100001", Name="Queer Cosmic Reads", OwnerUserId="4", OwnerUserName="sofghughes", Description="A cozy, queer-friendly space exploring cosmic horror, sapphic space fantasies, and strange universes. Expect found-family themes and eldritch vibes.", PreferredGenres=new List<string>{"Horror","Science-Fiction","Fantasy"}, PrivateClub=false, MemberUserIds=new List<string>{"4","6","9","11","14","15","19","22"} },
+        new() { Id="100002", Name="Cozy Blanket Book Nook", OwnerUserId="5", OwnerUserName="socoolguy", Description="A slow, gentle reading club for anyone who loves warm drinks, soft sweaters, and comforting slice-of-life novels. Perfect for readers who want to relax.", PreferredGenres=new List<string>{"Fiction","Romance","Young Adult"}, PrivateClub=false, MemberUserIds=new List<string>{"5","4","10","11","17","20","21","22"} },
+        new() { Id="100003", Name="A24 Horror Society", OwnerUserId="6", OwnerUserName="vidya", Description="A club dedicated to eerie, stylish, and deeply unsettling horror—from A24 vibes to gothic dread. Psychological, atmospheric, always artistic.", PreferredGenres=new List<string>{"Horror","Thriller","Drama"}, PrivateClub=true, MemberUserIds=new List<string>{"6","8","9","15","20","13","21","22"} },
+        new() { Id="100004", Name="Contemporary Poets Collective", OwnerUserId="7", OwnerUserName="katkit", Description="A gathering of poetry lovers who enjoy modern poets, emotional verse, and exploring the boundaries of language.", PreferredGenres=new List<string>{"Poetry","Drama","Non-Fiction"}, PrivateClub=false, MemberUserIds=new List<string>{"7","11","13","15","17","19","4","22"} },
+        new() { Id="100005", Name="Chaotic Romance Enthusiasts", OwnerUserId="8", OwnerUserName="theben", Description="For readers who love dramatic, messy, heart-aching romance—whether it's swoony, toxic, or adorably wholesome.", PreferredGenres=new List<string>{"Romance","Fiction","Young Adult"}, PrivateClub=false, MemberUserIds=new List<string>{"8","4","5","14","16","17","19","22"} },
+        new() { Id="100006", Name="True Crime After Dark", OwnerUserId="9", OwnerUserName="breimann", Description="A darker-lit club diving into true crime, memoirs, and psychological storytelling. Bring your theories and your moral dilemmas.", PreferredGenres=new List<string>{"True Crime","Memoir","Mystery"}, PrivateClub=true, MemberUserIds=new List<string>{"9","7","12","14","20","21","6","22"} },
+        new() { Id="100007", Name="Stargazers", OwnerUserId="22", OwnerUserName="alyssa", Description="A space for sci-fi fans who adore starships, wormholes, robots, and wildly speculative futures.", PreferredGenres=new List<string>{"Science-Fiction","Science","Drama"}, PrivateClub=false, MemberUserIds=new List<string>{"10","6","18","4","11","13","20"} },
+        new() { Id="100008", Name="Cottagecore Reading Circle", OwnerUserId="11", OwnerUserName="pepperoni", Description="A whimsical nature-loving club filled with soft fantasy, gentle adventures, herbal tea, and aesthetic story worlds.", PreferredGenres=new List<string>{"Fantasy","Young Adult","Romance"}, PrivateClub=false, MemberUserIds=new List<string>{"11","4","17","15","19","21","14","22"} }
+    };
+
+    foreach (var c in allClubs)
+    {
+        try
+        {
+            await clubs.UpsertItemAsync(c, new PartitionKey(c.Id));
+            await libs.UpsertItemAsync(new Library { OwnerId = c.Id }, new PartitionKey(c.Id));
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            Console.WriteLine($"Club {c.Name} already exists, skipping.");
+        }
+    }
+
+    Console.WriteLine("Seeding completed successfully.");
+
 }
 
 var updateSpec = args.Contains("--updateSpec");

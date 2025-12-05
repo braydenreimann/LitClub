@@ -23,6 +23,7 @@ import { client } from '@/api/client';
 import { leaveLitClub } from '@/api/services/litClubsService';
 import { pushBookDetail } from '@/navigation/routes';
 import { useFocusEffect } from 'expo-router';
+import { getUserFromId } from '@/api/services/usersService';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -75,10 +76,6 @@ export default function LitClubScreen() {
         NotoSansMono_400Regular,
     });
 
-    useEffect(() => {
-        if (fontsLoaded) SplashScreen.hideAsync();
-    }, [fontsLoaded]);
-
     const { id } = useLocalSearchParams<{ id?: string }>();
     const router = useRouter();
     const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
@@ -89,6 +86,10 @@ export default function LitClubScreen() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [currentBook, setCurrentBook] = useState<Book | null>(null);
     const [upcomingBooks, setUpcomingBooks] = useState<Book[]>([]); // still loaded, not yet rendered
+
+    useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
 
     // Load archived clubs from local storage
     useEffect(() => {
@@ -158,6 +159,24 @@ export default function LitClubScreen() {
 
     const club = litClubs.find((c) => c.id === id);
 
+    useEffect(() => {
+        if (!club?.ownerUserId) return;
+
+        const fetchOwner = async () => {
+            const user = await getUserFromId(club.ownerUserId);
+            setOwnerUser(user);
+        };
+
+        fetchOwner();
+    }, [club?.ownerUserId]);
+
+    const currentUserId = user?.id ?? '';
+    const isOwner = club ? club.ownerUserId === currentUserId : false;
+    const isArchived = club ? archivedClubIds.includes(club.id) : false;
+
+    const [ownerUser, setOwnerUser] = useState<User | null>(null);
+    
+
     if (loading) {
         return <ActivityIndicator style={{ flex: 1 }} />;
     }
@@ -173,14 +192,9 @@ export default function LitClubScreen() {
     if (!litClubs.length) {
         return <Text style={{ padding: 20 }}>No LitClubs found.</Text>;
     }
-
     if (!club) {
         return <Text style={{ padding: 20 }}>Club not found.</Text>;
     }
-
-    const currentUserId = user?.id ?? '';
-    const isOwner = club.ownerUserId === currentUserId;
-    const isArchived = archivedClubIds.includes(club.id);
 
     // Leave a club (for non-owners)
     async function handleLeaveClub() {
@@ -286,14 +300,10 @@ export default function LitClubScreen() {
         <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}>
             <View style={{ flexDirection: 'row', paddingTop: 25 }}>
                 <BackButton />
-                <Text style={[globalStyles.heading, { paddingTop: 0 }]}>
+                <Text style={[globalStyles.heading, { paddingTop: 6, fontSize: 24 }]}>
                     {club.name}
                 </Text>
             </View>
-
-            <Text style={[globalStyles.body, { margin: 20 }]}>
-                {club.description}
-            </Text>
 
             <View style={litStyles.leaderBanner}>
                 <Foundation
@@ -302,8 +312,14 @@ export default function LitClubScreen() {
                     color="#193350"
                     style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}
                 />
-                <Text style={globalStyles.subheading}> CLUB LEADER: </Text>
-                <Text style={globalStyles.subheading}>@{club.ownerUserId}</Text>
+                    <Text style={[globalStyles.subheading, {fontSize: 16}]}> CLUB LEADER: </Text>
+                    <Text style={[globalStyles.subheading, {fontSize: 16}]}>
+                        {ownerUser ? ownerUser.firstName : "Loading..."}
+                         {' '}
+                        {ownerUser ? ownerUser.lastName : "Loading..."}
+                        {' | '}
+                        @{ownerUser ? ownerUser.userName : "Loading..."}
+                    </Text>
                 <Foundation
                     name="crown"
                     size={30}
@@ -311,9 +327,13 @@ export default function LitClubScreen() {
                     style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}
                 />
             </View>
+            <Text style={[globalStyles.body, { margin: 20 }]}>
+                {club.description}
+            </Text>
 
             {/* Currently reading section */}
-            <View style={litStyles.currentRead}>
+            { /*
+                <View style={litStyles.currentRead}>
                 <View style={litStyles.sideRead}>
                     <View style={globalStyles.card}>
                         {currentBook ? (
@@ -364,13 +384,14 @@ export default function LitClubScreen() {
                     </View>
                     <Jump2discButton />
                 </View>
-            </View>
+            </View> */}
 
             <View>
                 {/* Preferred Genres */}
-                <Text style={[globalStyles.subheading, { margin: 20 }]}>
+                <Text style={litStyles.sectionHeader}>
                     Preferred Genres
                 </Text>
+
                 <View
                     style={{
                         flexDirection: 'row',
@@ -379,21 +400,32 @@ export default function LitClubScreen() {
                     }}
                 >
                     {(club.preferredGenres || []).map((genre, idx) => (
-                        <Text
+                        <View
                             key={idx}
-                            style={[globalStyles.body, { marginRight: 10 }]}
+                            style={{
+                                backgroundColor: colors.sage,
+                                paddingVertical: 6,
+                                paddingHorizontal: 12,
+                                borderRadius: 20,
+                                marginRight: 8,
+                                marginBottom: 8,
+                            }}
                         >
-                            #{genre}
-                        </Text>
+                            <Text
+                                style={[
+                                    globalStyles.body,
+                                    { color: colors.darkest },
+                                ]}
+                            >
+                                {genre}
+                            </Text>
+                        </View>
                     ))}
                 </View>
 
                 {/* Club Library reading lists */}
                 <Text
-                    style={[
-                        globalStyles.subheading,
-                        { paddingTop: 25, paddingHorizontal: 20 },
-                    ]}
+                    style={litStyles.sectionHeader}
                 >
                     Currently Reading
                 </Text>
@@ -409,10 +441,7 @@ export default function LitClubScreen() {
                 </View>
 
                 <Text
-                    style={[
-                        globalStyles.subheading,
-                        { paddingTop: 25, paddingHorizontal: 20 },
-                    ]}
+                    style={litStyles.sectionHeader}
                 >
                     Future Reads
                 </Text>
@@ -428,10 +457,7 @@ export default function LitClubScreen() {
                 </View>
 
                 <Text
-                    style={[
-                        globalStyles.subheading,
-                        { paddingTop: 25, paddingHorizontal: 20 },
-                    ]}
+                    style={litStyles.sectionHeader}
                 >
                     Past Reads
                 </Text>
@@ -447,12 +473,12 @@ export default function LitClubScreen() {
                 </View>
 
                 {/* Members */}
-                <Text style={[globalStyles.subheading, { margin: 20 }]}>
+                <Text style={litStyles.sectionHeader}>
                     Current Members
                 </Text>
                 <ClubMembers
-                    memberUserIds={club.memberUserIds ?? []}
                     ownerUserId={club.ownerUserId}
+                    memberUserIds={club.memberUserIds ?? []}
                 />
             </View>
 
@@ -499,6 +525,21 @@ export default function LitClubScreen() {
                     {isArchived ? 'Unarchive Club' : 'Archive Club'}
                 </Text>
             </Pressable>
+
+
+            {(isOwner || (!club.privateClub && club.memberUserIds?.includes(currentUserId))) && (
+                <View style={{ marginHorizontal: 30, marginBottom: 40 }}>
+                    <Text style={[globalStyles.subheading, { marginBottom: 10 }]}>
+                        {isOwner ? 'Invite Code' : 'Club Invite Code'}
+                    </Text>
+
+                    <View style={litStyles.invite}>
+                        <Text style={[globalStyles.body, { fontSize: 16 }]}>
+                            {club.id}
+                        </Text> 
+                    </View>
+                </View>
+            )}
         </ScrollView>
     );
 }
@@ -599,6 +640,22 @@ const litStyles = StyleSheet.create({
         marginHorizontal: 30,
         padding: 15,
         borderRadius: 12,
+        marginBottom: 20,
+    },
+    invite: {
+        backgroundColor: colors.cream,
+        padding: 12,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: colors.darkest,
         marginBottom: 40,
     },
+    sectionHeader: {
+        paddingLeft: 20,
+        marginBottom: 10,
+        marginTop: 10,
+        fontSize: 20,
+        fontFamily: fonts.subheading,
+        color: colors.midBlue
+    }
 });

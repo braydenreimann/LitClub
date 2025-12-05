@@ -13,15 +13,11 @@ import { colors } from '@/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '@/domain/models';
 import { useRouter } from "expo-router";
+import index from '..';
 
 
 export default function AllLitClubs() {
   // Example data
-  const [fontsLoaded] = useFonts({
-    Fraunces_700Bold,
-    ChivoMono_500Medium,
-    NotoSansMono_400Regular,
-  });
 
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false); //create/join club
@@ -35,13 +31,15 @@ export default function AllLitClubs() {
     }, [fetchLitClubs])
   )
 
-  const toggleMenu = () => {
-      setMenuOpen((prev) => !prev);
-  };
-
+  const [fontsLoaded] = useFonts({
+    Fraunces_700Bold,
+    ChivoMono_500Medium,
+    NotoSansMono_400Regular,
+  });
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
+
 
   useEffect(() => {
     const loadArchivedClubs = async () => {
@@ -73,6 +71,15 @@ export default function AllLitClubs() {
     loadSession();
   }, []);
 
+  const toggleMenu = () => {
+      setMenuOpen((prev) => !prev);
+  };
+
+  const userId = user?.id ?? '';
+  const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId) && !archivedClubIds.includes(c.id));
+  const leaderClubs = litClubs.filter(c => c.ownerUserId === userId && !archivedClubIds.includes(c.id));
+  const archivedClubs = litClubs.filter(c => archivedClubIds.includes(c.id)); // example filter
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -96,11 +103,6 @@ export default function AllLitClubs() {
     );
   }
 
-  const userId = user?.id ?? '';
-  const userClubs = litClubs.filter(c => c.memberUserIds?.includes(userId) && !archivedClubIds.includes(c.id));
-  const leaderClubs = litClubs.filter(c => c.ownerUserId === userId && !archivedClubIds.includes(c.id));
-  const archivedClubs = litClubs.filter(c => archivedClubIds.includes(c.id)); // example filter
-
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
@@ -111,34 +113,42 @@ export default function AllLitClubs() {
       <ScrollView contentContainerStyle={{ padding: 16 }}>
 
         {/* New Club Button */}
-        <Link href="/createLitClub" asChild>
-          <Pressable
-            style={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              zIndex: 100,
-              borderRadius: 30,
-              width: 50,
-              height: 50,
-              justifyContent: 'center',
-              alignContent: 'center',
-              alignItems: 'center',
-              marginBottom: 16,
-            }}>
+        <Pressable 
+          style={styles.toggle}
+          onPress={toggleMenu}
+        >
             <EvilIcons name="plus" size={50} color={colors.midBlue} />
-          </Pressable>
-        </Link>
+        </Pressable>
+        
+
+        {menuOpen && (
+          <View style={[styles.dropdown, { zIndex: 100 }]}>
+            <Pressable
+              style={[styles.dropdownItem, { zIndex: 100 }]}
+              onPress={() => router.push("/createLitClub")}
+            >
+              <Text style = {globalStyles.body}>Create New LitClub</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.dropdownItem, { zIndex: 100 }]}
+              onPress={() => router.push("/JoinLitClub")}
+            >
+              <Text style = {globalStyles.body}>Join a LitClub</Text>
+            </Pressable>
+
+          </View>
+        )}
 
         {/* MAIN HEADING */}
-        <Text style={globalStyles.heading}>My LitClubs</Text>
+        <Text style={[globalStyles.heading, {paddingTop: 20}]}>My LitClubs</Text>
 
         <View style={globalStyles.cardGroup}>
           {leaderClubs.length ? (
-            leaderClubs.map((club) => (
+            leaderClubs.map((club, index) => (
 
               <Pressable
-                key={club.id}
+                key={`${club.id}-${index}`}
                 style={globalStyles.litclubCard}            >
                 <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >
                   <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
@@ -154,9 +164,9 @@ export default function AllLitClubs() {
 
         <View style={globalStyles.cardGroup}>
           {userClubs.length ? (
-            userClubs.map((club) => (
+            userClubs.map((club, index) => (
               <Pressable
-                key={club.id}
+                key={`${club.id}-${index}`}
                 style={globalStyles.litclubCard}
               >
                 <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >

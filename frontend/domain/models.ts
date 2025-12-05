@@ -69,14 +69,10 @@ export type LitClub = {
     id: string,
     name: string,
     ownerUserId: string,
+    ownerUserName: string,
     description: string,
     preferredGenres: string[],
     privateClub: boolean,
     memberUserIds: string[]
 }
-export enum ShelfStatus {
-    notInYourLibrary = 0,
-    currentlyReading = 1,
-    futureReads = 2, 
-    pastReads = 3
-}
+//export type ShelfStatus = 0 | 1 | 2 | 3 | 4;

@@ -41,10 +41,6 @@ export default function CreateLitClub() {
         NotoSansMono_400Regular,
     });
 
-    React.useEffect(() => {
-        if (fontsLoaded) SplashScreen.hideAsync();
-    }, [fontsLoaded]);
-
     const router = useRouter();
     const params = useLocalSearchParams();
     const { addLitClub } = useLitClubs();
@@ -79,8 +75,12 @@ export default function CreateLitClub() {
 
     const [privateClub, setPrivateClub] = useState<boolean>(params.isPrivate === 'true');
 
-    const [selectedBooks, setSelectedBooks] = useState<Book[]>([]);
+    //const [selectedBooks, setSelectedBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(false);
+
+    React.useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
 
     // ---- Load current user from session (via usersService) ----
     useEffect(() => {
@@ -99,7 +99,7 @@ export default function CreateLitClub() {
     }, []);
 
     // ---- Load selectedBooks from route params (if present) ----
-    useEffect(() => {
+    /*useEffect(() => {
         if (params.selectedBooks) {
             try {
                 const books: Book[] = JSON.parse(params.selectedBooks as string);
@@ -115,7 +115,7 @@ export default function CreateLitClub() {
             pathname: '/bookPicksForClub',
             params: { preselected: JSON.stringify(selectedBooks) },
         });
-    };
+    };*/
 
     // ---- Create Lit Club (integration-strategy style) ----
     const handleCreateClub = async () => {
@@ -129,10 +129,10 @@ export default function CreateLitClub() {
             return;
         }
 
-        if (selectedBooks.length === 0) {
+        /*if (selectedBooks.length === 0) {
             Alert.alert('Error', 'Please select at least one book');
             return;
-        }
+        }*/
 
         if (!user?.id) {
             Alert.alert('Error', 'User not logged in.');
@@ -143,6 +143,7 @@ export default function CreateLitClub() {
         const input: AddLitClubInput = {
             name: trimmedName,
             ownerUserId: user.id,
+            ownerUserName: user.userName || user.username || user.name || (user as any).displayName || 'Unknown',
             description: trimmedDescription,
             preferredGenres: preferredGenres.length ? preferredGenres : null,
             privateClub,
@@ -181,7 +182,7 @@ export default function CreateLitClub() {
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <View style={{ flexDirection: 'row', paddingTop: 90, margin: 10 }}>
                 <BackButton />
-                <Text style={[globalStyles.heading, { paddingTop: 0, paddingBottom: 10 }]}>
+                <Text style={[globalStyles.heading, {paddingTop: 7, paddingBottom: 10, fontSize: 20}]}>
                     Create a New Lit Club
                 </Text>
             </View>
@@ -242,7 +243,7 @@ export default function CreateLitClub() {
                     onChange={setPreferredGenres}
                 />
 
-                {/* Book Selection */}
+                {/* Book Selection FEATURE REMOVED FOR NOW 
                 <Text
                     style={[
                         globalStyles.subheading,
@@ -266,7 +267,7 @@ export default function CreateLitClub() {
                             ? `Selected Books: ${selectedBooks.length}`
                             : 'Select Books for Your Club'}
                     </Text>
-                </Pressable>
+                </Pressable> */}
 
                 <Text
                     style={[

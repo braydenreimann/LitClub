@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useSession } from '@/context/AuthContext' // or wherever your auth is
 import { Pressable, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { colors, fonts } from '../../theme';
 import {
@@ -12,12 +13,15 @@ import {
 
 import { globalStyles } from '@/styles/globalStyles';
 
-import { Book } from '../../domain/models';
+import { Book, User } from '../../domain/models';
 import { getBook } from '../../api/services/booksService';
 import { getUriRead } from '@/api/services/imagesService';
 import BookTableOfContentsTabs from '@/components/BookTableOfContentsTabs';
+import { checkIfBookOnPedestal, removeBookFromPedestal, addBookToPedestal } from '@/api/services/librariesService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function BookInfoScreen() {
+    const router = useRouter();
     const params = useLocalSearchParams<{
         bookId: string | string[];
         litClubId?: string | string[];
@@ -28,13 +32,34 @@ export default function BookInfoScreen() {
     const litClubIdParam = Array.isArray(params.litClubId) ? params.litClubId[0] : params.litClubId;
     const litClubNameParam = Array.isArray(params.litClubName) ? params.litClubName[0] : params.litClubName;
     const litClubOwnerIdParam = Array.isArray(params.litClubOwnerId) ? params.litClubOwnerId[0] : params.litClubOwnerId;
-
+    const [user, setUser] = useState<User | null>(null)
     const [isExpanded, setIsExpanded] = useState(false);
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const [coverUri, setCoverUri] = useState<string>('');
+    const [isOnPedestal, setIsOnPedestal] = useState(false);
+    const [pedestalLoading, setPedestalLoading] = useState(false);
+
+    useEffect(() => {
+        // Define an async function inside useEffect
+        const loadSession = async () => {
+            try {
+                const sessionString = await AsyncStorage.getItem('session');
+                if (!sessionString) return; // no session stored
+
+                const session: User = JSON.parse(sessionString);
+                setUser(session); // update state
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+
+        loadSession(); // call the async function
+    }, []);
+
+    
 
     // Fetch book data
     useEffect(() => {
@@ -54,6 +79,50 @@ export default function BookInfoScreen() {
             fetchBook();
         }
     }, [bookId]);
+
+    //fetch pedestal status
+    useFocusEffect(
+        useCallback(() => {
+            const fetchPedestalStatus = async () => {
+                if (!bookId || !user?.id) return;
+                setPedestalLoading(true);
+                try {
+                    if (!bookId || !user?.id) return;
+                    const status = await checkIfBookOnPedestal(user.id, bookId);
+                    setIsOnPedestal(status);
+                } catch (err) {
+                    console.error("Error fetching pedestal status:", err);
+                } finally {
+                    setPedestalLoading(false);
+                }
+            };
+            fetchPedestalStatus();
+        }, [bookId, user?.id])
+    );
+
+    const handlePedestalToggle = async () => {
+        setPedestalLoading(true);
+        try {
+            if (!user?.id || !bookId) {
+                throw new Error("Missing required parameters for pedestal operation.");
+            }
+            if (isOnPedestal) {
+                await removeBookFromPedestal(user.id, bookId);
+                setIsOnPedestal(false);
+            }
+            else {
+                await addBookToPedestal(user.id, bookId);
+                setIsOnPedestal(true);
+            }
+            const newStatus = await checkIfBookOnPedestal(user.id, bookId);
+            setIsOnPedestal(newStatus);
+            console.log('Pedestal status after toggle:', newStatus);
+        } catch (err) {
+            console.error("Error updating pedestal status:", err);
+        } finally {
+            setPedestalLoading(false);
+        }
+    };
 
     // Load cover image
     useEffect(() => {
@@ -97,6 +166,21 @@ return (
                                 contentFit="cover"
                                 transition={150}
                             />
+
+                            {/* pedestal toggle button */}
+                            <Pressable
+                                style={[infoStyle.pedestalButton, isOnPedestal && infoStyle.pedestalButtonActive]}
+                                onPress={handlePedestalToggle}
+                                disabled={pedestalLoading}
+                            >
+                                {pedestalLoading ? (
+                                    <ActivityIndicator size="small" color={colors.cream} />
+                                ) : (
+                                    <Text style={infoStyle.pedestalButtonText}>
+                                        {isOnPedestal ? 'Remove from Pedestal' : 'Add to Pedestal'}
+                                    </Text>
+                                )}
+                            </Pressable>
                         </View>
 
                         <View style={infoStyle.descriptionBlock}>
@@ -134,10 +218,6 @@ return (
                 <View style={{ height: 4, backgroundColor: colors.darkest }} />
                 {book && (
                     <View style={infoStyle.bookStatsContainer}>
-                        <View style={infoStyle.bookStat}>
-                            <Text style={infoStyle.bookStatLabel}>Pages</Text>
-                            <Text style={infoStyle.bookStatValue}>{'313'}</Text>
-                        </View>
 
                         <View style={infoStyle.bookStat}>
                             <Text style={infoStyle.bookStatLabel}>Chapters</Text>
@@ -251,5 +331,20 @@ const infoStyle = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         gap: 8,
+    },
+    pedestalButton: {
+        marginTop: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        backgroundColor: colors.midBlue,
+        borderRadius: 8,
+    },
+    pedestalButtonActive: {
+        backgroundColor: colors.darkest,
+    },
+    pedestalButtonText: {
+        color: colors.cream,
+        fontFamily: fonts.subheading,
+        fontSize: 16,
     },
 });

@@ -29,6 +29,8 @@ const STATUS_OPTIONS = [
   "Past Reads",
 ];
 
+type ShelfStatus = 0 | 1 | 3 ;
+
 type BookStatusDropdownProps = {
   status: string;
   onStatusChange?: (newStatus: string) => void;
