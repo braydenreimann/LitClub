@@ -16,15 +16,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { User } from '../../domain/models';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../../styles/globalStyles';
-import { useLitClubs } from '../../context/litClubsContext';
+import { useLitClubs } from '@/context/LitClubsContext';
 import { getUriRead } from '../../api/services/imagesService';
 import { getUserFromId } from '../../api/services/usersService';
 import { FontAwesome } from '@expo/vector-icons';
 import { getBooksOnPedestal } from '@/api/services/librariesService';
 import { DisplayBook } from '@/domain/models';
-import index from '..';
-
-
 
 function EditButton() {
     return (
@@ -215,10 +212,10 @@ export default function ProfileScreen() {
         if (pedestalBooks.length === 0) {
             return <Text style={[globalStyles.body, { paddingLeft: 15 }]}>No books on your pedestal yet.</Text>;
         }
-        
+
         return (
-            <ScrollView 
-                horizontal 
+            <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 10, gap: 12 }}
             >
@@ -231,7 +228,7 @@ export default function ProfileScreen() {
 
     function PedestalBookCard({ book }: { book: DisplayBook }) {
         const [coverUri, setCoverUri] = useState<string>('');
-        
+
         useEffect(() => {
             let alive = true;
             (async () => {
@@ -240,30 +237,30 @@ export default function ProfileScreen() {
             })();
             return () => { alive = false; };
         }, [book.coverImageUrl]);
-        
+
         return (
-        <Link href={`/books/${book.id}`} asChild>
-            <Pressable style={profStyles.pedestalBook}>
-                <Image
-                    source={
-                        coverUri
-                            ? { uri: coverUri }
-                            : require('@/assets/images/turkstra.jpg')
-                    }
-                    style={profStyles.pedestalBookImage}
-                    contentFit="cover"
-                />
-                <Text 
-                    style={profStyles.pedestalBookTitle} 
-                    numberOfLines={2} 
-                    ellipsizeMode="tail"
-                >
-                    {book.title}
-                </Text>
-            </Pressable>
-        </Link>
-    );
-}
+            <Link href={`/books/${book.id}`} asChild>
+                <Pressable style={profStyles.pedestalBook}>
+                    <Image
+                        source={
+                            coverUri
+                                ? { uri: coverUri }
+                                : require('@/assets/images/turkstra.jpg')
+                        }
+                        style={profStyles.pedestalBookImage}
+                        contentFit="cover"
+                    />
+                    <Text
+                        style={profStyles.pedestalBookTitle}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                    >
+                        {book.title}
+                    </Text>
+                </Pressable>
+            </Link>
+        );
+    }
 
 
 
@@ -275,7 +272,7 @@ export default function ProfileScreen() {
                 {/* Name + action icons row */}
                 <View style={profStyles.nameRow}>
                     <View style={profStyles.nameSection}>
-                        <Text style={[globalStyles.heading, {fontSize: 25}]} numberOfLines={1} ellipsizeMode="tail">
+                        <Text style={[globalStyles.heading, { fontSize: 25 }]} numberOfLines={1} ellipsizeMode="tail">
                             {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
                         </Text>
                         {/*<Text style={globalStyles.body}>he/him</Text>*/}
@@ -317,11 +314,11 @@ export default function ProfileScreen() {
                 {/* ⬆️ close the header row here so the rest stacks vertically */}
 
                 {/* Pedestal Section */}
-                <View style={[profStyles.pedestalContainer, {marginTop: 20, marginBottom: 30}]}>
+                <View style={[profStyles.pedestalContainer, { marginTop: 20, marginBottom: 30 }]}>
                     <Text style={[globalStyles.subheading, { color: colors.cream, marginLeft: 10, marginBottom: 20 }]}>Pedestal</Text>
                     {renderPedestalBooks()}
                 </View>
-                
+
 
                 {/* Books Section */}
                 <View>

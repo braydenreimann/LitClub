@@ -17,7 +17,7 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLitClubs } from '@/context/litClubsContext';
+import { useLitClubs } from '@/context/LitClubsContext';
 import type { Book, User } from '@/domain/models';
 import { client } from '@/api/client';
 import { leaveLitClub } from '@/api/services/litClubsService';
@@ -175,7 +175,7 @@ export default function LitClubScreen() {
     const isArchived = club ? archivedClubIds.includes(club.id) : false;
 
     const [ownerUser, setOwnerUser] = useState<User | null>(null);
-    
+
 
     if (loading) {
         return <ActivityIndicator style={{ flex: 1 }} />;
@@ -312,14 +312,14 @@ export default function LitClubScreen() {
                     color="#193350"
                     style={{ marginLeft: 20, marginBottom: 10, marginTop: 25 }}
                 />
-                    <Text style={[globalStyles.subheading, {fontSize: 16}]}> CLUB LEADER: </Text>
-                    <Text style={[globalStyles.subheading, {fontSize: 16}]}>
-                        {ownerUser ? ownerUser.firstName : "Loading..."}
-                         {' '}
-                        {ownerUser ? ownerUser.lastName : "Loading..."}
-                        {' | '}
-                        @{ownerUser ? ownerUser.userName : "Loading..."}
-                    </Text>
+                <Text style={[globalStyles.subheading, { fontSize: 16 }]}> CLUB LEADER: </Text>
+                <Text style={[globalStyles.subheading, { fontSize: 16 }]}>
+                    {ownerUser ? ownerUser.firstName : "Loading..."}
+                    {' '}
+                    {ownerUser ? ownerUser.lastName : "Loading..."}
+                    {' | '}
+                    @{ownerUser ? ownerUser.userName : "Loading..."}
+                </Text>
                 <Foundation
                     name="crown"
                     size={30}
@@ -536,7 +536,7 @@ export default function LitClubScreen() {
                     <View style={litStyles.invite}>
                         <Text style={[globalStyles.body, { fontSize: 16 }]}>
                             {club.id}
-                        </Text> 
+                        </Text>
                     </View>
                 </View>
             )}

@@ -1,34 +1,20 @@
 
 import React, { useEffect, useState } from 'react';
-import Foundation from '@expo/vector-icons/Foundation'; 
-import { InteractionManager, Platform, Pressable, TextInput} from 'react-native';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Pressable, TextInput } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { Image } from 'expo-image';
-//import SearchBar from '@/components/SearchBar';
-import Header from '@/components/headerWithSearch';
 import { colors, fonts } from '@/theme';
-import ReadingList from '@/components/ReadingList'; 
-//import TopThreeBooks from '@/components/TopThreeBooks';
-import { View, Text, FlatList, ScrollView, StyleSheet, Alert,Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
-import { Fonts } from '@/constants/theme';
 
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
-// Update the import path to the correct location of profileService
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '@/styles/globalStyles';
-import { useLitClubs } from '@/context/litClubsContext';
+import { useLitClubs } from '@/context/LitClubsContext';
 import Constants from 'expo-constants';
-import { Book, User } from '@/domain/models';
+import { User } from '@/domain/models';
 import { useSession } from '@/context/AuthContext';
-import { GenresSelector } from '@/components/genresSelector';
-import { isPromise } from 'formik';
-import { useFocusEffect } from '@react-navigation/native';
 import { joinLitClub } from '@/api/services/litClubsService';
 import { getUser } from '@/api/services/usersService';
 
@@ -45,7 +31,7 @@ function BackButton() {
     return (
         <Pressable>
             <Link href="/litClubs" onPress={() => router.back()}>
-                <EvilIcons name="chevron-left" size={50} color="#193350" style={{marginLeft: 0}}/>
+                <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 0 }} />
             </Link>
         </Pressable>
     );
@@ -54,38 +40,38 @@ function BackButton() {
 // Define user state
 export default function JoinLitClub() {
     const [fontsLoaded] = useFonts({
-            Fraunces_700Bold,
-            ChivoMono_500Medium,
-            NotoSansMono_400Regular,
-        });
-        React.useEffect(() => {
-            if (fontsLoaded) SplashScreen.hideAsync();
-        }, [fontsLoaded]);
+        Fraunces_700Bold,
+        ChivoMono_500Medium,
+        NotoSansMono_400Regular,
+    });
+    React.useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded]);
 
     const router = useRouter();
     const params = useLocalSearchParams();
     //const preselectedBooks = params?.selectedBooks ? JSON.parse(params.selectedBooks as string) : [];
     const { addLitClub } = useLitClubs();
     const { session } = useSession();
-    const [ inviteCode, setInviteCode ] = useState('')
+    const [inviteCode, setInviteCode] = useState('')
     const [loading, setLoading] = useState(false);
-    const [ user, setUser ] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     // ---- Load current user from session (via usersService) ----
-        useEffect(() => {
-            const loadUser = async () => {
-                try {
-                    const sessionUser = await getUser();
-                    if (sessionUser) {
-                        setUser(sessionUser);
-                    }
-                } catch (error) {
-                    console.error('Error loading user from session:', error);
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const sessionUser = await getUser();
+                if (sessionUser) {
+                    setUser(sessionUser);
                 }
-            };
-    
-            loadUser();
-        }, []);
+            } catch (error) {
+                console.error('Error loading user from session:', error);
+            }
+        };
+
+        loadUser();
+    }, []);
 
     const handleJoinLitClub = async () => {
         if (!inviteCode.trim()) {
@@ -94,9 +80,9 @@ export default function JoinLitClub() {
         }
 
         if (!user?.id) {
-                    Alert.alert('Error', 'User not logged in.');
-                    return;
-                }
+            Alert.alert('Error', 'User not logged in.');
+            return;
+        }
 
         try {
             setLoading(true);
@@ -126,12 +112,12 @@ export default function JoinLitClub() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream, }}>
-            <View style={{flexDirection:'row', paddingTop: 30, margin: 10} } >
-                <BackButton /> 
-                <Text style={[globalStyles.heading, {paddingTop: 7, paddingBottom: 10, fontSize: 20}]}>Join a LitClub</Text>
+            <View style={{ flexDirection: 'row', paddingTop: 30, margin: 10 }} >
+                <BackButton />
+                <Text style={[globalStyles.heading, { paddingTop: 7, paddingBottom: 10, fontSize: 20 }]}>Join a LitClub</Text>
             </View>
             <ScrollView contentContainerStyle={styles.container}>
-                
+
                 {/* Club Invite Code */}
                 <Text style={[globalStyles.subheading, { fontSize: 18, color: colors.darkest }]}>Enter the Invite Code to Join a LitClub</Text>
                 <TextInput
@@ -141,7 +127,7 @@ export default function JoinLitClub() {
                     value={inviteCode}
                     onChangeText={setInviteCode}
                 />
-                
+
                 {/* Join Button */}
                 <Pressable
                     style={[styles.joinButton, loading && { opacity: 0.6 }, { marginTop: 20, marginBottom: 40 }]}
@@ -205,7 +191,7 @@ const styles = StyleSheet.create({
         color: colors.darkest,
         fontFamily: fonts.body,
         fontSize: 18,
-    }, 
+    },
     textArea: {
         height: 120,
         textAlignVertical: 'top',
@@ -225,7 +211,7 @@ const styles = StyleSheet.create({
         color: colors.darkest,
         fontFamily: fonts.body,
         fontSize: 16,
-    }, 
-    
+    },
+
 });
 

@@ -3,18 +3,16 @@ import Header from '../../components/headerWithSearch';
 import { globalStyles } from '@/styles/globalStyles';
 import { Link, useFocusEffect } from 'expo-router';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ChivoMono_500Medium } from '@expo-google-fonts/chivo-mono';
 import { Fraunces_700Bold, useFonts } from '@expo-google-fonts/fraunces';
 import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
-import { useLitClubs } from '@/context/litClubsContext';
 import { colors } from '@/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '@/domain/models';
 import { useRouter } from "expo-router";
-import index from '..';
-
+import { useLitClubs } from '@/context/LitClubsContext';
 
 export default function AllLitClubs() {
   // Example data
@@ -72,7 +70,7 @@ export default function AllLitClubs() {
   }, []);
 
   const toggleMenu = () => {
-      setMenuOpen((prev) => !prev);
+    setMenuOpen((prev) => !prev);
   };
 
   const userId = user?.id ?? '';
@@ -113,13 +111,13 @@ export default function AllLitClubs() {
       <ScrollView contentContainerStyle={{ padding: 16 }}>
 
         {/* New Club Button */}
-        <Pressable 
+        <Pressable
           style={styles.toggle}
           onPress={toggleMenu}
         >
-            <EvilIcons name="plus" size={50} color={colors.midBlue} />
+          <EvilIcons name="plus" size={50} color={colors.midBlue} />
         </Pressable>
-        
+
 
         {menuOpen && (
           <View style={[styles.dropdown, { zIndex: 100 }]}>
@@ -127,21 +125,21 @@ export default function AllLitClubs() {
               style={[styles.dropdownItem, { zIndex: 100 }]}
               onPress={() => router.push("/createLitClub")}
             >
-              <Text style = {globalStyles.body}>Create New LitClub</Text>
+              <Text style={globalStyles.body}>Create New LitClub</Text>
             </Pressable>
 
             <Pressable
               style={[styles.dropdownItem, { zIndex: 100 }]}
               onPress={() => router.push("/JoinLitClub")}
             >
-              <Text style = {globalStyles.body}>Join a LitClub</Text>
+              <Text style={globalStyles.body}>Join a LitClub</Text>
             </Pressable>
 
           </View>
         )}
 
         {/* MAIN HEADING */}
-        <Text style={[globalStyles.heading, {paddingTop: 20}]}>My LitClubs</Text>
+        <Text style={[globalStyles.heading, { paddingTop: 20 }]}>My LitClubs</Text>
 
         <View style={globalStyles.cardGroup}>
           {leaderClubs.length ? (
@@ -206,33 +204,33 @@ export default function AllLitClubs() {
 }
 
 const styles = StyleSheet.create({
-    dropdown: {
-        position: "absolute",
-        top: 60,
-        right: 25,
-        backgroundColor: colors.cream,
-        borderRadius: 16,
-        paddingVertical: 10,
-        width: 200,
-        borderWidth: 2,
-        borderColor: colors.midBlue,
-        elevation: 4,
-    },
-    dropdownItem: {
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-    },
-    toggle: {
-      position: 'absolute',
-      top: 16,
-      right: 16,
-      zIndex: 100, 
-      borderRadius: 30,
-      width: 50,
-      height: 50,
-      justifyContent: 'center',
-      alignContent: 'center',
-      alignItems: 'center',
-      marginBottom: 16,
-    }
+  dropdown: {
+    position: "absolute",
+    top: 60,
+    right: 25,
+    backgroundColor: colors.cream,
+    borderRadius: 16,
+    paddingVertical: 10,
+    width: 200,
+    borderWidth: 2,
+    borderColor: colors.midBlue,
+    elevation: 4,
+  },
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  toggle: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 100,
+    borderRadius: 30,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  }
 });

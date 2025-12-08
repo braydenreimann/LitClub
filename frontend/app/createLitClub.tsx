@@ -12,7 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { colors, fonts } from '@/theme';
 import { globalStyles } from '@/styles/globalStyles';
-import { useLitClubs } from '@/context/litClubsContext';
+import { useLitClubs } from '@/context/LitClubsContext';
 import { Book, User } from '@/domain/models';
 import { useSession } from '@/context/AuthContext';
 import { GenresSelector } from '@/components/genresSelector';
@@ -182,7 +182,7 @@ export default function CreateLitClub() {
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <View style={{ flexDirection: 'row', paddingTop: 90, margin: 10 }}>
                 <BackButton />
-                <Text style={[globalStyles.heading, {paddingTop: 7, paddingBottom: 10, fontSize: 20}]}>
+                <Text style={[globalStyles.heading, { paddingTop: 7, paddingBottom: 10, fontSize: 20 }]}>
                     Create a New Lit Club
                 </Text>
             </View>
