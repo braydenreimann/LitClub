@@ -153,12 +153,7 @@ export default function ReadingList({
                                         ? { uri: coverUris[book.id] }
                                         : require('../assets/images/turkstra.jpg')
                                 }
-                                style={{
-                                    width: 120,
-                                    height: 180,
-                                    borderRadius: 8,
-                                    marginBottom: 6,
-                                }}
+                                style={styles.coverImage}
                                 resizeMode="cover"
                             />
                         </Pressable>
@@ -177,18 +172,24 @@ const styles = StyleSheet.create({
     },
     scrollingWrapper: {
         flex: 1,
+        marginTop: 6,
     },
     card: {
         width: 120,
-        height: 180,
         marginRight: 8,
         backgroundColor: 'transparent',
         borderColor: 'transparent',
         borderRadius: 12,
+        overflow: 'hidden',
         alignItems: 'center',
         alignContent: 'center',
         justifyContent: 'center',
         textAlign: 'center',
         textAlignVertical: 'center',
+    },
+    coverImage: {
+        width: '100%',
+        height: 180,
+        borderRadius: 12,
     },
 });
