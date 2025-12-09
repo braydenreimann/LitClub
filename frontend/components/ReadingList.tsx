@@ -177,8 +177,8 @@ const styles = StyleSheet.create({
     card: {
         width: 120,
         marginRight: 8,
-        backgroundColor: 'transparent',
-        borderColor: 'transparent',
+        backgroundColor: '#ffffff',
+        borderColor: '#e5dfd6',
         borderRadius: 12,
         overflow: 'hidden',
         alignItems: 'center',
@@ -186,6 +186,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center',
         textAlignVertical: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 1,
     },
     coverImage: {
         width: '100%',

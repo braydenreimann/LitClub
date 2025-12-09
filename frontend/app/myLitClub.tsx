@@ -424,20 +424,14 @@ export default function LitClubScreen() {
                 </View>
 
                 {/* Club Library reading lists */}
-                <Text
-                    style={litStyles.sectionHeader}
-                >
-                    Club Bookshelf
-                </Text>
-                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5, paddingBottom: 10 }}>
-                    <BookShelf
-                        ownerId={club.id}
-                        refreshKey={refreshKey}
-                        onBookPress={(bookId) =>
-                            pushBookDetail(router, bookId, club.id, club.name, club.ownerUserId)
-                        }
-                    />
-                </View>
+                <BookShelf
+                    title="Club Bookshelf"
+                    ownerId={club.id}
+                    refreshKey={refreshKey}
+                    onBookPress={(bookId) =>
+                        pushBookDetail(router, bookId, club.id, club.name, club.ownerUserId)
+                    }
+                />
 
                 {/* Members */}
                 <Text style={litStyles.sectionHeader}>

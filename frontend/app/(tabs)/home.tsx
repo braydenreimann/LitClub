@@ -1,6 +1,6 @@
 // /frontend/app/(whatever)/HomeScreen.tsx (path may differ)
 
-import { StyleSheet, View, ScrollView, Text } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFocusEffect } from 'expo-router';
@@ -40,13 +40,7 @@ export default function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <Header />
       <ScrollView>
-        <View style={{ paddingHorizontal: 20, paddingTop: 45 }}>
-          <Text style={globalStyles.heading}>My Bookshelf</Text>
-        </View>
-
-        <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 30 }}>
-          <BookShelf refreshKey={refreshKey} />
-        </View>
+        <BookShelf refreshKey={refreshKey} />
       </ScrollView>
     </View>
   );

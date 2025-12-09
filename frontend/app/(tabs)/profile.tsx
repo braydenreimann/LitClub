@@ -323,9 +323,7 @@ export default function ProfileScreen() {
 
 
                 {/* Books Section */}
-                <View style={{ marginTop: 10 }}>
-                    <BookShelf refreshKey={bookshelfRefreshKey} />
-                </View>
+                <BookShelf refreshKey={bookshelfRefreshKey} />
 
                 {/* Memberships */}
                 <Text style={globalStyles.subheading}> LitClub Memberships </Text>
