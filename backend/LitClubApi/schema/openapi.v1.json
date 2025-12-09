@@ -349,6 +349,47 @@
         }
       }
     },
+    "/libraries": {
+      "post": {
+        "tags": [
+          "Add"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddLibraryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/threads/{threadId}/comments": {
       "post": {
         "tags": [
@@ -1914,6 +1955,70 @@
         }
       }
     },
+    "/users/search": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "operationId": "SearchUsers",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/books/search": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "operationId": "SearchBooks",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/threads/{threadId}/vote": {
       "post": {
         "tags": [
@@ -2159,7 +2264,7 @@
             "nullable": true
           },
           "status": {
-            "$ref": "#/components/schemas/ShelfStatusContract"
+            "$ref": "#/components/schemas/ShelfStatus"
           },
           "startedReading": {
             "type": "string",
@@ -2187,10 +2292,24 @@
         },
         "additionalProperties": false
       },
+      "AddLibraryRequest": {
+        "required": [
+          "ownerId"
+        ],
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "AddLitClubRequest": {
         "required": [
           "name",
-          "ownerUserId"
+          "ownerUserId",
+          "ownerUserName"
         ],
         "type": "object",
         "properties": {
@@ -2199,6 +2318,10 @@
             "nullable": true
           },
           "ownerUserId": {
+            "type": "string",
+            "nullable": true
+          },
+          "ownerUserName": {
             "type": "string",
             "nullable": true
           },
@@ -2215,17 +2338,6 @@
           },
           "privateClub": {
             "type": "boolean"
-          },
-          "memberUserIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "libraryId": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2606,7 +2718,7 @@
         "type": "object",
         "properties": {
           "status": {
-            "$ref": "#/components/schemas/ShelfStatusContract"
+            "$ref": "#/components/schemas/ShelfStatus"
           },
           "startedReading": {
             "type": "string",
@@ -2668,7 +2780,7 @@
             },
             "nullable": true
           },
-          "libraryId": {
+          "ownerUserName": {
             "type": "string",
             "nullable": true
           }
@@ -2867,7 +2979,7 @@
             "nullable": true
           },
           "status": {
-            "$ref": "#/components/schemas/ShelfStatusContract"
+            "$ref": "#/components/schemas/ShelfStatus"
           },
           "startedReading": {
             "type": "string",
@@ -3071,7 +3183,8 @@
         "required": [
           "id",
           "name",
-          "ownerUserId"
+          "ownerUserId",
+          "ownerUserName"
         ],
         "type": "object",
         "properties": {
@@ -3084,6 +3197,10 @@
             "nullable": true
           },
           "ownerUserId": {
+            "type": "string",
+            "nullable": true
+          },
+          "ownerUserName": {
             "type": "string",
             "nullable": true
           },
@@ -3106,10 +3223,6 @@
             "items": {
               "type": "string"
             },
-            "nullable": true
-          },
-          "libraryId": {
-            "type": "string",
             "nullable": true
           },
           "created": {
@@ -3193,7 +3306,7 @@
         },
         "additionalProperties": false
       },
-      "ShelfStatusContract": {
+      "ShelfStatus": {
         "enum": [
           0,
           1,
