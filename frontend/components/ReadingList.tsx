@@ -13,14 +13,14 @@ import { getBookshelfByStatus } from '../api/services/librariesService';
 import { getUriRead } from '@/api/services/imagesService';
 import { pushBookDetail } from '@/navigation/routes';
 
-// Status from backend enum: 0 | 1 | 2 | 3
-type ShelfStatus = 0 | 1 | 2 | 3 | 4;
+import type { components } from '@/api/schema/openapi-types';
+type ShelfStatus = components['schemas']['ShelfStatusContract'];
 
 interface ReadingListProps {
     status: ShelfStatus;
     books?: DisplayBook[];
     refreshKey?: number;
-    ownerId?: string; // optional owner for shelves; defaults to current user
+    ownerId?: string;
     onBookPress?: (bookId: string) => void;
 }
 
@@ -43,14 +43,11 @@ export default function ReadingList({
         const loadUser = async () => {
             try {
                 const sessionUser = await getUser();
-                if (sessionUser) {
-                    setUser(sessionUser);
-                }
+                if (sessionUser) setUser(sessionUser);
             } catch (error) {
                 console.error('Error loading user from session:', error);
             }
         };
-
         loadUser();
     }, [ownerId]);
 
@@ -103,11 +100,7 @@ export default function ReadingList({
             ) : shelf.length === 0 ? (
                 <Text style={globalStyles.body}>No books found for this shelf.</Text>
             ) : (
-                <ScrollView
-                    style={styles.scrollContainer}
-                    horizontal
-                    showsHorizontalScrollIndicator
-                >
+                <ScrollView style={styles.scrollContainer} horizontal showsHorizontalScrollIndicator>
                     {shelf.map((book) => (
                         <Pressable
                             key={book.id}

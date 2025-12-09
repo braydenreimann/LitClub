@@ -73,7 +73,7 @@ export default function HomeScreen() {
           Future Reads
         </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={3} refreshKey={refreshKey} />
+          <ReadingList status={2} refreshKey={refreshKey} />
         </View>
 
         {/* Shelf Three */}
@@ -86,7 +86,7 @@ export default function HomeScreen() {
           Past Reads
         </Text>
         <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={0} refreshKey={refreshKey} />
+          <ReadingList status={3} refreshKey={refreshKey} />
         </View>
       </ScrollView>
     </View>

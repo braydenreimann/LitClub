@@ -160,7 +160,7 @@ using (var scope = app.Services.CreateScope())
     string basePath = AppContext.BaseDirectory; //Makes relative path to function on all machines
     string litClubFolder = Path.GetFullPath(Path.Combine(basePath, "..", "..", "..", ".."));
     string exist = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "bookdata.csv");
-  
+
     List<Book> booklist = CSVParserInsert.Parse(exist);
 
     foreach (Book b in booklist)
@@ -210,7 +210,7 @@ using (var scope = app.Services.CreateScope())
 
     Book book = new()
     {
-        Id = "1",
+        Id = "99",
         Title = "The Fault in Our Stars",
         Author = "John Green",
         TotalChapters = 25,
@@ -391,40 +391,41 @@ using (var scope = app.Services.CreateScope())
     await libs.UpsertItemAsync(litClubLibrary, new PartitionKey(litClubLibrary.OwnerId));
 
     await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
+    await SeedUsers.SeedUsersAsync(client, o, booklist);
 
     //string usersCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Users", "users.csv");
     //string litClubsCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "LitClubs", "litclubs.csv");
     // --------------------
     // Seed Users
     // --------------------
-    var allUsers = new LitClubUser[]
-    {
-        new() { Id="4", FirstName="Sofia", LastName="Hughes", UserName="sofghughes", Email="shughes@gmail.com", PasswordHash="sofghughespw", Bio="Hey!", PreferredGenres=new List<string>{"Fantasy","Romance"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="5", FirstName="firstever", LastName="user socool", UserName="socoolguy", Email="this@fake.com", PasswordHash="socoolguypw", Bio="Hi!", PreferredGenres=new List<string>{"Romance","Fiction"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="6", FirstName="Vidya", LastName="Madana", UserName="vidya", Email="vidya@fake.com", PasswordHash="vidyapw", Bio="Hello!", PreferredGenres=new List<string>{"Science-Fiction","Drama"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="7", FirstName="Kathleen", LastName="Lowe", UserName="katkit", Email="katkit@fake.com", PasswordHash="katkitpw", Bio="hiya", PreferredGenres=new List<string>{"Mystery","Non-Fiction"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="8", FirstName="Ben", LastName="Herrington", UserName="theben", Email="theben@fake.com", PasswordHash="thebenpw", Bio="how are you", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="9", FirstName="Brayden", LastName="Reimann", UserName="breimann", Email="breimann@fake.com", PasswordHash="breimannpw", Bio="bio", PreferredGenres=new List<string>{"Horror","Historical"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="10", FirstName="Domino", LastName="Pizza", UserName="pizzafan", Email="pizzafan@fake.com", PasswordHash="pizzafanpw", Bio="I love reading and science", PreferredGenres=new List<string>{"Fiction","Romance","Drama","Science-Fiction"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="11", FirstName="Pizza", LastName="Box", UserName="pepperoni", Email="pepperoni@fake.com", PasswordHash="pepperonipw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Young Adult"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="12", FirstName="Reader", LastName="Number 1", UserName="litclublover", Email="litclublover@fake.com", PasswordHash="litclubloverpw", Bio="No bio provided", PreferredGenres=new List<string>{"True Crime","Memoir"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="13", FirstName="Whale", LastName="Shark", UserName="whaleguy", Email="whaleguy@fake.com", PasswordHash="whaleguypw", Bio="No bio provided", PreferredGenres=new List<string>{"Historical","Poetry"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="14", FirstName="Crow", LastName="fella", UserName="crowfella", Email="crowfella@fake.com", PasswordHash="crowfellapw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance","Mystery"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="15", FirstName="Kitty", LastName="Cat", UserName="justacat", Email="justacat@fake.com", PasswordHash="justacatpw", Bio="No bio provided", PreferredGenres=new List<string>{"Horror","Poetry"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="16", FirstName="Magician", LastName="Dude", UserName="foreveralone", Email="foreveralone@fake.com", PasswordHash="foreveralonepw", Bio="No bio provided", PreferredGenres=new List<string>{"Memoir","Romance"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="17", FirstName="barbie", LastName="doll", UserName="barbiegirl", Email="barbiegirl@fake.com", PasswordHash="barbiegirlpw", Bio="No bio provided", PreferredGenres=new List<string>{"Young Adult","Biography"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="18", FirstName="just", LastName="ken", UserName="justken", Email="justken@fake.com", PasswordHash="justkenpw", Bio="No bio provided", PreferredGenres=new List<string>{"Science","Western Fiction"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="19", FirstName="Star", LastName="Celestial", UserName="starrynight", Email="starrynight@fake.com", PasswordHash="starrynightpw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="20", FirstName="Dino", LastName="Luvr", UserName="t-rex", Email="t-rex@fake.com", PasswordHash="t-rexpw", Bio="No bio provided", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="21", FirstName="Weevil", LastName="Fan", UserName="bugfan", Email="bugfan@fake.com", PasswordHash="bugfanpw", Bio="No bio provided", PreferredGenres=new List<string>{"Mystery"}, ProfilePhotoUrl="John-Green.png" },
-        new() { Id="22", FirstName="Alyssa", LastName="Collins", UserName="alyssa", Email="alyssa@fake.com", PasswordHash="alyssapw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Science Fiction"}, ProfilePhotoUrl="John-Green.png" }
-    };
+    // var allUsers = new LitClubUser[]
+    // {
+    //     new() { Id="4", FirstName="Sofia", LastName="Hughes", UserName="sofghughes", Email="shughes@gmail.com", PasswordHash="sofghughespw", Bio="Hey!", PreferredGenres=new List<string>{"Fantasy","Romance"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="5", FirstName="firstever", LastName="user socool", UserName="socoolguy", Email="this@fake.com", PasswordHash="socoolguypw", Bio="Hi!", PreferredGenres=new List<string>{"Romance","Fiction"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="6", FirstName="Vidya", LastName="Madana", UserName="vidya", Email="vidya@fake.com", PasswordHash="vidyapw", Bio="Hello!", PreferredGenres=new List<string>{"Science-Fiction","Drama"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="7", FirstName="Kathleen", LastName="Lowe", UserName="katkit", Email="katkit@fake.com", PasswordHash="katkitpw", Bio="hiya", PreferredGenres=new List<string>{"Mystery","Non-Fiction"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="8", FirstName="Ben", LastName="Herrington", UserName="theben", Email="theben@fake.com", PasswordHash="thebenpw", Bio="how are you", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="9", FirstName="Brayden", LastName="Reimann", UserName="breimann", Email="breimann@fake.com", PasswordHash="breimannpw", Bio="bio", PreferredGenres=new List<string>{"Horror","Historical"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="10", FirstName="Domino", LastName="Pizza", UserName="pizzafan", Email="pizzafan@fake.com", PasswordHash="pizzafanpw", Bio="I love reading and science", PreferredGenres=new List<string>{"Fiction","Romance","Drama","Science-Fiction"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="11", FirstName="Pizza", LastName="Box", UserName="pepperoni", Email="pepperoni@fake.com", PasswordHash="pepperonipw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Young Adult"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="12", FirstName="Reader", LastName="Number 1", UserName="litclublover", Email="litclublover@fake.com", PasswordHash="litclubloverpw", Bio="No bio provided", PreferredGenres=new List<string>{"True Crime","Memoir"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="13", FirstName="Whale", LastName="Shark", UserName="whaleguy", Email="whaleguy@fake.com", PasswordHash="whaleguypw", Bio="No bio provided", PreferredGenres=new List<string>{"Historical","Poetry"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="14", FirstName="Crow", LastName="fella", UserName="crowfella", Email="crowfella@fake.com", PasswordHash="crowfellapw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance","Mystery"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="15", FirstName="Kitty", LastName="Cat", UserName="justacat", Email="justacat@fake.com", PasswordHash="justacatpw", Bio="No bio provided", PreferredGenres=new List<string>{"Horror","Poetry"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="16", FirstName="Magician", LastName="Dude", UserName="foreveralone", Email="foreveralone@fake.com", PasswordHash="foreveralonepw", Bio="No bio provided", PreferredGenres=new List<string>{"Memoir","Romance"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="17", FirstName="barbie", LastName="doll", UserName="barbiegirl", Email="barbiegirl@fake.com", PasswordHash="barbiegirlpw", Bio="No bio provided", PreferredGenres=new List<string>{"Young Adult","Biography"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="18", FirstName="just", LastName="ken", UserName="justken", Email="justken@fake.com", PasswordHash="justkenpw", Bio="No bio provided", PreferredGenres=new List<string>{"Science","Western Fiction"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="19", FirstName="Star", LastName="Celestial", UserName="starrynight", Email="starrynight@fake.com", PasswordHash="starrynightpw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="20", FirstName="Dino", LastName="Luvr", UserName="t-rex", Email="t-rex@fake.com", PasswordHash="t-rexpw", Bio="No bio provided", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="21", FirstName="Weevil", LastName="Fan", UserName="bugfan", Email="bugfan@fake.com", PasswordHash="bugfanpw", Bio="No bio provided", PreferredGenres=new List<string>{"Mystery"}, ProfilePhotoUrl="John-Green.png" },
+    //     new() { Id="22", FirstName="Alyssa", LastName="Collins", UserName="alyssa", Email="alyssa@fake.com", PasswordHash="alyssapw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Science Fiction"}, ProfilePhotoUrl="John-Green.png" }
+    // };
 
-    foreach (var u in allUsers)
-    {
-        try { await users.UpsertItemAsync(u, new PartitionKey(u.Id)); }
-        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict) { }
-    }
+    // foreach (var u in allUsers)
+    // {
+    //     try { await users.UpsertItemAsync(u, new PartitionKey(u.Id)); }
+    //     catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict) { }
+    // }
 
     // --------------------
     // Seed LitClubs

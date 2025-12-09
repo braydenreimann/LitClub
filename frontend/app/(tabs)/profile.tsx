@@ -325,9 +325,9 @@ export default function ProfileScreen() {
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Currently Reading</Text>
                     <ReadingList status={1} />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Future Reads</Text>
-                    <ReadingList status={3} />
+                    <ReadingList status={2} />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Past Reads</Text>
-                    <ReadingList status={0} />
+                    <ReadingList status={3} />
                 </View>
 
                 {/* Memberships */}

@@ -1,4 +1,5 @@
-﻿using LitClubApi.Utilities;
+﻿using LitClubApi.Domain;
+using LitClubApi.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -14,7 +15,7 @@ public sealed class AddLibraryBookRequest
 public sealed class AddLibraryBookBody
 {
     public required string BookId { get; init; }
-    public required ShelfStatusContract Status { get; init; }
+    public required ShelfStatus Status { get; init; }
     [JsonConverter(typeof(DateOnlyConverter))]
     public DateOnly? StartedReading { get; init; }
     [JsonConverter(typeof(DateOnlyConverter))]

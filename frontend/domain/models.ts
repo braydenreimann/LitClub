@@ -75,4 +75,3 @@ export type LitClub = {
     privateClub: boolean,
     memberUserIds: string[]
 }
-//export type ShelfStatus = 0 | 1 | 2 | 3 | 4;
