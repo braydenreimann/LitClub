@@ -5,7 +5,7 @@ import { Link, router, useFocusEffect } from 'expo-router';
 import { Image } from 'expo-image';
 import Header from '../../components/headerWithSearch';
 import { colors, fonts } from '../../theme';
-import ReadingList from '../../components/ReadingList';
+import BookShelf from '@/components/BookShelf';
 import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
@@ -104,6 +104,7 @@ export default function ProfileScreen() {
 
     const [pedestalBooks, setPedestalBooks] = useState<DisplayBook[]>([]);
     const [pedestalLoading, setPedestalLoading] = useState(false);
+    const [bookshelfRefreshKey, setBookshelfRefreshKey] = useState(0);
 
     useEffect(() => {
         let alive = true; // to prevent state updates after unmount
@@ -169,6 +170,7 @@ export default function ProfileScreen() {
 
             if (user?.id) {
                 fetchPedestalBooks();
+                setBookshelfRefreshKey((k) => k + 1);
             }
         }, [user?.id])
     );
@@ -321,13 +323,8 @@ export default function ProfileScreen() {
 
 
                 {/* Books Section */}
-                <View>
-                    <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Currently Reading</Text>
-                    <ReadingList status={1} />
-                    <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Future Reads</Text>
-                    <ReadingList status={2} />
-                    <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Past Reads</Text>
-                    <ReadingList status={3} />
+                <View style={{ marginTop: 10 }}>
+                    <BookShelf refreshKey={bookshelfRefreshKey} />
                 </View>
 
                 {/* Memberships */}

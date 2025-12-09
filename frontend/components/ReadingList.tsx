@@ -1,10 +1,9 @@
 // /frontend/components/ReadingList.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { colors } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
 
 import { User, DisplayBook } from '../domain/models';
@@ -12,9 +11,8 @@ import { getUser } from '@/api/services/usersService';
 import { getBookshelfByStatus } from '../api/services/librariesService';
 import { getUriRead } from '@/api/services/imagesService';
 import { pushBookDetail } from '@/navigation/routes';
-
-import type { components } from '@/api/schema/openapi-types';
-type ShelfStatus = components['schemas']['ShelfStatusContract'];
+import { ShelfStatus } from '@/domain/shelfStatus';
+import { subscribeToBookshelfUpdates } from '@/utils/bookshelfEvents';
 
 interface ReadingListProps {
     status: ShelfStatus;
@@ -37,6 +35,11 @@ export default function ReadingList({
     const [coverUris, setCoverUris] = useState<{ [id: string]: string }>({});
     const router = useRouter();
 
+    const resolvedOwnerId = useMemo(
+        () => ownerId ?? user?.id ?? null,
+        [ownerId, user?.id]
+    );
+
     // Load user from session (via usersService) if an explicit owner isn't provided
     useEffect(() => {
         if (ownerId) return;
@@ -51,27 +54,56 @@ export default function ReadingList({
         loadUser();
     }, [ownerId]);
 
+    useEffect(() => {
+        if (books) {
+            setShelf(books);
+            setLoading(false);
+        }
+    }, [books]);
+
+    const loadBookshelf = useCallback(async () => {
+        if (books) return;
+
+        if (!resolvedOwnerId) {
+            setShelf([]);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const fetched = await getBookshelfByStatus(resolvedOwnerId, status);
+            setShelf(fetched ?? []);
+        } catch (err) {
+            console.error('Error loading bookshelf:', err);
+            setShelf([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [books, resolvedOwnerId, status]);
+
     // Load bookshelf by status (from librariesService)
     useEffect(() => {
         if (books) return;
 
-        const resolvedOwnerId = ownerId ?? user?.id;
-        if (!resolvedOwnerId) return;
+        void loadBookshelf();
+    }, [books, loadBookshelf, refreshKey]);
 
-        const loadBookshelf = async () => {
-            setLoading(true);
-            try {
-                const fetched = await getBookshelfByStatus(resolvedOwnerId, status);
-                setShelf(fetched ?? []);
-            } catch (err) {
-                console.error('Error loading bookshelf:', err);
-            } finally {
-                setLoading(false);
+    useEffect(() => {
+        if (books || !resolvedOwnerId) return;
+
+        return subscribeToBookshelfUpdates(
+            ({ ownerId: updatedOwnerId, previousStatus, nextStatus }) => {
+                const affectsThisList =
+                    updatedOwnerId === resolvedOwnerId &&
+                    (previousStatus === status || nextStatus === status);
+
+                if (affectsThisList) {
+                    void loadBookshelf();
+                }
             }
-        };
-
-        loadBookshelf();
-    }, [books, user?.id, ownerId, status, refreshKey]);
+        );
+    }, [books, resolvedOwnerId, status, loadBookshelf]);
 
     // Load cover images for the shelf
     useEffect(() => {
@@ -100,7 +132,11 @@ export default function ReadingList({
             ) : shelf.length === 0 ? (
                 <Text style={globalStyles.body}>No books found for this shelf.</Text>
             ) : (
-                <ScrollView style={styles.scrollContainer} horizontal showsHorizontalScrollIndicator>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator
+                    contentContainerStyle={styles.scrollContent}
+                >
                     {shelf.map((book) => (
                         <Pressable
                             key={book.id}
@@ -134,9 +170,10 @@ export default function ReadingList({
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flexWrap: 'wrap',
-        padding: 10,
+    scrollContent: {
+        flexDirection: 'row',
+        paddingLeft: 0,
+        paddingRight: 8,
     },
     scrollingWrapper: {
         flex: 1,
@@ -144,9 +181,9 @@ const styles = StyleSheet.create({
     card: {
         width: 120,
         height: 180,
-        marginRight: 10,
-        backgroundColor: colors.yellow,
-        borderColor: colors.darkest,
+        marginRight: 8,
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
         borderRadius: 12,
         alignItems: 'center',
         alignContent: 'center',

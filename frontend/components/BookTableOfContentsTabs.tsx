@@ -33,9 +33,7 @@ import {
     removeBookFromLibrary,
     setBookShelfStatus,
 } from "@/api/services/librariesService";
-
-// Backend enum: 0 | 1 | 2 | 3
-type ShelfStatus = 0 | 1 | 2 | 3 | 4;
+import { ShelfStatus } from "@/domain/shelfStatus";
 
 type ShelfStatusOption = {
     label: string;
@@ -45,15 +43,15 @@ type ShelfStatusOption = {
 const shelfStatusOptions: ShelfStatusOption[] = [
     {
         label: "Currently Reading",
-        value: 1,
-    },
-    {
-        label: "Future Reads",
-        value: 3,
+        value: ShelfStatus.CurrentlyReading,
     },
     {
         label: "Past Reads",
-        value: 0,
+        value: ShelfStatus.PastReads,
+    },
+    {
+        label: "Future Reads",
+        value: ShelfStatus.FutureReads,
     },
     {
         label: "Remove from Bookshelf",
@@ -63,18 +61,23 @@ const shelfStatusOptions: ShelfStatusOption[] = [
 
 function mapStatusToLabel(status: ShelfStatus | null): string {
     switch (status) {
-        case 1:
+        case ShelfStatus.CurrentlyReading:
             return "Currently Reading";
-        case 3:
+        case ShelfStatus.FutureReads:
             return "Future Reads";
-        case 0:
+        case ShelfStatus.PastReads:
             return "Past Reads";
-        case 2:
-            return "On Hiatus";
         default:
             return "Add to Bookshelf";
     }
 }
+
+const validShelfStatuses = new Set<ShelfStatus>([
+    ShelfStatus.NotInYourLibrary,
+    ShelfStatus.CurrentlyReading,
+    ShelfStatus.FutureReads,
+    ShelfStatus.PastReads,
+]);
 
 type TabKey = "library" | "litclub";
 
@@ -148,7 +151,6 @@ function BookTableOfContentsTabs({
         width: number;
         x: number;
     }>({ height: 0, y: 0, width: 0, x: 0 });
-    const [shelfStatus, setShelfStatus] = useState<ShelfStatus | null>(null);
     const [statusMenuOpen, setStatusMenuOpen] = useState(false);
     const [statusLoading, setStatusLoading] = useState(true);
     const [statusSaving, setStatusSaving] = useState(false);
@@ -507,7 +509,8 @@ function BookTableOfContentsTabs({
                     : "Select a LitClub";
 
     // helper to check valid enum statuses
-    const isValidStatus = (s: any) => s === 0 || s === 1 || s === 2 || s === 3;
+    const isValidStatus = (s: any): s is ShelfStatus =>
+        validShelfStatuses.has(s as ShelfStatus);
 
     // Load bookshelf status for this book (for the current owner context)
     useEffect(() => {
@@ -800,7 +803,7 @@ function BookTableOfContentsTabs({
                 ) : (
                     <>
                         {/* Future reads message */}
-                        {activeTab === "litclub" && isValidStatus(litClubStatus) && litClubStatus === 3 && (
+                        {activeTab === "litclub" && isValidStatus(litClubStatus) && litClubStatus === ShelfStatus.FutureReads && (
                             <View style={{ marginTop: 8, marginBottom: 8 }}>
                                 <Text style={[globalStyles.body, { fontStyle: "italic", color: colors.nextDarkest }]}>
                                     {selectedClubName ? `${selectedClubName} has not started reading this book yet!` : "This LitClub has not started reading this book yet!"}

@@ -7,7 +7,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 import { colors, fonts } from '@/theme';
-import ReadingList from '@/components/ReadingList';
+import BookShelf from '@/components/BookShelf';
 import ClubMembers from '@/components/ClubMembers';
 import { globalStyles } from '@/styles/globalStyles';
 
@@ -427,43 +427,10 @@ export default function LitClubScreen() {
                 <Text
                     style={litStyles.sectionHeader}
                 >
-                    Currently Reading
+                    Club Bookshelf
                 </Text>
-                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5 }}>
-                    <ReadingList
-                        status={1}
-                        ownerId={club.id}
-                        refreshKey={refreshKey}
-                        onBookPress={(bookId) =>
-                            pushBookDetail(router, bookId, club.id, club.name, club.ownerUserId)
-                        }
-                    />
-                </View>
-
-                <Text
-                    style={litStyles.sectionHeader}
-                >
-                    Future Reads
-                </Text>
-                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5 }}>
-                    <ReadingList
-                        status={3}
-                        ownerId={club.id}
-                        refreshKey={refreshKey}
-                        onBookPress={(bookId) =>
-                            pushBookDetail(router, bookId, club.id, club.name, club.ownerUserId)
-                        }
-                    />
-                </View>
-
-                <Text
-                    style={litStyles.sectionHeader}
-                >
-                    Past Reads
-                </Text>
-                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5 }}>
-                    <ReadingList
-                        status={0}
+                <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 5, paddingBottom: 10 }}>
+                    <BookShelf
                         ownerId={club.id}
                         refreshKey={refreshKey}
                         onBookPress={(bookId) =>

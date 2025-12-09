@@ -11,8 +11,8 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 
 import { colors } from '../../theme';
 import Header from '../../components/headerWithSearch';
-import ReadingList from '@/components/ReadingList';
 import { globalStyles } from '@/styles/globalStyles';
+import BookShelf from '@/components/BookShelf';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,57 +36,16 @@ export default function HomeScreen() {
     }, [])
   );
 
-  // Status mapping (from backend ShelfStatusContract: 0 | 1 | 2 | 3)
-  // 0 = Past Reads
-  // 1 = Currently Reading
-  // 2 = (Hiatus / Not in use yet)
-  // 3 = Future Reads
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <Header />
       <ScrollView>
-        <View style={{ paddingLeft: 25, paddingTop: 45 }}>
+        <View style={{ paddingHorizontal: 20, paddingTop: 45 }}>
           <Text style={globalStyles.heading}>My Bookshelf</Text>
         </View>
 
-        {/* Shelf One */}
-        <Text
-          style={[
-            globalStyles.subheading,
-            { paddingTop: 25, paddingHorizontal: 25 },
-          ]}
-        >
-          Currently Reading
-        </Text>
-        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={1} refreshKey={refreshKey} />
-        </View>
-
-        {/* Shelf Two */}
-        <Text
-          style={[
-            globalStyles.subheading,
-            { paddingTop: 25, paddingHorizontal: 25 },
-          ]}
-        >
-          Future Reads
-        </Text>
-        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={2} refreshKey={refreshKey} />
-        </View>
-
-        {/* Shelf Three */}
-        <Text
-          style={[
-            globalStyles.subheading,
-            { paddingTop: 25, paddingHorizontal: 25 },
-          ]}
-        >
-          Past Reads
-        </Text>
-        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={3} refreshKey={refreshKey} />
+        <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 30 }}>
+          <BookShelf refreshKey={refreshKey} />
         </View>
       </ScrollView>
     </View>
