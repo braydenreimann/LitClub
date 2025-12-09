@@ -30,7 +30,7 @@ public class CSVParserInsert
             if (col.Length != 10)
             {
                 Console.WriteLine(
-                    $"Error: Invalid number of fields for {col[0]}. This book will not be inserted, continuing csv parse");
+                    $"Error: Invalid number of fields for {col[0]}. This book will not be inserted, continuing CSV parse.");
                 continue;
             }
 
@@ -45,7 +45,17 @@ public class CSVParserInsert
             else if (col[4].Equals("Mixed Media")) format = 4;
             else
             {
-                Console.WriteLine($"Invalid Book Format for {col[0]}. This book will not be inserted, continuing csv parse");
+                Console.WriteLine($"Invalid Book Format for {col[0]}. Skipping.");
+                continue;
+            }
+
+            string rawIsbn = col[6];
+
+            string isbn13 = rawIsbn.Replace(" ", "").Trim();
+
+            if (string.IsNullOrWhiteSpace(isbn13))
+            {
+                Console.WriteLine($"Warning: Missing ISBN for {col[0]}. Skipping.");
                 continue;
             }
 
@@ -55,11 +65,12 @@ public class CSVParserInsert
                 PublicationDate = new DateOnly(int.Parse(date[2]), int.Parse(date[0]), int.Parse(date[1])),
                 Format = (BookFormat)format,
                 PrintLength = int.Parse(col[5]),
-                Isbn13s = new List<string> { col[6] }
+                Isbn13s = new List<string> { rawIsbn }
             };
 
             var book = new Book
             {
+                Id = isbn13,
                 Title = col[0],
                 Author = col[1],
                 TotalChapters = int.Parse(col[7]),

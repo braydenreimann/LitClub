@@ -207,6 +207,16 @@ using (var scope = app.Services.CreateScope())
         await blobClient.UploadAsync(stream, overwrite: true);
     }
 
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "severus-snape.jpeg"); //Default profile image for John Green
+
+    blobName = "severus-snape.jpeg";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
 
     Book book = new()
     {

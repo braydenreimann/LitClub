@@ -40,35 +40,41 @@ public static class SeedUsers
                 [
                     new LibraryBook()
                     {
-                        BookId = books.FirstOrDefault(b => string.Equals(b.Title, "steve jobs", StringComparison.OrdinalIgnoreCase))?.Id ?? string.Empty,
+                        // Steve Jobs
+                        BookId = "978-1451648539",
                         Status = ShelfStatus.pastReads,
                         OnPedastal = true
                     },
                     new LibraryBook()
                     {
-                        BookId = books.FirstOrDefault(b => string.Equals(b.Title, "the anxious generation", StringComparison.OrdinalIgnoreCase))?.Id ?? string.Empty,
+                        // The Anxious Generation
+                        BookId = "978-0593655030",
                         Status = ShelfStatus.pastReads,
                         OnPedastal = true
                     },
                     new LibraryBook()
                     {
-                        BookId = books.FirstOrDefault(b => string.Equals(b.Title, "ultra-processed people", StringComparison.OrdinalIgnoreCase))?.Id ?? string.Empty,
+                        // Ultra-Processed People
+                        BookId = "978-1324076261",
                         Status = ShelfStatus.pastReads,
                         OnPedastal = true
                     },
                     new LibraryBook()
                     {
-                        BookId = books.FirstOrDefault(b => string.Equals(b.Title, "dawn of the new everything", StringComparison.OrdinalIgnoreCase))?.Id ?? string.Empty,
+                        // Dawn of the New Everything
+                        BookId = "978-1847923523",
                         Status = ShelfStatus.pastReads,
                     },
                     new LibraryBook()
                     {
-                        BookId = books.FirstOrDefault(b => string.Equals(b.Title, "if anyone builds it, everyone dies", StringComparison.OrdinalIgnoreCase))?.Id ?? string.Empty,
+                        // If Anyone Builds It, Everyone Dies
+                        BookId = "978-0316595643",
                         Status = ShelfStatus.currentlyReading,
                     },
                     new LibraryBook()
                     {
-                        BookId = books.FirstOrDefault(b => string.Equals(b.Author, "Bernie Sanders"))?.Id ?? string.Empty,
+                        // It's OK to Be Angry About Capitalism
+                        BookId = "978-0593238714",
                         Status = ShelfStatus.futureReads,
                     }
                 ]
