@@ -23,4 +23,5 @@ public sealed class AddLibraryBookBody
     public int? CurrentPage { get; init; }
     public int? PercentComplete { get; init; }
     public bool OnPedastal { get; init; }
+    public bool[]? CompletedChapters { get; init; }
 }

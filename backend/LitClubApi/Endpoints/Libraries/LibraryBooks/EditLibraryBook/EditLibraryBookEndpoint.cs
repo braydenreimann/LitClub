@@ -75,6 +75,15 @@ public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
         {
             libraryBook.OnPedastal = b.OnPedastal.Value;
         }
+        if (b.CompletedChapters is not null)
+        {
+            libraryBook.CompletedChapters = await NormalizeCompletedChaptersAsync(
+                libraryBook.CompletedChapters,
+                b.CompletedChapters,
+                libraryBook.BookId,
+                cosmosContext,
+                cancellationToken);
+        }
 
         await SeedLitClubChapterThreadsIfNeeded(
             cosmosContext,
@@ -184,5 +193,40 @@ public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
                 new PartitionKey(thread.Id),
                 cancellationToken: cancellationToken);
         }
+    }
+
+    private static async Task<bool[]> NormalizeCompletedChaptersAsync(
+        bool[] current,
+        bool[] incoming,
+        string bookId,
+        ICosmosContext cosmosContext,
+        CancellationToken cancellationToken)
+    {
+        int totalChapters = 0;
+        try
+        {
+            var bookResp = await cosmosContext.Books.ReadItemAsync<Book>(
+                id: bookId,
+                partitionKey: new Microsoft.Azure.Cosmos.PartitionKey(bookId),
+                cancellationToken: cancellationToken);
+            totalChapters = Math.Max(0, bookResp.Resource.TotalChapters);
+        }
+        catch
+        {
+            totalChapters = Math.Max(current?.Length ?? 0, incoming.Length);
+        }
+
+        if (totalChapters <= 0)
+        {
+            return incoming ?? Array.Empty<bool>();
+        }
+
+        var normalized = new bool[totalChapters];
+        var source = incoming ?? Array.Empty<bool>();
+        for (int i = 0; i < normalized.Length && i < source.Length; i++)
+        {
+            normalized[i] = source[i];
+        }
+        return normalized;
     }
 }

@@ -13,5 +13,6 @@ export function toDomainLibraryBook(dto: LibraryBookResponse): LibraryBook {
         currentPage: dto.currentPage!,
         percentComplete: dto.percentComplete!,
         onPedastal: dto.onPedastal!,
+        completedChapters: dto.completedChapters ?? [],
     };
 }

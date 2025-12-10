@@ -12,5 +12,6 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks
         public int? CurrentPage { get; init; }
         public int? PercentComplete { get; init; }
         public bool OnPedastal { get; init; }
+        public bool[] CompletedChapters { get; set; } = [];
     }
 }

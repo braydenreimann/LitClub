@@ -1,4 +1,5 @@
-﻿using LitClubApi.Domain;
+﻿using System;
+using LitClubApi.Domain;
 
 namespace LitClubApi.Endpoints.Libraries.LibraryBooks
 {
@@ -13,7 +14,8 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks
             FinishedReading = librarybook.FinishedReading,
             CurrentPage = librarybook.CurrentPage,
             PercentComplete = librarybook.PercentComplete,
-            OnPedastal = librarybook.OnPedastal
+            OnPedastal = librarybook.OnPedastal,
+            CompletedChapters = librarybook.CompletedChapters ?? Array.Empty<bool>()
         };
     }
 }

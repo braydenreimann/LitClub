@@ -1,6 +1,6 @@
 /* begin BookTableOfContentsTabs.tsx */
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -8,7 +8,6 @@ import {
     StyleSheet,
     ActivityIndicator,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import {
     ChevronDown,
@@ -21,7 +20,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { colors, fonts } from "../theme";
 import { globalStyles } from "@/styles/globalStyles";
-import { Book, LitClub, User } from "@/domain/models";
+import { Book, LitClub, User, LibraryBook } from "@/domain/models";
 import {
     getThreadsForChapter,
     type ThreadSummary,
@@ -32,6 +31,7 @@ import {
     getLibraryBookForBook,
     removeBookFromLibrary,
     setBookShelfStatus,
+    updateCompletedChapters,
 } from "@/api/services/librariesService";
 import { ShelfStatus } from "@/domain/shelfStatus";
 
@@ -181,6 +181,7 @@ function BookTableOfContentsTabs({
         x: 0,
     });
     const [statusByOwner, setStatusByOwner] = useState<Record<string, ShelfStatus | null>>({});
+    const [libraryBooksByOwner, setLibraryBooksByOwner] = useState<Record<string, LibraryBook | null>>({});
 
     const [checkedChapters, setCheckedChapters] =
         useState<CheckedChaptersState>({});
@@ -206,18 +207,7 @@ function BookTableOfContentsTabs({
 
     const totalChapters = book?.totalChapters ?? 0;
 
-    // Persist chapter completion per-context (library vs specific LitClub)
-    const chapterStorageKey = useMemo(() => {
-        if (!bookId) return null;
-        if (activeTab === "litclub") {
-            const clubKey = selectedLitClubId ?? litClubId ?? null;
-            if (!clubKey) return null;
-            return `book-${bookId}-owner-${clubKey}-chapters`;
-        }
-        const userKey = user?.id ?? null;
-        if (!userKey) return null;
-        return `book-${bookId}-owner-${userKey}-chapters`;
-    }, [activeTab, bookId, litClubId, selectedLitClubId, user?.id]);
+    // Chapter completion is persisted via backend per owner/club.
 
     // Load user from session
     useEffect(() => {
@@ -298,45 +288,7 @@ function BookTableOfContentsTabs({
         };
     }, [user?.id]);
 
-    // Load checkbox state from storage (per-context)
-    useEffect(() => {
-        const loadChecked = async () => {
-            if (!chapterStorageKey) {
-                setCheckedChapters({});
-                return;
-            }
-            try {
-                const saved = await AsyncStorage.getItem(chapterStorageKey);
-                if (saved) {
-                    const parsed = JSON.parse(saved) as CheckedChaptersState;
-                    setCheckedChapters(parsed);
-                } else {
-                    setCheckedChapters({});
-                }
-            } catch (e) {
-                console.warn("Failed to load checked chapters", e);
-                setCheckedChapters({});
-            }
-        };
-        loadChecked();
-    }, [chapterStorageKey]);
-
-    // Save checkbox state (per-context)
-    useEffect(() => {
-        const saveChecked = async () => {
-            if (!chapterStorageKey) return;
-            try {
-                await AsyncStorage.setItem(
-                    chapterStorageKey,
-                    JSON.stringify(checkedChapters)
-                );
-            } catch (e) {
-                console.warn("Failed to save checked chapters", e);
-            }
-        };
-
-        saveChecked();
-    }, [chapterStorageKey, checkedChapters]);
+    // Chapter completion is persisted via backend per owner/club.
 
     const toggleChapterCheckbox = (chapterNumber: number) => {
         if (!canEditChapters) return;
@@ -354,6 +306,11 @@ function BookTableOfContentsTabs({
                 for (let i = 1; i <= chapterNumber; i++) {
                     next[i] = true;
                 }
+            }
+
+            const ownerId = ownerForStatus;
+            if (ownerId) {
+                void persistCompletedChapters(ownerId, next);
             }
 
             return next;
@@ -506,6 +463,36 @@ function BookTableOfContentsTabs({
         router.push(`/threads/${thread.id}`);
     };
 
+    const persistCompletedChapters = async (
+        ownerId: string,
+        chapters: CheckedChaptersState
+    ) => {
+        // Normalize to array length = totalChapters
+        const normalized: boolean[] = Array.from(
+            { length: totalChapters },
+            (_, idx) => !!chapters[idx + 1]
+        );
+
+        let libBook = libraryBooksByOwner[ownerId];
+        if (!libBook) {
+            const fetched = await getLibraryBookForBook(ownerId, bookId);
+            if (fetched) {
+                setLibraryBooksByOwner((prev) => ({ ...prev, [ownerId]: fetched }));
+                libBook = fetched;
+            }
+        }
+        if (!libBook?.id) return;
+
+        const updated = await updateCompletedChapters(
+            ownerId,
+            libBook.id,
+            normalized
+        );
+        if (updated) {
+            setLibraryBooksByOwner((prev) => ({ ...prev, [ownerId]: updated }));
+        }
+    };
+
     const effectiveLitClubId = selectedLitClubId ?? litClubId ?? null;
     const selectedClub =
         availableLitClubs.find((club) => club.id === effectiveLitClubId) ?? null;
@@ -565,6 +552,16 @@ function BookTableOfContentsTabs({
                     ...prev,
                     [ownerForStatus]: (existing?.status ?? null) as ShelfStatus | null,
                 }));
+                setLibraryBooksByOwner((prev) => ({ ...prev, [ownerForStatus]: existing }));
+                if (ownerForStatus === (activeTab === "litclub" ? effectiveLitClubId : user?.id)) {
+                    const completed = existing?.completedChapters ?? [];
+                    // map to 1-based keyed object
+                    const mapped: CheckedChaptersState = {};
+                    for (let i = 0; i < completed.length; i++) {
+                        mapped[i + 1] = !!completed[i];
+                    }
+                    setCheckedChapters(mapped);
+                }
             } catch (err) {
                 if (!alive) return;
                 console.error("Error loading shelf status:", err);
