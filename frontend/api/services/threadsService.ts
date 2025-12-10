@@ -36,6 +36,8 @@ export async function createThread(params: {
             body,
             bookId: bookId ?? null,
             litClubId: litClubId ?? null,
+            // Backend treats AfterChapter as the canonical per-chapter anchor
+            // (and matches on either AfterChapter OR ChapterNumber).
             afterChapter,
             chapterNumber: chapterNumber ?? null,
         },
@@ -70,12 +72,19 @@ export type ThreadSummary = {
 /**
  * Fetch threads for a given book + chapter.
  *
- * - For "My Library", call with bookId + afterChapter and NO litClubId.
- * - For "My LitClub", call with bookId + afterChapter + litClubId.
+ * Backend behavior:
+ * - Filters by BookId when present.
+ * - If `afterChapter` is passed, it matches:
+ *     (c.AfterChapter = @afterChapter OR c.ChapterNumber = @afterChapter)
+ * - If `litClubId` is passed, it scopes to that LitClub's threads only.
+ *
+ * Usage:
+ * - For "My Library": call with bookId + afterChapter and NO litClubId to get global threads.
+ * - For "My LitClub": call with bookId + afterChapter + litClubId to get LitClub-specific threads.
  */
 export async function getThreadsForChapter(params: {
     bookId: string;
-    afterChapter: number;   // still called this for now to avoid touching all callers
+    afterChapter: number;   // canonical chapter anchor
     litClubId?: string | null;
 }): Promise<ThreadSummary[]> {
     const { bookId, afterChapter, litClubId } = params;
@@ -84,11 +93,10 @@ export async function getThreadsForChapter(params: {
         throw new Error("bookId is required to load chapter threads.");
     }
 
-    // NOTE: we now query by chapterNumber (the canonical chapter-thread anchor),
-    // but keep afterChapter for compatibility with older API behavior.
+    // The API only understands `afterChapter`; it internally matches on
+    // (AfterChapter OR ChapterNumber). No need to send chapterNumber here.
     const query: Record<string, any> = {
         bookId,
-        chapterNumber: afterChapter,
         afterChapter,
     };
 
