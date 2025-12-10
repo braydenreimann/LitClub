@@ -38,22 +38,20 @@ public static class SeedThreads
             var existingCount = book.ChapterThreadIds.Count;
             var startChapter = existingCount + 1;
 
-            //Console.WriteLine($"SeedThreads: Seeding chapter threads for '{book.Title}' ({book.Id}) starting at chapter {startChapter} of {book.TotalChapters}.");
-
             for (int chapterNumber = startChapter; chapterNumber <= book.TotalChapters; chapterNumber++)
             {
                 // "System" author for seeded threads (adjust to your real Author model as needed)
                 var systemAuthor = new Author
                 {
-                    AuthorId = "system",
-                    Username = "system"
+                    AuthorId = "admin",
+                    Username = "LitClub Team"
                 };
 
                 var thread = new LitClubApi.Domain.Thread
                 {
                     Author = systemAuthor,
-                    Title = $"{book.Title} – Chapter {chapterNumber}",
-                    Body = $"Discussion thread for **{book.Title}**, Chapter {chapterNumber}.",
+                    Title = $"Chapter {chapterNumber} Discussion",
+                    Body = $"Share your thoughts, reactions, and questions about Chapter {chapterNumber} of {book.Title} here.",
                     BookId = book.Id,
                     ChapterNumber = chapterNumber,
                     LitClubId = null
@@ -63,14 +61,11 @@ public static class SeedThreads
                 var threadId = response.Resource.Id;
 
                 book.ChapterThreadIds.Add(threadId);
-
-                //Console.WriteLine($"SeedThreads: Created thread '{thread.Title}' with Id={threadId} for chapter {chapterNumber}.");
             }
 
             // Persist the updated book (including ChapterThreadIds) back to Cosmos
             await booksContainer.UpsertItemAsync(book, new PartitionKey(book.Id));
 
-            //Console.WriteLine($"SeedThreads: Updated Book '{book.Title}' ({book.Id}) with {book.ChapterThreadIds.Count} chapter thread IDs.");
         }
 
         Console.WriteLine("SeedThreads: Completed seeding chapter threads for all books.");
