@@ -39,8 +39,12 @@ export default function RootLayout() {
 
             <Stack.Screen
               name="createLitClub"
-              options={{ title: 'Create Club' }}
+              options={{ title: '', 
+                headerLeft: () => <HeaderBackButton />,
+                headerBackVisible: false, 
+              }}
             />
+
 
             <Stack.Screen
               name="books/[bookId]"
