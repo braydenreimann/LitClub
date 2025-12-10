@@ -1,24 +1,23 @@
 import { Image } from 'expo-image';
-import { StyleSheet, View } from 'react-native';
-
+import { StyleSheet, View, Pressable } from 'react-native';
 import { Link } from 'expo-router';
-//import SearchBar from '@/components/temp/SearchBar';
 import SearchBar from '@/components/SearchBar';
 
 export default function Header() {
   return (
-    // Sample data to display in the FlatList - Sourced from GeeksforGeeks
     <View style={styles.header}>
-      <Link href="/bookrecs">
-        <Image
-          source={require('@/assets/images/small logo.png')}
-          style={styles.headerImage}
-          contentFit="contain"
-        />
+      <Link href="/bookrecs" asChild>
+        <Pressable>
+          <Image
+            source={require('@/assets/images/small logo.png')}
+            style={styles.headerImage}
+            contentFit="contain"
+          />
+        </Pressable>
       </Link>
 
-      <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 20 }}>
-        <SearchBar />
+      <View style={styles.searchWrapper}>
+        <SearchBar maxWidth={220} />
       </View>
     </View>
   );
@@ -39,9 +38,13 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     height: 150,
     flexDirection: 'row',
+    zIndex: 10,
+    elevation: 6,
+    position: 'relative',
   },
-  searchBar: {
-    marginTop: 10,
-
-  }
+  searchWrapper: {
+    flex: 1,
+    alignItems: 'flex-end',
+    paddingRight: 20,
+  },
 });
