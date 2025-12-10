@@ -28,9 +28,9 @@ export default function AllLitClubs() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("Fetching clubs...");
+      //console.log("Fetching clubs...");
       fetchLitClubs().then(() => {
-        console.log("Clubs after fetch:", litClubs.length);
+        //console.log("Clubs after fetch:", litClubs.length);
       });
     }, [])
   )

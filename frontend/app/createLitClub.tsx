@@ -163,7 +163,7 @@ export default function CreateLitClub() {
 
             // Update local context with newly created domain LitClub
             //addLitClub(createdClub);
-            console.log("Created club returned:", createdClub);
+            //console.log("Created club returned:", createdClub);
 
             // TODO: After this, you may want to:
             // - Create LibraryBooks for each selected book ID
@@ -181,7 +181,7 @@ export default function CreateLitClub() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
-            <View style={{ flexDirection: 'row', paddingTop: 90, margin: 10 }}>
+            <View style={{ flexDirection: 'row', paddingTop: 20, margin: 10 }}>
                 <BackButton />
                 <Text style={[globalStyles.heading, { paddingTop: 7, paddingBottom: 10, fontSize: 20 }]}>
                     Create a New LitClub
@@ -270,7 +270,7 @@ export default function CreateLitClub() {
                     </Text>
                 </Pressable> */}
 
-                <Text
+                {/*<Text
                     style={[
                         globalStyles.subheading,
                         {
@@ -281,9 +281,19 @@ export default function CreateLitClub() {
                         },
                     ]}
                 >
-                    _____________________________________
-                </Text>
+                        _____________________________________
+                </Text*/}
 
+                <View
+                    style={{
+                        width: '100%',
+                        height: 1,
+                        backgroundColor: colors.darkest,
+                        marginTop: 50,
+                        marginBottom: 30,
+                    }}
+                />
+                
                 {/* Privacy toggle */}
                 <Pressable
                     style={[
