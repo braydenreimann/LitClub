@@ -8,7 +8,6 @@ import {
     StyleSheet,
     ActivityIndicator,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import {
     ChevronDown,
@@ -21,7 +20,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { colors, fonts } from "../theme";
 import { globalStyles } from "@/styles/globalStyles";
-import { Book, LitClub, User } from "@/domain/models";
+import { Book, LitClub, User, LibraryBook } from "@/domain/models";
 import {
     getThreadsForChapter,
     type ThreadSummary,
@@ -32,6 +31,7 @@ import {
     getLibraryBookForBook,
     removeBookFromLibrary,
     setBookShelfStatus,
+    updateCompletedChapters,
 } from "@/api/services/librariesService";
 import { ShelfStatus } from "@/domain/shelfStatus";
 
@@ -114,18 +114,32 @@ type ChapterThreadsErrorMap = {
 const CustomCheckbox = ({
     value,
     onChange,
+    disabled = false,
 }: {
     value: boolean;
     onChange: () => void;
-}) => (
-    <Pressable onPress={onChange} style={styles.checkboxPressable}>
-        <Ionicons
-            name={value ? "checkbox" : "square-outline"}
-            size={24}
-            color={value ? colors.midBlue : colors.darkest}
-        />
-    </Pressable>
-);
+    disabled?: boolean;
+}) => {
+    const tint = disabled
+        ? "rgba(33, 31, 62, 0.45)" // muted dark
+        : value
+            ? colors.midBlue
+            : colors.darkest;
+
+    return (
+        <Pressable
+            onPress={disabled ? undefined : onChange}
+            style={styles.checkboxPressable}
+            disabled={disabled}
+        >
+            <Ionicons
+                name={value ? "checkbox" : "square-outline"}
+                size={24}
+                color={tint}
+            />
+        </Pressable>
+    );
+};
 
 function BookTableOfContentsTabs({
     bookId,
@@ -167,6 +181,7 @@ function BookTableOfContentsTabs({
         x: 0,
     });
     const [statusByOwner, setStatusByOwner] = useState<Record<string, ShelfStatus | null>>({});
+    const [libraryBooksByOwner, setLibraryBooksByOwner] = useState<Record<string, LibraryBook | null>>({});
 
     const [checkedChapters, setCheckedChapters] =
         useState<CheckedChaptersState>({});
@@ -192,8 +207,7 @@ function BookTableOfContentsTabs({
 
     const totalChapters = book?.totalChapters ?? 0;
 
-    // For now, both tabs share the same checkbox state.
-    const storageKey = `book-${bookId}-checkedChapters`;
+    // Chapter completion is persisted via backend per owner/club.
 
     // Load user from session
     useEffect(() => {
@@ -274,40 +288,10 @@ function BookTableOfContentsTabs({
         };
     }, [user?.id]);
 
-    // Load checkbox state from storage
-    useEffect(() => {
-        const loadChecked = async () => {
-            try {
-                const saved = await AsyncStorage.getItem(storageKey);
-                if (saved) {
-                    const parsed = JSON.parse(saved) as CheckedChaptersState;
-                    setCheckedChapters(parsed);
-                }
-            } catch (e) {
-                console.warn("Failed to load checked chapters", e);
-            }
-        };
-        if (bookId) {
-            loadChecked();
-        }
-    }, [bookId, storageKey]);
-
-    // Save checkbox state
-    useEffect(() => {
-        const saveChecked = async () => {
-            try {
-                await AsyncStorage.setItem(storageKey, JSON.stringify(checkedChapters));
-            } catch (e) {
-                console.warn("Failed to save checked chapters", e);
-            }
-        };
-
-        if (bookId) {
-            saveChecked();
-        }
-    }, [bookId, storageKey, checkedChapters]);
+    // Chapter completion is persisted via backend per owner/club.
 
     const toggleChapterCheckbox = (chapterNumber: number) => {
+        if (!canEditChapters) return;
         setCheckedChapters((prev) => {
             const next: CheckedChaptersState = { ...prev };
             const currentlyChecked = !!prev[chapterNumber];
@@ -322,6 +306,11 @@ function BookTableOfContentsTabs({
                 for (let i = 1; i <= chapterNumber; i++) {
                     next[i] = true;
                 }
+            }
+
+            const ownerId = ownerForStatus;
+            if (ownerId) {
+                void persistCompletedChapters(ownerId, next);
             }
 
             return next;
@@ -474,6 +463,36 @@ function BookTableOfContentsTabs({
         router.push(`/threads/${thread.id}`);
     };
 
+    const persistCompletedChapters = async (
+        ownerId: string,
+        chapters: CheckedChaptersState
+    ) => {
+        // Normalize to array length = totalChapters
+        const normalized: boolean[] = Array.from(
+            { length: totalChapters },
+            (_, idx) => !!chapters[idx + 1]
+        );
+
+        let libBook = libraryBooksByOwner[ownerId];
+        if (!libBook) {
+            const fetched = await getLibraryBookForBook(ownerId, bookId);
+            if (fetched) {
+                setLibraryBooksByOwner((prev) => ({ ...prev, [ownerId]: fetched }));
+                libBook = fetched;
+            }
+        }
+        if (!libBook?.id) return;
+
+        const updated = await updateCompletedChapters(
+            ownerId,
+            libBook.id,
+            normalized
+        );
+        if (updated) {
+            setLibraryBooksByOwner((prev) => ({ ...prev, [ownerId]: updated }));
+        }
+    };
+
     const effectiveLitClubId = selectedLitClubId ?? litClubId ?? null;
     const selectedClub =
         availableLitClubs.find((club) => club.id === effectiveLitClubId) ?? null;
@@ -487,6 +506,8 @@ function BookTableOfContentsTabs({
         activeTab === "library"
             ? !!user
             : !!effectiveLitClubId && isSelectedClubOwner;
+    const canEditChapters =
+        activeTab === "litclub" ? !!isSelectedClubOwner : true;
     const currentStatus =
         ownerForStatus && ownerForStatus in statusByOwner
             ? statusByOwner[ownerForStatus] ?? null
@@ -531,6 +552,16 @@ function BookTableOfContentsTabs({
                     ...prev,
                     [ownerForStatus]: (existing?.status ?? null) as ShelfStatus | null,
                 }));
+                setLibraryBooksByOwner((prev) => ({ ...prev, [ownerForStatus]: existing }));
+                if (ownerForStatus === (activeTab === "litclub" ? effectiveLitClubId : user?.id)) {
+                    const completed = existing?.completedChapters ?? [];
+                    // map to 1-based keyed object
+                    const mapped: CheckedChaptersState = {};
+                    for (let i = 0; i < completed.length; i++) {
+                        mapped[i + 1] = !!completed[i];
+                    }
+                    setCheckedChapters(mapped);
+                }
             } catch (err) {
                 if (!alive) return;
                 console.error("Error loading shelf status:", err);
@@ -932,6 +963,10 @@ function BookTableOfContentsTabs({
                                                                     toggleChapterCheckbox(
                                                                         chapterNumber
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    activeTab === "litclub" &&
+                                                                    !canEditChapters
                                                                 }
                                                             />
                                                         </View>

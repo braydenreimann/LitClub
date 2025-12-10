@@ -57,6 +57,7 @@ export type LibraryBook = {
     currentPage: number;
     percentComplete: number;
     onPedastal: boolean;
+    completedChapters: boolean[];
 }
 
 export type DisplayBook = {

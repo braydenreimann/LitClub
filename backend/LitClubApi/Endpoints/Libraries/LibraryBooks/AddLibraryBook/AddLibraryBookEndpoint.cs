@@ -41,6 +41,31 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
         }
 
         var b = request.Body;
+        bool[] NormalizeCompletedChapters(bool[]? source, int totalChapters)
+        {
+            if (totalChapters <= 0) return source ?? Array.Empty<bool>();
+            var normalized = new bool[totalChapters];
+            if (source is null) return normalized;
+            for (int i = 0; i < normalized.Length && i < source.Length; i++)
+            {
+                normalized[i] = source[i];
+            }
+            return normalized;
+        }
+
+        int totalChapters = 0;
+        try
+        {
+            var bookResp = await cosmosContext.Books.ReadItemAsync<Book>(
+                id: b.BookId,
+                partitionKey: new PartitionKey(b.BookId),
+                cancellationToken: cancellationToken);
+            totalChapters = Math.Max(0, bookResp.Resource.TotalChapters);
+        }
+        catch (CosmosException)
+        {
+            totalChapters = 0;
+        }
 
         LibraryBook newLibraryBook = new()
         {
@@ -50,7 +75,8 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
             FinishedReading = b.FinishedReading,
             CurrentPage = b.CurrentPage,
             PercentComplete = b.PercentComplete,
-            OnPedastal = b.OnPedastal
+            OnPedastal = b.OnPedastal,
+            CompletedChapters = NormalizeCompletedChapters(b.CompletedChapters, totalChapters)
         };
 
         library.LibraryBooks.Add(newLibraryBook);

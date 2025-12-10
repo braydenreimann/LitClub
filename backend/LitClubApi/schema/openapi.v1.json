@@ -1625,6 +1625,76 @@
         }
       }
     },
+    "/libraries/{ownerId}/libraryBooks/{libraryBookId}/completedChapters": {
+      "patch": {
+        "tags": [
+          "EditCompletedChapters"
+        ],
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "libraryBookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCompletedChaptersBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryBook"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/libraries/{ownerId}": {
       "get": {
         "tags": [
@@ -2288,6 +2358,13 @@
           },
           "onPedastal": {
             "type": "boolean"
+          },
+          "completedChapters": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2684,6 +2761,21 @@
         },
         "additionalProperties": false
       },
+      "EditCompletedChaptersBody": {
+        "required": [
+          "completedChapters"
+        ],
+        "type": "object",
+        "properties": {
+          "completedChapters": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "EditEditionBody": {
         "type": "object",
         "properties": {
@@ -2742,6 +2834,13 @@
           },
           "onPedastal": {
             "type": "boolean",
+            "nullable": true
+          },
+          "completedChapters": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            },
             "nullable": true
           }
         },
@@ -2962,6 +3061,57 @@
         },
         "additionalProperties": false
       },
+      "LibraryBook": {
+        "required": [
+          "bookId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "bookId": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/ShelfStatus"
+          },
+          "startedReading": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "finishedReading": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "percentComplete": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "onPedastal": {
+            "type": "boolean"
+          },
+          "completedChapters": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LibraryBookResponse": {
         "required": [
           "bookId",
@@ -3003,6 +3153,13 @@
           },
           "onPedastal": {
             "type": "boolean"
+          },
+          "completedChapters": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
