@@ -1,25 +1,28 @@
-// code borrowed from https://plainenglish.io/blog/how-to-implement-a-search-bar-in-react-js
+// components/SearchBar.tsx
 
-import React, { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, FlatList, Text, Pressable } from 'react-native';
-import { useRouter } from 'expo-router'
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, FlatList, Text, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import { searchBooks, searchUsers } from '@/services/searchservice';
 import { Book, User } from '@/domain/models';
 import { pushBookDetail, pushUserDetail } from '@/navigation/routes';
+import { colors } from '@/theme';
+import SearchField from './SearchField';
 
 interface SearchBarProps {
-    onBookPress: (id: string) => void;
-    onUserPress: (id: string) => void;
+    onBookPress?: (id: string) => void;
+    onUserPress?: (id: string) => void;
+    maxWidth?: number;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
-    const [searchInput, setSearchInput] = useState("");
+const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress, maxWidth }) => {
+    const [searchInput, setSearchInput] = useState('');
     const [isFocused, setIsFocused] = useState(false);
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = useState('');
     const [bookResults, setBookResults] = useState<Book[]>([]);
     const [userResults, setUserResults] = useState<User[]>([]);
     const router = useRouter();
+    const blurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         if (!query.trim()) {
@@ -29,7 +32,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
         }
 
         const timeout = setTimeout(async () => {
-            const [books, users] = await Promise.all([ searchBooks(query), searchUsers(query)]);
+            const [books, users] = await Promise.all([
+                searchBooks(query),
+                searchUsers(query),
+            ]);
             setBookResults(books ?? []);
             setUserResults(users ?? []);
         }, 300);
@@ -41,32 +47,60 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
         setIsFocused(false);
         setSearchInput('');
         setQuery('');
-        onBookPress ? onBookPress(bookId) : pushBookDetail(router, bookId);
+        if (onBookPress) {
+            onBookPress(bookId);
+        } else {
+            pushBookDetail(router, bookId);
+        }
     };
 
     const handleUserPress = (userId: string) => {
         setIsFocused(false);
         setSearchInput('');
         setQuery('');
-        onUserPress ? onUserPress(userId) : pushUserDetail(router, userId);
+        if (onUserPress) {
+            onUserPress(userId);
+        } else {
+            pushUserDetail(router, userId);
+        }
     };
 
+    useEffect(() => {
+        return () => {
+            if (blurTimeout.current) clearTimeout(blurTimeout.current);
+        };
+    }, []);
+
+    const hasResults = bookResults.length > 0 || userResults.length > 0;
+    const showDropdown = isFocused && hasResults;
+
+    const resolvedMaxWidth = maxWidth ?? 320;
+    const containerSizing = maxWidth
+        ? { width: resolvedMaxWidth, maxWidth: resolvedMaxWidth }
+        : { width: '100%', maxWidth: resolvedMaxWidth };
+
     return (
-        <View style={styles.container}>
-            <TextInput
-                style={styles.searchBar}
-                placeholder="Search"
-                placeholderTextColor="#224B6F"
+        <View style={[styles.container, containerSizing]}>
+            <SearchField
+                placeholder="Search books or users"
                 value={searchInput}
                 onChangeText={(text) => {
                     setSearchInput(text);
                     setQuery(text);
+                    setIsFocused(true);
                 }}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                onFocus={() => {
+                    if (blurTimeout.current) clearTimeout(blurTimeout.current);
+                    setIsFocused(true);
+                }}
+                onBlur={() => {
+                    blurTimeout.current = setTimeout(() => setIsFocused(false), 120);
+                }}
+                returnKeyType="search"
+                containerStyle={styles.inputRow}
             />
 
-            {isFocused && (
+            {showDropdown && (
                 <View style={styles.dropdownContainer}>
                     {bookResults.length > 0 && (
                         <View style={styles.dropdown}>
@@ -78,7 +112,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
                                 style={styles.list}
                                 renderItem={({ item }) => (
                                     <Pressable
-                                        style={styles.item}
+                                        style={({ pressed }) => [
+                                            styles.item,
+                                            pressed && styles.itemPressed,
+                                        ]}
                                         onPress={() => handleBookPress(item.id)}
                                     >
                                         <Text style={styles.title} numberOfLines={1}>
@@ -100,11 +137,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
                                 style={styles.list}
                                 renderItem={({ item }) => (
                                     <Pressable
-                                        style={styles.item}
+                                        style={({ pressed }) => [
+                                            styles.item,
+                                            pressed && styles.itemPressed,
+                                        ]}
                                         onPress={() => handleUserPress(item.id)}
                                     >
                                         <Text style={styles.title} numberOfLines={1}>
-                                            {item.firstName + " " + item.lastName}
+                                            {item.firstName} {item.lastName}
                                         </Text>
                                     </Pressable>
                                 )}
@@ -119,50 +159,56 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        paddingLeft: 20,
-        marginTop: 20,
+        position: 'relative',
     },
-    searchBar: {
-        borderRadius: 10,
-        borderColor: '#212f3e',
-        borderWidth: 3,
-        paddingHorizontal: 10,
-        height: 38,
-        fontSize: 16,
-        width: 180,
+    inputRow: {
+        width: '100%',
     },
     dropdownContainer: {
-        marginTop: 4,
-        width: 180,
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        marginTop: 8,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        borderColor: '#d9d4cc',
+        borderWidth: StyleSheet.hairlineWidth,
+        shadowColor: colors.nextDarkest,
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
+        elevation: 4,
+        zIndex: 50,
+        overflow: 'hidden',
     },
     dropdown: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        maxHeight: 150,
-        marginBottom: 4,
+        maxHeight: 160,
+        paddingBottom: 8,
         zIndex: 100,
     },
     header: {
-        fontWeight: 'bold',
-        padding: 6,
+        fontWeight: '700',
+        paddingHorizontal: 12,
+        paddingTop: 10,
+        paddingBottom: 6,
         fontSize: 14,
-        backgroundColor: '#f0f0f0',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
+        color: colors.nextDarkest,
+        backgroundColor: colors.cream,
     },
     list: {
-        maxHeight: 120, // scrollable height
+        maxHeight: 124,
     },
     item: {
-        paddingVertical: 6,
-        paddingHorizontal: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
     },
     title: {
         fontSize: 16,
-        color: '#333',
+        color: colors.nextDarkest,
+    },
+    itemPressed: {
+        backgroundColor: '#f4efe8',
     },
 });
 

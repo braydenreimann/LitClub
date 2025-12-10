@@ -1,3 +1,5 @@
+// navigation/stackOptions.tsx
+
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';
 

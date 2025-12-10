@@ -1,3 +1,5 @@
+/* app/books/[bookId].tsx */
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSession } from '@/context/AuthContext' // or wherever your auth is
 import { Pressable, ActivityIndicator } from 'react-native';
@@ -59,7 +61,7 @@ export default function BookInfoScreen() {
         loadSession(); // call the async function
     }, []);
 
-    
+
 
     // Fetch book data
     useEffect(() => {
@@ -133,14 +135,14 @@ export default function BookInfoScreen() {
             if (alive) setCoverUri(uri || '');
         })();
 
-    return () => {
-        alive = false;
-    };
-}, [book?.coverImageUrl]);
+        return () => {
+            alive = false;
+        };
+    }, [book?.coverImageUrl]);
 
-return (
-    <View style={{ flex: 1, backgroundColor: colors.cream }}>
-        <ScrollView>
+    return (
+        <View style={{ flex: 1, backgroundColor: colors.cream }}>
+            <ScrollView>
 
                 {loading ? (
                     <ActivityIndicator size="large" color={colors.midBlue} />

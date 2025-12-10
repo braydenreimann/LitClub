@@ -1,3 +1,5 @@
+/* navigation/routes.ts */
+
 import { Router } from 'expo-router';
 
 type BookHref = {
@@ -36,24 +38,24 @@ export const pushBookDetail = (
 };
 
 type UserHref = {
-    pathname: '/users/[userId]';
-    params: {
-        userId: string;
-    };
+  pathname: '/users/[userId]';
+  params: {
+    userId: string;
+  };
 };
 
 export const userDetailHref = (
-    userId: string,
+  userId: string,
 ): UserHref => ({
-    pathname: '/users/[userId]',
-    params: {
-        userId
-    },
+  pathname: '/users/[userId]',
+  params: {
+    userId
+  },
 });
 
 export const pushUserDetail = (
-    router: Router,
-    userId: string,
+  router: Router,
+  userId: string,
 ) => {
-    router.push(userDetailHref(userId));
+  router.push(userDetailHref(userId));
 };

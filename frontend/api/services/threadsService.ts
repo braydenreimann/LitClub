@@ -75,7 +75,7 @@ export type ThreadSummary = {
  */
 export async function getThreadsForChapter(params: {
     bookId: string;
-    afterChapter: number;
+    afterChapter: number;   // still called this for now to avoid touching all callers
     litClubId?: string | null;
 }): Promise<ThreadSummary[]> {
     const { bookId, afterChapter, litClubId } = params;
@@ -84,8 +84,11 @@ export async function getThreadsForChapter(params: {
         throw new Error("bookId is required to load chapter threads.");
     }
 
+    // NOTE: we now query by chapterNumber (the canonical chapter-thread anchor),
+    // but keep afterChapter for compatibility with older API behavior.
     const query: Record<string, any> = {
         bookId,
+        chapterNumber: afterChapter,
         afterChapter,
     };
 

@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fonts } from '../../theme';
 
@@ -82,103 +83,124 @@ export default function CreateAccountScreen() {
   };
 
   return (
-    <ScrollView style={[globalStyles.container, styles.container]}>
-      <Text style={globalStyles.heading}>Complete Your Profile</Text>
+    <SafeAreaView style={[globalStyles.container, styles.screen]}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={[globalStyles.heading, styles.title]}>Create Your Profile</Text>
 
-      {/* Email (readonly) */}
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={[styles.input, styles.readonly]}
-        value={email || ''}
-        editable={false}
-      />
-
-      {/* Username */}
-      <Text style={styles.label}>Username *</Text>
-      <Text style={[styles.label, { marginTop: 0, fontSize: 12, color: colors.nextDarkest }]}>Choose wisely - this can't be changed later!</Text>
-      <TextInput
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Choose a username"
-        placeholderTextColor={colors.nextDarkest}
-      />
-
-      {/* First name */}
-      <Text style={styles.label}>First Name *</Text>
-      <TextInput
-        style={styles.input}
-        value={firstName}
-        onChangeText={setFirstName}
-        placeholder="Enter your first name"
-        placeholderTextColor={colors.nextDarkest}
-      />
-
-      {/* Last name */}
-      <Text style={styles.label}>Last Name *</Text>
-      <TextInput
-        style={styles.input}
-        value={lastName}
-        onChangeText={setLastName}
-        placeholder="Enter your last name"
-        placeholderTextColor={colors.nextDarkest}
-      />
-
-      {/* Pronouns */}
-      <Text style={styles.label}>Pronouns (select up to 4)</Text>
-      <View style={styles.pronounContainer}>
-        {pronounOptions.map((p) => {
-          const selected = selectedPronouns.includes(p);
-          return (
-            <TouchableOpacity
-              key={p}
-              onPress={() => togglePronoun(p)}
-              style={[styles.pronounButton, selected && styles.pronounSelected]}
-            >
-              <Text style={[styles.pronounText, selected && styles.pronounTextSelected]}>
-                {p}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {/* Bio */}
-      <Text style={styles.label}>Short Bio (optional, up to 500 characters)</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        value={biography}
-        onChangeText={(text) => {
-          if (text.length <= 500) setBiography(text);
-        }}
-        multiline
-        placeholder="Tell us a little about yourself..."
-        placeholderTextColor={colors.nextDarkest}
-      />
-      <Text style={styles.charCount}>{biography.length}/500</Text>
-
-      {/* Private Account */}
-      <View style={styles.switchRow}>
-        <Text style={styles.label}>Private Account</Text>
-        <Switch
-          value={privateAccount}
-          onValueChange={setPrivateAccount}
-          trackColor={{ false: colors.teal, true: colors.midBlue }}
-          thumbColor={colors.cream}
+        {/* Email (readonly) */}
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={[styles.input, styles.readonly]}
+          value={email || ''}
+          editable={false}
         />
-      </View>
 
-      {/* Save button */}
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save and Continue</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        {/* Username */}
+        <Text style={styles.label}>Username *</Text>
+        <Text
+          style={[
+            styles.label,
+            { marginTop: 0, fontSize: 12, color: colors.nextDarkest },
+          ]}
+        >
+          Choose wisely - this can't be changed later!
+        </Text>
+        <TextInput
+          style={styles.input}
+          value={username}
+          onChangeText={setUsername}
+          placeholder="Choose a username"
+          placeholderTextColor={colors.nextDarkest}
+        />
+
+        {/* First name */}
+        <Text style={styles.label}>First Name *</Text>
+        <TextInput
+          style={styles.input}
+          value={firstName}
+          onChangeText={setFirstName}
+          placeholder="Enter your first name"
+          placeholderTextColor={colors.nextDarkest}
+        />
+
+        {/* Last name */}
+        <Text style={styles.label}>Last Name *</Text>
+        <TextInput
+          style={styles.input}
+          value={lastName}
+          onChangeText={setLastName}
+          placeholder="Enter your last name"
+          placeholderTextColor={colors.nextDarkest}
+        />
+
+        {/* Pronouns */}
+        <Text style={styles.label}>Pronouns (select up to 4)</Text>
+        <View style={styles.pronounContainer}>
+          {pronounOptions.map((p) => {
+            const selected = selectedPronouns.includes(p);
+            return (
+              <TouchableOpacity
+                key={p}
+                onPress={() => togglePronoun(p)}
+                style={[styles.pronounButton, selected && styles.pronounSelected]}
+              >
+                <Text style={[styles.pronounText, selected && styles.pronounTextSelected]}>
+                  {p}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Bio */}
+        <Text style={styles.label}>Short Bio (optional, up to 500 characters)</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={biography}
+          onChangeText={(text) => {
+            if (text.length <= 500) setBiography(text);
+          }}
+          multiline
+          placeholder="Tell us a little about yourself..."
+          placeholderTextColor={colors.nextDarkest}
+        />
+        <Text style={styles.charCount}>{biography.length}/500</Text>
+
+        {/* Private Account */}
+        <View style={styles.switchRow}>
+          <Text style={styles.label}>Private Account</Text>
+          <Switch
+            value={privateAccount}
+            onValueChange={setPrivateAccount}
+            trackColor={{ false: colors.teal, true: colors.midBlue }}
+            thumbColor={colors.cream}
+          />
+        </View>
+
+        {/* Save button */}
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>Save and Continue</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   container: {
-    paddingVertical: 20,
+    paddingTop: 40,    // nicely below the notch, feels airy
+    paddingBottom: 56, // keeps bio + button clear of the rounded bottom
+  },
+  title: {
+    fontSize: 28,      // premium heading size, matching Login
+    marginBottom: 4,
   },
   label: {
     fontFamily: fonts.subheading,
@@ -222,6 +244,7 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     textAlignVertical: 'top',
+    marginBottom: 8, // breathing room above the char count
   },
   charCount: {
     textAlign: 'right',
@@ -232,14 +255,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 20,
   },
   saveButton: {
     backgroundColor: colors.midBlue,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 28, // separated from the switch for a more premium feel
   },
   saveButtonText: {
     fontFamily: fonts.subheading,

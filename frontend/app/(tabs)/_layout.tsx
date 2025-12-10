@@ -1,5 +1,4 @@
-//initial set up code borrowed from expo router template
-// https://docs.expo.dev/tutorial/create-your-first-app/
+/* app/(tabs)/_layout.tsx */
 
 import { Stack, Tabs } from 'expo-router';
 import React from 'react';
