@@ -195,7 +195,6 @@ export default function LitClubScreen() {
     if (!club) {
         return <Text style={{ padding: 20 }}>Club not found.</Text>;
     }
-
     // Leave a club (for non-owners)
     async function handleLeaveClub() {
         if (!currentUserId) {
@@ -246,7 +245,7 @@ export default function LitClubScreen() {
             return;
         }
         Alert.alert(
-            'Delete Club',
+            'Delete LitClub',
             'Are you sure you want to delete this club? It will be deleted for all members.',
             [
                 { text: 'Cancel', style: 'cancel' },
@@ -295,6 +294,35 @@ export default function LitClubScreen() {
         Alert.alert(isArchived ? 'Club unarchived.' : 'Club archived.');
         router.replace('/litClubs');
     };
+
+    //cannot access club if archived
+    if (isArchived) {
+        return (
+            <View style={{  flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.cream,}}>
+                <Text style={{ fontSize: 18, marginBottom: 20 }}>
+                    This LitClub is archived.
+                </Text>
+
+                <Text style={{ fontSize: 18, marginBottom: 20 }}>
+                    You must unarchive this LitClub to view details.
+                </Text>
+
+                <Pressable
+                    onPress={handleArchiveToggle}
+                    style={[litStyles.archiveButton, { backgroundColor: colors.yellow }]}
+                >
+                    <Text style={[globalStyles.body, { color: 'black' }]}>Unarchive Club</Text>
+                </Pressable>
+
+                <Pressable
+                    onPress={() => router.back()}
+                    style={{ marginTop: 20 }}
+                >
+                    <Text style={[globalStyles.body, { textDecorationLine: 'underline' }]}>Return to LitClubs Page</Text>
+                </Pressable>
+            </View>
+        );
+    }
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: colors.cream }}>
@@ -483,7 +511,7 @@ export default function LitClubScreen() {
                         },
                     ]}
                 >
-                    {isArchived ? 'Unarchive Club' : 'Archive Club'}
+                    {'Archive Club'}
                 </Text>
             </Pressable>
 

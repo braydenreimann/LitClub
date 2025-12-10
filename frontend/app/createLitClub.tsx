@@ -117,7 +117,7 @@ export default function CreateLitClub() {
         });
     };*/
 
-    // ---- Create Lit Club (integration-strategy style) ----
+    // ---- Create LitClub (integration-strategy style) ----
     const handleCreateClub = async () => {
         // Basic validation
         const trimmedName = typeof name === 'string' ? name.trim() : String(name).trim();
@@ -162,14 +162,15 @@ export default function CreateLitClub() {
             }
 
             // Update local context with newly created domain LitClub
-            addLitClub(createdClub);
+            //addLitClub(createdClub);
+            //console.log("Created club returned:", createdClub);
 
             // TODO: After this, you may want to:
             // - Create LibraryBooks for each selected book ID
             //   using a librariesService method.
 
             //Alert.alert('Success', `${trimmedName} club created successfully!`);
-            router.push('/litClubs');
+            router.push("/litClubs");
         } catch (error: any) {
             console.error('Error creating club:', error);
             Alert.alert('Error', `Failed to create club: ${error.message ?? 'Unknown error'}`);
@@ -180,10 +181,10 @@ export default function CreateLitClub() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
-            <View style={{ flexDirection: 'row', paddingTop: 90, margin: 10 }}>
+            <View style={{ flexDirection: 'row', paddingTop: 20, margin: 10 }}>
                 <BackButton />
                 <Text style={[globalStyles.heading, { paddingTop: 7, paddingBottom: 10, fontSize: 20 }]}>
-                    Create a New Lit Club
+                    Create a New LitClub
                 </Text>
             </View>
 
@@ -269,7 +270,7 @@ export default function CreateLitClub() {
                     </Text>
                 </Pressable> */}
 
-                <Text
+                {/*<Text
                     style={[
                         globalStyles.subheading,
                         {
@@ -280,9 +281,19 @@ export default function CreateLitClub() {
                         },
                     ]}
                 >
-                    _____________________________________
-                </Text>
+                        _____________________________________
+                </Text*/}
 
+                <View
+                    style={{
+                        width: '100%',
+                        height: 1,
+                        backgroundColor: colors.darkest,
+                        marginTop: 50,
+                        marginBottom: 30,
+                    }}
+                />
+                
                 {/* Privacy toggle */}
                 <Pressable
                     style={[
@@ -310,14 +321,14 @@ export default function CreateLitClub() {
                     disabled={loading}
                 >
                     <Text style={styles.createButtonText}>
-                        {loading ? 'Creating Club...' : 'Create Lit Club'}
+                        {loading ? 'Creating Club...' : 'Create LitClub'}
                     </Text>
                 </Pressable>
             </ScrollView>
         </View>
     );
 }
-
+//
 const styles = StyleSheet.create({
     container: {
         padding: 20,

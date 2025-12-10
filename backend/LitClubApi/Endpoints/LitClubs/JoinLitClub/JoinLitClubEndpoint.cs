@@ -24,7 +24,7 @@ public class Join(ICosmosContext cosmosContext) : EndpointBaseAsync
     {
         if (string.IsNullOrWhiteSpace(request.Body.UserId))
         {
-            return BadRequest("A valid userId is required to join a lit club.");
+            return BadRequest("A valid userId is required to join a LitClub.");
         }
 
         LitClub litClub;

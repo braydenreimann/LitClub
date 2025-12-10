@@ -4,7 +4,7 @@ namespace LitClubApi.Endpoints.LitClubs.ListLitClubs;
 
 public sealed class ListLitClubsRequest
 {
-    private const int DefaultPageSize = 10;
+    private const int DefaultPageSize = 100;
     private const int MaxPageSize = 100;
 
     [FromQuery(Name = "pageSize")]

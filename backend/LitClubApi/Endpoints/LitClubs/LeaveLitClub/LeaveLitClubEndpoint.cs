@@ -24,7 +24,7 @@ public class Leave(ICosmosContext cosmosContext) : EndpointBaseAsync
     {
         if (string.IsNullOrWhiteSpace(request.Body.UserId))
         {
-            return BadRequest("A valid userId is required to leave a lit club.");
+            return BadRequest("A valid userId is required to leave a LitClub.");
         }
 
         LitClub litClub;
@@ -111,7 +111,7 @@ public class Leave(ICosmosContext cosmosContext) : EndpointBaseAsync
             }
         }
 
-        // ---- Persist lit club changes ----
+        // ---- Persist litclub changes ----
         if (litClubChanged)
         {
             try

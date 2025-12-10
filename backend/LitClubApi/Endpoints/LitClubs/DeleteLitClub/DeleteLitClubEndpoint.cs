@@ -49,7 +49,7 @@ public class Delete(ICosmosContext cosmosContext) : EndpointBaseAsync
                 partitionKey: new PartitionKey(request.LitClubId),
                 cancellationToken: cancellationToken);
 
-            // If a library exists for this lit club, delete it too
+            // If a library exists for this litclub, delete it too
             var libraryId = litClub?.LibraryId ?? request.LitClubId;
             try
             {
