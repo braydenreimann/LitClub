@@ -220,7 +220,7 @@ using (var scope = app.Services.CreateScope())
 
     Book book = new()
     {
-        Id = "99",
+        Id = "978-0142424179",
         Title = "The Fault in Our Stars",
         Author = "John Green",
         TotalChapters = 25,

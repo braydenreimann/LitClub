@@ -55,7 +55,7 @@ export default function LoginScreen() {
 
   return (
     <View style={[globalStyles.container, styles.container]}>
-      <Text style={globalStyles.heading}>Welcome Back</Text>
+      <Text style={[globalStyles.heading, styles.title]}>Welcome Back</Text>
 
       <Formik
         validationSchema={loginValidationSchema}
@@ -133,6 +133,10 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     paddingVertical: 20,
+  },
+  title: {
+    fontSize: 28,
+    marginBottom: 18,
   },
   inputContainer: {
     backgroundColor: colors.sage,

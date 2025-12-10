@@ -40,6 +40,12 @@ public static class SeedUsers
                 [
                     new LibraryBook()
                     {
+                        // The Fault in Our Stars
+                        BookId = "978-0142424179",
+                        Status = ShelfStatus.pastReads,
+                    },
+                    new LibraryBook()
+                    {
                         // Steve Jobs
                         BookId = "978-1451648539",
                         Status = ShelfStatus.pastReads,

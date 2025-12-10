@@ -1,4 +1,4 @@
-// /frontend/app/(whatever)/HomeScreen.tsx (path may differ)
+/* app/(tabs)/home.tsx */
 
 import { StyleSheet, View, ScrollView } from 'react-native';
 import React, { useState } from 'react';
