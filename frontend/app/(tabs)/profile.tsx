@@ -182,30 +182,6 @@ export default function ProfileScreen() {
     const leaderClubs = safeClubs.filter(c => c.ownerUserId === userId && !archivedClubIds.includes(c.id));
     const archivedClubs = safeClubs.filter(c => archivedClubIds.includes(c.id)); // example filter
 
-    if (loading) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Loading clubs...</Text>
-            </View>
-        );
-    }
-
-    if (error) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: 'red' }}>Error loading clubs: {error}</Text>
-            </View>
-        );
-    }
-
-    if (!litClubs.length) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>No Clubs Found.</Text>
-            </View>
-        );
-    }
-
     const renderPedestalBooks = () => {
         if (pedestalLoading) {
             return <Text>Loading pedestal books...</Text>;
