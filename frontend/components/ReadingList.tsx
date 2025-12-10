@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
     },
     scrollingWrapper: {
         flex: 1,
-        marginTop: 6,
     },
     card: {
         width: 120,
@@ -182,10 +181,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         overflow: 'hidden',
         alignItems: 'center',
-        alignContent: 'center',
         justifyContent: 'center',
-        textAlign: 'center',
-        textAlignVertical: 'center',
         shadowColor: '#000',
         shadowOpacity: 0.05,
         shadowRadius: 4,
