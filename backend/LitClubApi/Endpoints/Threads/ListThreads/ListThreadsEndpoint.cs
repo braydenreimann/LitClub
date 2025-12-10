@@ -51,7 +51,8 @@ public class List(ICosmosContext cosmosContext) : EndpointBaseAsync
 
             if (request.AfterChapter.HasValue)
             {
-                conditions.Add("c.AfterChapter = @afterChapter");
+                // Match both "after chapter" threads and "chapter threads"
+                conditions.Add("(c.AfterChapter = @afterChapter OR c.ChapterNumber = @afterChapter)");
                 parameters["@afterChapter"] = request.AfterChapter.Value;
             }
 
