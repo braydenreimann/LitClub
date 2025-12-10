@@ -142,7 +142,7 @@ export default function BookInfoScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
-            <ScrollView>
+            <ScrollView contentContainerStyle={infoStyle.pageContent}>
 
                 {loading ? (
                     <ActivityIndicator size="large" color={colors.midBlue} />
@@ -254,6 +254,9 @@ export default function BookInfoScreen() {
 }
 
 const infoStyle = StyleSheet.create({
+    pageContent: {
+        paddingBottom: 60,
+    },
     bookContainer: {
         width: 220,
         height: 320,

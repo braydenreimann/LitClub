@@ -549,38 +549,40 @@ function BookTableOfContentsTabs({
     return (
         <View style={styles.container}>
             {/* Tabs header */}
-            <View style={styles.tabHeader}>
-                <Pressable
-                    style={[styles.tab, activeTab === "library" && styles.activeTab]}
-                    onPress={() => setActiveTab("library")}
-                >
-                    <Text
-                        style={[
-                            styles.tabText,
-                            activeTab === "library" && styles.activeTabText,
-                        ]}
+            <View style={styles.tabHeaderWrapper}>
+                <View style={styles.tabHeader}>
+                    <Pressable
+                        style={[styles.tab, activeTab === "library" && styles.activeTab]}
+                        onPress={() => setActiveTab("library")}
                     >
-                        My Library
-                    </Text>
-                </Pressable>
+                        <Text
+                            style={[
+                                styles.tabText,
+                                activeTab === "library" && styles.activeTabText,
+                            ]}
+                        >
+                            My Library
+                        </Text>
+                    </Pressable>
 
-                <Pressable
-                    style={[styles.tab, activeTab === "litclub" && styles.activeTab]}
-                    onPress={() => setActiveTab("litclub")}
-                >
-                    <Text
-                        style={[
-                            styles.tabText,
-                            activeTab === "litclub" && styles.activeTabText,
-                        ]}
+                    <Pressable
+                        style={[styles.tab, activeTab === "litclub" && styles.activeTab]}
+                        onPress={() => setActiveTab("litclub")}
                     >
-                        My LitClubs
-                    </Text>
-                </Pressable>
+                        <Text
+                            style={[
+                                styles.tabText,
+                                activeTab === "litclub" && styles.activeTabText,
+                            ]}
+                        >
+                            My LitClubs
+                        </Text>
+                    </Pressable>
+                </View>
+
+                {/* Divider between tabs and content */}
+                <View style={styles.headerDivider} />
             </View>
-
-            {/* Divider between tabs and content */}
-            <View style={styles.headerDivider} />
 
             {/* Chapter discussions area (same structure for both tabs, different context) */}
             <View style={styles.tocContainer}>
@@ -784,7 +786,7 @@ function BookTableOfContentsTabs({
                     - If activeTab === 'litclub' and there's a selected club but the book is NOT on any shelf (status invalid),
                       we show only the message telling the user that the book is not on that club's bookshelves.
                     - If the book is on the club's shelf and status === Future Reads (3), show the message
-                      "[LitClub Name] has not started reading this book yet!" above the ToC, but still show the full ToC/threads.
+                      "[LitClub Name] has not started reading this book yet!" and do NOT render chapters/threads.
                 */}
 
                 {/* LitClub tab logic */}
@@ -800,117 +802,300 @@ function BookTableOfContentsTabs({
                             This book is not in {selectedClubName}'s library.
                         </Text>
                     </View>
+                ) : activeTab === "litclub" &&
+                    isValidStatus(litClubStatus) &&
+                    litClubStatus === ShelfStatus.FutureReads ? (
+                    // LitClub has the book but hasn't started it yet → show ONLY the message.
+                    <View style={styles.futureReadsMessage}>
+                        <Text
+                            style={[
+                                globalStyles.body,
+                                styles.futureReadsMessageText,
+                            ]}
+                        >
+                            {selectedClubName
+                                ? `${selectedClubName} has not started reading this book yet!`
+                                : "This LitClub has not started reading this book yet!"}
+                        </Text>
+                    </View>
                 ) : (
                     <>
-                        {/* Future reads message */}
-                        {activeTab === "litclub" && isValidStatus(litClubStatus) && litClubStatus === ShelfStatus.FutureReads && (
-                            <View style={{ marginTop: 8, marginBottom: 8 }}>
-                                <Text style={[globalStyles.body, { fontStyle: "italic", color: colors.nextDarkest }]}>
-                                    {selectedClubName ? `${selectedClubName} has not started reading this book yet!` : "This LitClub has not started reading this book yet!"}
-                                </Text>
-                            </View>
-                        )}
-
                         {/* Section header */}
                         <View style={styles.sectionHeaderCard}>
-                            <Text style={[globalStyles.subheading, styles.tocTitle]}>Chapters & Threads</Text>
+                            <Text style={[globalStyles.subheading, styles.tocTitle]}>
+                                Chapters & Threads
+                            </Text>
                         </View>
 
                         <View style={styles.tocDivider} />
 
                         {/* Chapters list */}
                         {totalChapters === 0 ? (
-                            <Text style={[globalStyles.body, { fontStyle: "italic", color: colors.nextDarkest }]}>
+                            <Text
+                                style={[
+                                    globalStyles.body,
+                                    { fontStyle: "italic", color: colors.nextDarkest },
+                                ]}
+                            >
                                 No chapters available.
                             </Text>
                         ) : (
                             <View>
-                                {Array.from({ length: totalChapters }, (_, i) => i + 1).map((chapterNumber) => {
-                                    const isExpanded = !!expandedChapters[chapterNumber];
-                                    const storedThreads = chapterThreads[activeTab][chapterNumber] ?? [];
-                                    const isLoadingThreads = chapterThreadsLoading[activeTab][chapterNumber] ?? false;
-                                    const threadsError = chapterThreadsError[activeTab][chapterNumber] ?? null;
+                                {Array.from({ length: totalChapters }, (_, i) => i + 1).map(
+                                    (chapterNumber) => {
+                                        const isExpanded =
+                                            !!expandedChapters[chapterNumber];
+                                        const storedThreads =
+                                            chapterThreads[activeTab][chapterNumber] ??
+                                            [];
+                                        const isLoadingThreads =
+                                            chapterThreadsLoading[activeTab][chapterNumber] ??
+                                            false;
+                                        const threadsError =
+                                            chapterThreadsError[activeTab][chapterNumber] ??
+                                            null;
 
-                                    const isLitClubTab = activeTab === "litclub";
-                                    const hasLitClubContext = !!effectiveLitClubId && typeof effectiveLitClubId === "string";
+                                        const isLitClubTab = activeTab === "litclub";
+                                        const hasLitClubContext =
+                                            !!effectiveLitClubId &&
+                                            typeof effectiveLitClubId === "string";
 
-                                    const threads: ThreadSummary[] =
-                                        activeTab === "library"
-                                            ? storedThreads.filter((t) => !t.litClubId)
-                                            : activeTab === "litclub"
-                                                ? storedThreads.filter((t) => !!t.litClubId && t.litClubId === effectiveLitClubId)
-                                                : storedThreads;
+                                        const threads: ThreadSummary[] =
+                                            activeTab === "library"
+                                                ? storedThreads.filter(
+                                                    (t) => !t.litClubId
+                                                )
+                                                : activeTab === "litclub"
+                                                    ? storedThreads.filter(
+                                                        (t) =>
+                                                            !!t.litClubId &&
+                                                            t.litClubId === effectiveLitClubId
+                                                    )
+                                                    : storedThreads;
 
-                                    return (
-                                        <View key={chapterNumber}>
-                                            <View style={styles.chapterRowOuter}>
-                                                <Pressable style={styles.chapterRow} onPress={() => toggleExpandChapter(chapterNumber)}>
-                                                    <View style={styles.chapterLeft}>
-                                                        <Pressable onPress={() => toggleExpandChapter(chapterNumber)} style={styles.expandButton}>
-                                                            {isExpanded ? (
-                                                                <ChevronUp size={18} color={colors.darkest} strokeWidth={2.5} />
-                                                            ) : (
-                                                                <ChevronDown size={18} color={colors.darkest} strokeWidth={2.5} />
-                                                            )}
-                                                        </Pressable>
-                                                        <Text style={[globalStyles.subheading, styles.chapterLabel]}>
-                                                            Chapter {chapterNumber}
-                                                        </Text>
-                                                    </View>
-
-                                                    <View style={styles.chapterRight}>
-                                                        <CustomCheckbox
-                                                            value={!!checkedChapters[chapterNumber]}
-                                                            onChange={() => toggleChapterCheckbox(chapterNumber)}
-                                                        />
-                                                    </View>
-                                                </Pressable>
-
-                                                {/* Expanded threads */}
-                                                {isExpanded && (
-                                                    <View style={styles.chapterThreadsContainer}>
-                                                        {isLitClubTab && !hasLitClubContext ? (
-                                                            <Text style={[globalStyles.body, styles.emptyThreadsText]}>
-                                                                Select a LitClub to see your club threads.
+                                        return (
+                                            <View key={chapterNumber}>
+                                                <View style={styles.chapterRowOuter}>
+                                                    <Pressable
+                                                        style={styles.chapterRow}
+                                                        onPress={() =>
+                                                            toggleExpandChapter(
+                                                                chapterNumber
+                                                            )
+                                                        }
+                                                    >
+                                                        <View style={styles.chapterLeft}>
+                                                            <Pressable
+                                                                onPress={() =>
+                                                                    toggleExpandChapter(
+                                                                        chapterNumber
+                                                                    )
+                                                                }
+                                                                style={styles.expandButton}
+                                                            >
+                                                                {isExpanded ? (
+                                                                    <ChevronUp
+                                                                        size={18}
+                                                                        color={
+                                                                            colors.darkest
+                                                                        }
+                                                                        strokeWidth={2.5}
+                                                                    />
+                                                                ) : (
+                                                                    <ChevronDown
+                                                                        size={18}
+                                                                        color={
+                                                                            colors.darkest
+                                                                        }
+                                                                        strokeWidth={2.5}
+                                                                    />
+                                                                )}
+                                                            </Pressable>
+                                                            <Text
+                                                                style={[
+                                                                    globalStyles.subheading,
+                                                                    styles.chapterLabel,
+                                                                ]}
+                                                            >
+                                                                Chapter {chapterNumber}
                                                             </Text>
-                                                        ) : isLoadingThreads ? (
-                                                            <View style={styles.threadLoadingRow}>
-                                                                <ActivityIndicator size="small" color={colors.midBlue} />
-                                                                <Text style={[globalStyles.body, styles.threadLoadingText]}>Loading threads...</Text>
-                                                            </View>
-                                                        ) : threadsError ? (
-                                                            <Text style={[globalStyles.body, styles.threadErrorText]}>{threadsError}</Text>
-                                                        ) : threads.length === 0 ? (
-                                                            <Text style={[globalStyles.body, styles.emptyThreadsText]}>No threads for this chapter yet.</Text>
-                                                        ) : (
-                                                            threads.map((thread) => (
-                                                                <Pressable key={thread.id} style={styles.threadRow} onPress={() => onPressThread(thread)}>
-                                                                    <View style={styles.threadTextColumn}>
-                                                                        <Text style={[globalStyles.body, styles.threadTitle]} numberOfLines={1}>
-                                                                            {thread.title || "(Untitled thread)"}
-                                                                        </Text>
-                                                                    </View>
-                                                                    <View style={styles.threadMeta}>
-                                                                        <View style={styles.threadMetaItem}>
-                                                                            <ArrowBigUp size={14} color={colors.midBlue} strokeWidth={2.4} />
-                                                                            <Text style={styles.threadMetaText}>{thread.upvotes ?? 0}</Text>
+                                                        </View>
+
+                                                        <View style={styles.chapterRight}>
+                                                            <CustomCheckbox
+                                                                value={
+                                                                    !!checkedChapters[
+                                                                    chapterNumber
+                                                                    ]
+                                                                }
+                                                                onChange={() =>
+                                                                    toggleChapterCheckbox(
+                                                                        chapterNumber
+                                                                    )
+                                                                }
+                                                            />
+                                                        </View>
+                                                    </Pressable>
+
+                                                    {/* Expanded threads */}
+                                                    {isExpanded && (
+                                                        <View
+                                                            style={
+                                                                styles.chapterThreadsContainer
+                                                            }
+                                                        >
+                                                            {isLitClubTab &&
+                                                                !hasLitClubContext ? (
+                                                                <Text
+                                                                    style={[
+                                                                        globalStyles.body,
+                                                                        styles.emptyThreadsText,
+                                                                    ]}
+                                                                >
+                                                                    Select a LitClub to
+                                                                    see your club threads.
+                                                                </Text>
+                                                            ) : isLoadingThreads ? (
+                                                                <View
+                                                                    style={
+                                                                        styles.threadLoadingRow
+                                                                    }
+                                                                >
+                                                                    <ActivityIndicator
+                                                                        size="small"
+                                                                        color={
+                                                                            colors.midBlue
+                                                                        }
+                                                                    />
+                                                                    <Text
+                                                                        style={[
+                                                                            globalStyles.body,
+                                                                            styles.threadLoadingText,
+                                                                        ]}
+                                                                    >
+                                                                        Loading threads...
+                                                                    </Text>
+                                                                </View>
+                                                            ) : threadsError ? (
+                                                                <Text
+                                                                    style={[
+                                                                        globalStyles.body,
+                                                                        styles.threadErrorText,
+                                                                    ]}
+                                                                >
+                                                                    {threadsError}
+                                                                </Text>
+                                                            ) : threads.length === 0 ? (
+                                                                <Text
+                                                                    style={[
+                                                                        globalStyles.body,
+                                                                        styles.emptyThreadsText,
+                                                                    ]}
+                                                                >
+                                                                    No threads for this
+                                                                    chapter yet.
+                                                                </Text>
+                                                            ) : (
+                                                                threads.map((thread) => (
+                                                                    <Pressable
+                                                                        key={thread.id}
+                                                                        style={
+                                                                            styles.threadRow
+                                                                        }
+                                                                        onPress={() =>
+                                                                            onPressThread(
+                                                                                thread
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <View
+                                                                            style={
+                                                                                styles.threadTextColumn
+                                                                            }
+                                                                        >
+                                                                            <Text
+                                                                                style={[
+                                                                                    globalStyles.body,
+                                                                                    styles.threadTitle,
+                                                                                ]}
+                                                                                numberOfLines={
+                                                                                    1
+                                                                                }
+                                                                            >
+                                                                                {thread.title ||
+                                                                                    "(Untitled thread)"}
+                                                                            </Text>
                                                                         </View>
-                                                                        <View style={styles.threadMetaItem}>
-                                                                            <MessageCircle size={14} color={colors.midBlue} strokeWidth={2.4} />
-                                                                            <Text style={styles.threadMetaText}>{thread.commentCount ?? 0}</Text>
+                                                                        <View
+                                                                            style={
+                                                                                styles.threadMeta
+                                                                            }
+                                                                        >
+                                                                            <View
+                                                                                style={
+                                                                                    styles.threadMetaItem
+                                                                                }
+                                                                            >
+                                                                                <ArrowBigUp
+                                                                                    size={
+                                                                                        14
+                                                                                    }
+                                                                                    color={
+                                                                                        colors.midBlue
+                                                                                    }
+                                                                                    strokeWidth={
+                                                                                        2.4
+                                                                                    }
+                                                                                />
+                                                                                <Text
+                                                                                    style={
+                                                                                        styles.threadMetaText
+                                                                                    }
+                                                                                >
+                                                                                    {thread.upvotes ??
+                                                                                        0}
+                                                                                </Text>
+                                                                            </View>
+                                                                            <View
+                                                                                style={
+                                                                                    styles.threadMetaItem
+                                                                                }
+                                                                            >
+                                                                                <MessageCircle
+                                                                                    size={
+                                                                                        14
+                                                                                    }
+                                                                                    color={
+                                                                                        colors.midBlue
+                                                                                    }
+                                                                                    strokeWidth={
+                                                                                        2.4
+                                                                                    }
+                                                                                />
+                                                                                <Text
+                                                                                    style={
+                                                                                        styles.threadMetaText
+                                                                                    }
+                                                                                >
+                                                                                    {thread.commentCount ??
+                                                                                        0}
+                                                                                </Text>
+                                                                            </View>
                                                                         </View>
-                                                                    </View>
-                                                                </Pressable>
-                                                            ))
-                                                        )}
-                                                    </View>
+                                                                    </Pressable>
+                                                                ))
+                                                            )}
+                                                        </View>
+                                                    )}
+                                                </View>
+
+                                                {chapterNumber < totalChapters && (
+                                                    <View style={styles.rowDivider} />
                                                 )}
                                             </View>
-
-                                            {chapterNumber < totalChapters && <View style={styles.rowDivider} />}
-                                        </View>
-                                    );
-                                })}
+                                        );
+                                    }
+                                )}
                             </View>
                         )}
                     </>
@@ -926,11 +1111,18 @@ const styles = StyleSheet.create({
     container: {
         marginTop: 12,
         marginHorizontal: 10,
+        marginBottom: 12,
         borderRadius: 16,
         borderWidth: 3,
         borderColor: colors.darkest,
         backgroundColor: colors.cream,
-        overflow: "visible",
+        overflow: "visible", // allow dropdowns to escape while keeping rounded border
+    },
+    tabHeaderWrapper: {
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        overflow: "hidden",
+        backgroundColor: colors.sage,
     },
     tabHeader: {
         flexDirection: "row",
@@ -963,6 +1155,21 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 10,
         backgroundColor: colors.cream,
+        paddingBottom: 18,
+        borderBottomLeftRadius: 16,
+        borderBottomRightRadius: 16,
+    },
+    futureReadsMessage: {
+        marginTop: 24,
+        marginBottom: 24,
+        paddingHorizontal: 12,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    futureReadsMessageText: {
+        fontStyle: "italic",
+        color: colors.nextDarkest,
+        textAlign: "center",
     },
     tocTitle: {
         fontSize: 20,
