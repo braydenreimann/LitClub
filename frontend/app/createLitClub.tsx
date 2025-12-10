@@ -117,7 +117,7 @@ export default function CreateLitClub() {
         });
     };*/
 
-    // ---- Create Lit Club (integration-strategy style) ----
+    // ---- Create LitClub (integration-strategy style) ----
     const handleCreateClub = async () => {
         // Basic validation
         const trimmedName = typeof name === 'string' ? name.trim() : String(name).trim();
@@ -311,7 +311,7 @@ export default function CreateLitClub() {
                     disabled={loading}
                 >
                     <Text style={styles.createButtonText}>
-                        {loading ? 'Creating Club...' : 'Create Lit Club'}
+                        {loading ? 'Creating Club...' : 'Create LitClub'}
                     </Text>
                 </Pressable>
             </ScrollView>
