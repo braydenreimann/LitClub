@@ -1,6 +1,6 @@
 /* begin BookTableOfContentsTabs.tsx */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     View,
     Text,
@@ -114,18 +114,32 @@ type ChapterThreadsErrorMap = {
 const CustomCheckbox = ({
     value,
     onChange,
+    disabled = false,
 }: {
     value: boolean;
     onChange: () => void;
-}) => (
-    <Pressable onPress={onChange} style={styles.checkboxPressable}>
-        <Ionicons
-            name={value ? "checkbox" : "square-outline"}
-            size={24}
-            color={value ? colors.midBlue : colors.darkest}
-        />
-    </Pressable>
-);
+    disabled?: boolean;
+}) => {
+    const tint = disabled
+        ? "rgba(33, 31, 62, 0.45)" // muted dark
+        : value
+            ? colors.midBlue
+            : colors.darkest;
+
+    return (
+        <Pressable
+            onPress={disabled ? undefined : onChange}
+            style={styles.checkboxPressable}
+            disabled={disabled}
+        >
+            <Ionicons
+                name={value ? "checkbox" : "square-outline"}
+                size={24}
+                color={tint}
+            />
+        </Pressable>
+    );
+};
 
 function BookTableOfContentsTabs({
     bookId,
@@ -192,8 +206,18 @@ function BookTableOfContentsTabs({
 
     const totalChapters = book?.totalChapters ?? 0;
 
-    // For now, both tabs share the same checkbox state.
-    const storageKey = `book-${bookId}-checkedChapters`;
+    // Persist chapter completion per-context (library vs specific LitClub)
+    const chapterStorageKey = useMemo(() => {
+        if (!bookId) return null;
+        if (activeTab === "litclub") {
+            const clubKey = selectedLitClubId ?? litClubId ?? null;
+            if (!clubKey) return null;
+            return `book-${bookId}-owner-${clubKey}-chapters`;
+        }
+        const userKey = user?.id ?? null;
+        if (!userKey) return null;
+        return `book-${bookId}-owner-${userKey}-chapters`;
+    }, [activeTab, bookId, litClubId, selectedLitClubId, user?.id]);
 
     // Load user from session
     useEffect(() => {
@@ -274,40 +298,48 @@ function BookTableOfContentsTabs({
         };
     }, [user?.id]);
 
-    // Load checkbox state from storage
+    // Load checkbox state from storage (per-context)
     useEffect(() => {
         const loadChecked = async () => {
+            if (!chapterStorageKey) {
+                setCheckedChapters({});
+                return;
+            }
             try {
-                const saved = await AsyncStorage.getItem(storageKey);
+                const saved = await AsyncStorage.getItem(chapterStorageKey);
                 if (saved) {
                     const parsed = JSON.parse(saved) as CheckedChaptersState;
                     setCheckedChapters(parsed);
+                } else {
+                    setCheckedChapters({});
                 }
             } catch (e) {
                 console.warn("Failed to load checked chapters", e);
+                setCheckedChapters({});
             }
         };
-        if (bookId) {
-            loadChecked();
-        }
-    }, [bookId, storageKey]);
+        loadChecked();
+    }, [chapterStorageKey]);
 
-    // Save checkbox state
+    // Save checkbox state (per-context)
     useEffect(() => {
         const saveChecked = async () => {
+            if (!chapterStorageKey) return;
             try {
-                await AsyncStorage.setItem(storageKey, JSON.stringify(checkedChapters));
+                await AsyncStorage.setItem(
+                    chapterStorageKey,
+                    JSON.stringify(checkedChapters)
+                );
             } catch (e) {
                 console.warn("Failed to save checked chapters", e);
             }
         };
 
-        if (bookId) {
-            saveChecked();
-        }
-    }, [bookId, storageKey, checkedChapters]);
+        saveChecked();
+    }, [chapterStorageKey, checkedChapters]);
 
     const toggleChapterCheckbox = (chapterNumber: number) => {
+        if (!canEditChapters) return;
         setCheckedChapters((prev) => {
             const next: CheckedChaptersState = { ...prev };
             const currentlyChecked = !!prev[chapterNumber];
@@ -487,6 +519,8 @@ function BookTableOfContentsTabs({
         activeTab === "library"
             ? !!user
             : !!effectiveLitClubId && isSelectedClubOwner;
+    const canEditChapters =
+        activeTab === "litclub" ? !!isSelectedClubOwner : true;
     const currentStatus =
         ownerForStatus && ownerForStatus in statusByOwner
             ? statusByOwner[ownerForStatus] ?? null
@@ -932,6 +966,10 @@ function BookTableOfContentsTabs({
                                                                     toggleChapterCheckbox(
                                                                         chapterNumber
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    activeTab === "litclub" &&
+                                                                    !canEditChapters
                                                                 }
                                                             />
                                                         </View>
