@@ -162,14 +162,15 @@ export default function CreateLitClub() {
             }
 
             // Update local context with newly created domain LitClub
-            addLitClub(createdClub);
+            //addLitClub(createdClub);
+            console.log("Created club returned:", createdClub);
 
             // TODO: After this, you may want to:
             // - Create LibraryBooks for each selected book ID
             //   using a librariesService method.
 
             //Alert.alert('Success', `${trimmedName} club created successfully!`);
-            router.push('/litClubs');
+            router.push("/litClubs");
         } catch (error: any) {
             console.error('Error creating club:', error);
             Alert.alert('Error', `Failed to create club: ${error.message ?? 'Unknown error'}`);
@@ -317,7 +318,7 @@ export default function CreateLitClub() {
         </View>
     );
 }
-
+//
 const styles = StyleSheet.create({
     container: {
         padding: 20,

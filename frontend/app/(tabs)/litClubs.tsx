@@ -13,7 +13,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '@/domain/models';
 import { useRouter } from "expo-router";
 import { useLitClubs } from '@/context/LitClubsContext';
+import { useLocalSearchParams } from 'expo-router';
 
+ //
 export default function AllLitClubs() {
   // Example data
 
@@ -22,11 +24,15 @@ export default function AllLitClubs() {
   const [user, setUser] = useState<User | null>(null)
   const { litClubs, loading, error, fetchLitClubs } = useLitClubs();
   const [archivedClubIds, setArchivedClubIds] = useState<string[]>([]);
+  const params = useLocalSearchParams();
 
   useFocusEffect(
     useCallback(() => {
-      if (!litClubs.length) fetchLitClubs();
-    }, [fetchLitClubs, litClubs])
+      console.log("Fetching clubs...");
+      fetchLitClubs().then(() => {
+        console.log("Clubs after fetch:", litClubs.length);
+      });
+    }, [])
   )
 
   const [fontsLoaded] = useFonts({

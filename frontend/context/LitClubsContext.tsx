@@ -1,5 +1,4 @@
-// /frontend/LitClubImport/LitClubContext.tsx
-
+//frontend/context/LitClubsContext.tsx
 import React, {
   createContext,
   useCallback,
@@ -44,6 +43,7 @@ export const LitClubProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
     try {
       const clubs = await listLitClubs();
+      console.log("Fetched clubs from API:", clubs.length, clubs); // Add this
       setLitClubs(clubs);
     } catch (err) {
       console.error('Error fetching LitClubs:', err);
@@ -54,7 +54,7 @@ export const LitClubProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   const addLitClub = useCallback((newClub: LitClub) => {
-    setLitClubs((prev) => [...prev, newClub]);
+    setLitClubs(prev => [...prev, newClub]);
   }, []);
 
   useEffect(() => {
