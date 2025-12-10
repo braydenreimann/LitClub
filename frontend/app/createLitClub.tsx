@@ -184,7 +184,7 @@ export default function CreateLitClub() {
             <View style={{ flexDirection: 'row', paddingTop: 90, margin: 10 }}>
                 <BackButton />
                 <Text style={[globalStyles.heading, { paddingTop: 7, paddingBottom: 10, fontSize: 20 }]}>
-                    Create a New Lit Club
+                    Create a New LitClub
                 </Text>
             </View>
 

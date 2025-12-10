@@ -246,7 +246,7 @@ export default function LitClubScreen() {
             return;
         }
         Alert.alert(
-            'Delete Club',
+            'Delete LitClub',
             'Are you sure you want to delete this club? It will be deleted for all members.',
             [
                 { text: 'Cancel', style: 'cancel' },
