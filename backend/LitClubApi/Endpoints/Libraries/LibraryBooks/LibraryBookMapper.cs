@@ -8,16 +8,12 @@ namespace LitClubApi.Endpoints.Libraries.LibraryBooks
         {
             Id = librarybook.Id,
             BookId = librarybook.BookId,
-            Status = librarybook.Status.ToContract(),
+            Status = librarybook.Status,
             StartedReading = librarybook.StartedReading,
             FinishedReading = librarybook.FinishedReading,
             CurrentPage = librarybook.CurrentPage,
             PercentComplete = librarybook.PercentComplete,
             OnPedastal = librarybook.OnPedastal
         };
-
-        public static ShelfStatusContract ToContract(this ShelfStatus status) => (ShelfStatusContract)status;
-
-        public static ShelfStatus ToDomain(this ShelfStatusContract status) => (ShelfStatus)status;
     }
 }

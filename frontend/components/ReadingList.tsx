@@ -1,10 +1,9 @@
 // /frontend/components/ReadingList.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { colors } from '../theme';
 import { globalStyles } from '../styles/globalStyles';
 
 import { User, DisplayBook } from '../domain/models';
@@ -12,15 +11,14 @@ import { getUser } from '@/api/services/usersService';
 import { getBookshelfByStatus } from '../api/services/librariesService';
 import { getUriRead } from '@/api/services/imagesService';
 import { pushBookDetail } from '@/navigation/routes';
-
-// Status from backend enum: 0 | 1 | 2 | 3
-type ShelfStatus = 0 | 1 | 2 | 3 | 4;
+import { ShelfStatus } from '@/domain/shelfStatus';
+import { subscribeToBookshelfUpdates } from '@/utils/bookshelfEvents';
 
 interface ReadingListProps {
     status: ShelfStatus;
     books?: DisplayBook[];
     refreshKey?: number;
-    ownerId?: string; // optional owner for shelves; defaults to current user
+    ownerId?: string;
     onBookPress?: (bookId: string) => void;
 }
 
@@ -37,44 +35,75 @@ export default function ReadingList({
     const [coverUris, setCoverUris] = useState<{ [id: string]: string }>({});
     const router = useRouter();
 
+    const resolvedOwnerId = useMemo(
+        () => ownerId ?? user?.id ?? null,
+        [ownerId, user?.id]
+    );
+
     // Load user from session (via usersService) if an explicit owner isn't provided
     useEffect(() => {
         if (ownerId) return;
         const loadUser = async () => {
             try {
                 const sessionUser = await getUser();
-                if (sessionUser) {
-                    setUser(sessionUser);
-                }
+                if (sessionUser) setUser(sessionUser);
             } catch (error) {
                 console.error('Error loading user from session:', error);
             }
         };
-
         loadUser();
     }, [ownerId]);
+
+    useEffect(() => {
+        if (books) {
+            setShelf(books);
+            setLoading(false);
+        }
+    }, [books]);
+
+    const loadBookshelf = useCallback(async () => {
+        if (books) return;
+
+        if (!resolvedOwnerId) {
+            setShelf([]);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const fetched = await getBookshelfByStatus(resolvedOwnerId, status);
+            setShelf(fetched ?? []);
+        } catch (err) {
+            console.error('Error loading bookshelf:', err);
+            setShelf([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [books, resolvedOwnerId, status]);
 
     // Load bookshelf by status (from librariesService)
     useEffect(() => {
         if (books) return;
 
-        const resolvedOwnerId = ownerId ?? user?.id;
-        if (!resolvedOwnerId) return;
+        void loadBookshelf();
+    }, [books, loadBookshelf, refreshKey]);
 
-        const loadBookshelf = async () => {
-            setLoading(true);
-            try {
-                const fetched = await getBookshelfByStatus(resolvedOwnerId, status);
-                setShelf(fetched ?? []);
-            } catch (err) {
-                console.error('Error loading bookshelf:', err);
-            } finally {
-                setLoading(false);
+    useEffect(() => {
+        if (books || !resolvedOwnerId) return;
+
+        return subscribeToBookshelfUpdates(
+            ({ ownerId: updatedOwnerId, previousStatus, nextStatus }) => {
+                const affectsThisList =
+                    updatedOwnerId === resolvedOwnerId &&
+                    (previousStatus === status || nextStatus === status);
+
+                if (affectsThisList) {
+                    void loadBookshelf();
+                }
             }
-        };
-
-        loadBookshelf();
-    }, [books, user?.id, ownerId, status, refreshKey]);
+        );
+    }, [books, resolvedOwnerId, status, loadBookshelf]);
 
     // Load cover images for the shelf
     useEffect(() => {
@@ -104,9 +133,9 @@ export default function ReadingList({
                 <Text style={globalStyles.body}>No books found for this shelf.</Text>
             ) : (
                 <ScrollView
-                    style={styles.scrollContainer}
                     horizontal
                     showsHorizontalScrollIndicator
+                    contentContainerStyle={styles.scrollContent}
                 >
                     {shelf.map((book) => (
                         <Pressable
@@ -124,12 +153,7 @@ export default function ReadingList({
                                         ? { uri: coverUris[book.id] }
                                         : require('../assets/images/turkstra.jpg')
                                 }
-                                style={{
-                                    width: 120,
-                                    height: 180,
-                                    borderRadius: 8,
-                                    marginBottom: 6,
-                                }}
+                                style={styles.coverImage}
                                 resizeMode="cover"
                             />
                         </Pressable>
@@ -141,24 +165,32 @@ export default function ReadingList({
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flexWrap: 'wrap',
-        padding: 10,
+    scrollContent: {
+        flexDirection: 'row',
+        paddingLeft: 0,
+        paddingRight: 8,
     },
     scrollingWrapper: {
         flex: 1,
     },
     card: {
         width: 120,
-        height: 180,
-        marginRight: 10,
-        backgroundColor: colors.yellow,
-        borderColor: colors.darkest,
+        marginRight: 8,
+        backgroundColor: '#ffffff',
+        borderColor: '#e5dfd6',
         borderRadius: 12,
+        overflow: 'hidden',
         alignItems: 'center',
-        alignContent: 'center',
         justifyContent: 'center',
-        textAlign: 'center',
-        textAlignVertical: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 1,
+    },
+    coverImage: {
+        width: '100%',
+        height: 180,
+        borderRadius: 12,
     },
 });

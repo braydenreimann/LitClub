@@ -8,6 +8,7 @@ import { colors, fonts } from '../theme';
 import ReadingList from '../components/ReadingList';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Fonts } from '../constants/theme';
+import { ShelfStatus } from '@/domain/shelfStatus';
 
 function Jump2discButton() {
     return (
@@ -75,12 +76,10 @@ export default function StatsScreen() {
                 {/* shelves */}
                 <View>
                     <Text style={globalStyles.subheading}>Upcoming Reads</Text>
-                    {/* 2 = Future / Upcoming Reads */}
-                    <ReadingList status={2} />
+                    <ReadingList status={ShelfStatus.FutureReads} />
 
                     <Text style={globalStyles.subheading}>Past Reads</Text>
-                    {/* 0 = Past Reads */}
-                    <ReadingList status={0} />
+                    <ReadingList status={ShelfStatus.PastReads} />
                     
                 </View>
             </ScrollView>

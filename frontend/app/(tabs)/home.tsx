@@ -1,6 +1,6 @@
 // /frontend/app/(whatever)/HomeScreen.tsx (path may differ)
 
-import { StyleSheet, View, ScrollView, Text } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFocusEffect } from 'expo-router';
@@ -11,8 +11,8 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 
 import { colors } from '../../theme';
 import Header from '../../components/headerWithSearch';
-import ReadingList from '@/components/ReadingList';
 import { globalStyles } from '@/styles/globalStyles';
+import BookShelf from '@/components/BookShelf';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,58 +36,11 @@ export default function HomeScreen() {
     }, [])
   );
 
-  // Status mapping (from backend ShelfStatusContract: 0 | 1 | 2 | 3)
-  // 0 = Past Reads
-  // 1 = Currently Reading
-  // 2 = (Hiatus / Not in use yet)
-  // 3 = Future Reads
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <Header />
       <ScrollView>
-        <View style={{ paddingLeft: 25, paddingTop: 45 }}>
-          <Text style={globalStyles.heading}>My Bookshelf</Text>
-        </View>
-
-        {/* Shelf One */}
-        <Text
-          style={[
-            globalStyles.subheading,
-            { paddingTop: 25, paddingHorizontal: 25 },
-          ]}
-        >
-          Currently Reading
-        </Text>
-        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={1} refreshKey={refreshKey} />
-        </View>
-
-        {/* Shelf Two */}
-        <Text
-          style={[
-            globalStyles.subheading,
-            { paddingTop: 25, paddingHorizontal: 25 },
-          ]}
-        >
-          Future Reads
-        </Text>
-        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={3} refreshKey={refreshKey} />
-        </View>
-
-        {/* Shelf Three */}
-        <Text
-          style={[
-            globalStyles.subheading,
-            { paddingTop: 25, paddingHorizontal: 25 },
-          ]}
-        >
-          Past Reads
-        </Text>
-        <View style={{ flex: 1, paddingHorizontal: 25, paddingTop: 5 }}>
-          <ReadingList status={0} refreshKey={refreshKey} />
-        </View>
+        <BookShelf refreshKey={refreshKey} />
       </ScrollView>
     </View>
   );

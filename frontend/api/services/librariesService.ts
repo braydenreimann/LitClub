@@ -5,11 +5,17 @@ import { LibraryBook, DisplayBook, Book } from '../../domain/models';
 import { toDomainLibraryBook } from '@/api/mappers/libraries-mappers';
 import { getBook } from './booksService';
 import type { components } from '@/api/schema/openapi-types';
+import { ShelfStatus as DomainShelfStatus } from '@/domain/shelfStatus';
+import { notifyBookshelfUpdate } from '@/utils/bookshelfEvents';
 
 // Backend enum: 0 | 1 | 2 | 3
-type ShelfStatus = components['schemas']['ShelfStatusContract'];
+type ShelfStatusContract = components['schemas']['ShelfStatusContract'];
 type AddLibraryBookBody = components['schemas']['AddLibraryBookBody'];
 type EditLibraryBookBody = components['schemas']['EditLibraryBookBody'];
+
+const toContractStatus = (
+    status: DomainShelfStatus
+): ShelfStatusContract => status as ShelfStatusContract;
 
 // ---------------------------------------------------------------------------
 // Core helpers
@@ -90,12 +96,12 @@ export async function getLibraryBookForBook(
 export async function createLibraryBook(
     ownerId: string,
     bookId: string,
-    status: ShelfStatus
+    status: DomainShelfStatus
 ): Promise<LibraryBook | null> {
     try {
         const body: AddLibraryBookBody = {
             bookId,
-            status,
+            status: toContractStatus(status),
             startedReading: null,
             finishedReading: null,
             currentPage: null,
@@ -151,7 +157,7 @@ export async function addBookToPedestal(
         }
         
         const body: EditLibraryBookBody = {
-            status: existing.status as ShelfStatus,
+            status: toContractStatus(existing.status as DomainShelfStatus),
             startedReading: null,
             finishedReading: null,
             currentPage: null,
@@ -198,7 +204,7 @@ export async function removeBookFromPedestal(
         }
         
         const body: EditLibraryBookBody = {
-            status: existing.status as ShelfStatus,
+            status: toContractStatus(existing.status as DomainShelfStatus),
             startedReading: null,
             finishedReading: null,
             currentPage: null,
@@ -276,11 +282,11 @@ export async function getBooksOnPedestal(
 export async function editLibraryBookStatus(
     userId: string,
     libraryBookId: string,
-    status: ShelfStatus
+    status: DomainShelfStatus
 ): Promise<LibraryBook | null> {
     try {
         const body: EditLibraryBookBody = {
-            status,
+            status: toContractStatus(status),
             startedReading: null,
             finishedReading: null,
             currentPage: null,
@@ -325,15 +331,34 @@ export async function editLibraryBookStatus(
 export async function setBookShelfStatus(
     ownerId: string,
     bookId: string,
-    status: ShelfStatus
+    status: DomainShelfStatus
 ): Promise<LibraryBook | null> {
     const existing = await getLibraryBookForBook(ownerId, bookId);
+    const previousStatus = (existing?.status as DomainShelfStatus | null) ?? null;
 
     if (!existing) {
-        return createLibraryBook(ownerId, bookId, status);
+        const created = await createLibraryBook(ownerId, bookId, status);
+        if (created) {
+            notifyBookshelfUpdate({
+                ownerId,
+                bookId,
+                previousStatus,
+                nextStatus: created.status as DomainShelfStatus,
+            });
+        }
+        return created;
     }
 
-    return editLibraryBookStatus(ownerId, existing.id, status);
+    const updated = await editLibraryBookStatus(ownerId, existing.id, status);
+    if (updated) {
+        notifyBookshelfUpdate({
+            ownerId,
+            bookId,
+            previousStatus,
+            nextStatus: updated.status as DomainShelfStatus,
+        });
+    }
+    return updated;
 }
 
 /**
@@ -380,7 +405,16 @@ export async function removeBookFromLibrary(
         return true; // nothing to remove
     }
 
-    return deleteLibraryBook(ownerId, existing.id);
+    const deleted = await deleteLibraryBook(ownerId, existing.id);
+    if (deleted) {
+        notifyBookshelfUpdate({
+            ownerId,
+            bookId,
+            previousStatus: (existing.status as DomainShelfStatus) ?? null,
+            nextStatus: null,
+        });
+    }
+    return deleted;
 }
 
 // ---------------------------------------------------------------------------
@@ -393,7 +427,7 @@ export async function removeBookFromLibrary(
  */
 export async function getBookshelfByStatus(
     ownerId: string,
-    status: ShelfStatus
+    status: DomainShelfStatus
 ): Promise<DisplayBook[] | null> {
     try {
         const libraryBooks = await getLibraryBooks(ownerId);

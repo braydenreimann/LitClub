@@ -45,7 +45,7 @@ public class Add(ICosmosContext cosmosContext) : EndpointBaseAsync
         LibraryBook newLibraryBook = new()
         {
             BookId = b.BookId,
-            Status = b.Status.ToDomain(),
+            Status = b.Status,
             StartedReading = b.StartedReading,
             FinishedReading = b.FinishedReading,
             CurrentPage = b.CurrentPage,

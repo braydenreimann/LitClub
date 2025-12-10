@@ -21,6 +21,7 @@ import { getUriRead } from '../../api/services/imagesService';
 import { getUserFromId } from '../../api/services/usersService';
 import { FontAwesome } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
+import { ShelfStatus } from '@/domain/shelfStatus';
 
 //THIS IS SO OVERWHELMINGLY SCUFFED, JUST REUSING PROFILE CODE AND EDITING TO GENERALIZE FOR ROUTING. Reading list does not link properly,
 export default function ProfileScreen() {
@@ -182,11 +183,11 @@ export default function ProfileScreen() {
                 {/* Books Section */}
                 <View>
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Currently Reading</Text>
-                    <ReadingList status={1} />
+                    <ReadingList status={ShelfStatus.CurrentlyReading} />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Future Reads</Text>
-                    <ReadingList status={2} />
+                    <ReadingList status={ShelfStatus.FutureReads} />
                     <Text style={[globalStyles.subheading, { marginLeft: 10 }]}>Past Reads</Text>
-                    <ReadingList status={0} />
+                    <ReadingList status={ShelfStatus.PastReads} />
                 </View>
 
                 {/* Memberships */}

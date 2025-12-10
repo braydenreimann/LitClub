@@ -12,15 +12,15 @@ public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
     .WithRequest<EditLibraryBookRequest>
     .WithActionResult<LibraryBookResponse>
 {
-[HttpPatch("libraries/{userId}/libraryBooks/{libraryBookId}")]
+    [HttpPatch("libraries/{userId}/libraryBooks/{libraryBookId}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(LibraryBookResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public override async Task<ActionResult<LibraryBookResponse>> HandleAsync(
-        EditLibraryBookRequest request,
-        CancellationToken cancellationToken = default)
+            EditLibraryBookRequest request,
+            CancellationToken cancellationToken = default)
     {
         Library? library;
         var ownerId = request.OwnerId;
@@ -49,7 +49,7 @@ public class Edit(ICosmosContext cosmosContext) : EndpointBaseAsync
         var b = request.Body;
         if (b.Status.HasValue)
         {
-            libraryBook.Status = b.Status.Value.ToDomain();
+            libraryBook.Status = b.Status.Value;
         }
         if (b.StartedReading.HasValue)
         {
