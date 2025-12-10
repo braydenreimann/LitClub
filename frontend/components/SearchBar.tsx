@@ -1,22 +1,21 @@
-// code borrowed from https://plainenglish.io/blog/how-to-implement-a-search-bar-in-react-js
+// components/SearchBar.tsx
 
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, StyleSheet, FlatList, Text, Pressable } from 'react-native';
-import { useRouter } from 'expo-router'
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useRouter } from 'expo-router';
 import { searchBooks, searchUsers } from '@/services/searchservice';
 import { Book, User } from '@/domain/models';
 import { pushBookDetail, pushUserDetail } from '@/navigation/routes';
 
 interface SearchBarProps {
-    onBookPress: (id: string) => void;
-    onUserPress: (id: string) => void;
+    onBookPress?: (id: string) => void;
+    onUserPress?: (id: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
-    const [searchInput, setSearchInput] = useState("");
+    const [searchInput, setSearchInput] = useState('');
     const [isFocused, setIsFocused] = useState(false);
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = useState('');
     const [bookResults, setBookResults] = useState<Book[]>([]);
     const [userResults, setUserResults] = useState<User[]>([]);
     const router = useRouter();
@@ -29,7 +28,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
         }
 
         const timeout = setTimeout(async () => {
-            const [books, users] = await Promise.all([ searchBooks(query), searchUsers(query)]);
+            const [books, users] = await Promise.all([
+                searchBooks(query),
+                searchUsers(query),
+            ]);
             setBookResults(books ?? []);
             setUserResults(users ?? []);
         }, 300);
@@ -41,14 +43,22 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
         setIsFocused(false);
         setSearchInput('');
         setQuery('');
-        onBookPress ? onBookPress(bookId) : pushBookDetail(router, bookId);
+        if (onBookPress) {
+            onBookPress(bookId);
+        } else {
+            pushBookDetail(router, bookId);
+        }
     };
 
     const handleUserPress = (userId: string) => {
         setIsFocused(false);
         setSearchInput('');
         setQuery('');
-        onUserPress ? onUserPress(userId) : pushUserDetail(router, userId);
+        if (onUserPress) {
+            onUserPress(userId);
+        } else {
+            pushUserDetail(router, userId);
+        }
     };
 
     return (
@@ -104,7 +114,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onBookPress, onUserPress }) => {
                                         onPress={() => handleUserPress(item.id)}
                                     >
                                         <Text style={styles.title} numberOfLines={1}>
-                                            {item.firstName + " " + item.lastName}
+                                            {item.firstName} {item.lastName}
                                         </Text>
                                     </Pressable>
                                 )}
@@ -154,7 +164,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 10,
     },
     list: {
-        maxHeight: 120, // scrollable height
+        maxHeight: 120,
     },
     item: {
         paddingVertical: 6,

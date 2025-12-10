@@ -50,6 +50,15 @@ export default function RootLayout() {
                 headerBackVisible: false,
               }}
             />
+
+            <Stack.Screen
+              name="bookrecs"
+              options={{
+                title: 'Book Recommendations',
+                headerLeft: () => <HeaderBackButton />,
+                headerBackVisible: false,
+              }}
+            />
           </Stack>
         </ThemeProvider>
       </LitClubProvider>
