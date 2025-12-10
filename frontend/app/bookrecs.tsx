@@ -6,7 +6,6 @@ import {
     ActivityIndicator,
     Dimensions,
     Image,
-    TextInput,
 } from 'react-native';
 import { globalStyles } from '@/styles/globalStyles';
 import { useRouter } from 'expo-router';
@@ -24,6 +23,7 @@ import { getBooks } from '@/api/services/booksService';
 import { getUriRead } from '@/api/services/imagesService';
 import { pushBookDetail } from '@/navigation/routes';
 import { searchBooks } from '@/services/searchservice';
+import SearchField from '@/components/SearchField';
 
 Dimensions.get('window');
 const CARD_MARGIN = 10;
@@ -32,7 +32,6 @@ const CARD_HEIGHT = 210;
 
 export default function BookRecs() {
     const [searchInput, setSearchInput] = useState('');
-    const [isFocused, setIsFocused] = useState(false);
     const [query, setQuery] = useState('');
     const [bookResults, setBookResults] = useState<Book[]>([]);
     const [books, setBooks] = useState<Book[]>([]);
@@ -125,7 +124,6 @@ export default function BookRecs() {
     }
 
     const handleBookPress = (bookId: string) => {
-        setIsFocused(false);
         setSearchInput('');
         setQuery('');
         pushBookDetail(router, bookId); // ← consistent navigation
@@ -139,17 +137,15 @@ export default function BookRecs() {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {/* Search Bar */}
                 <View style={styles.searchBarWrapper}>
-                    <TextInput
-                        style={styles.searchBar}
-                        placeholder="Search"
-                        placeholderTextColor={colors.midBlue}
+                    <SearchField
                         value={searchInput}
+                        placeholder="Search books"
                         onChangeText={(text) => {
                             setSearchInput(text);
                             setQuery(text);
                         }}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
+                        returnKeyType="search"
+                        containerStyle={{ width: '100%', maxWidth: 360 }}
                     />
                 </View>
 
@@ -211,17 +207,10 @@ const styles = StyleSheet.create({
         elevation: 1,
     },
     searchBarWrapper: {
-        marginVertical: 10,
+        marginTop: 10,
+        marginBottom: 18,
         alignItems: 'center',
-    },
-    searchBar: {
-        borderRadius: 10,
-        borderColor: '#212f3e',
-        borderWidth: 3,
-        paddingHorizontal: 10,
-        height: 38,
-        fontSize: 16,
-        width: 180,
+        width: '100%',
     },
     bookImage: {
         width: '100%',
@@ -232,6 +221,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
+        alignSelf: 'center',
+        width: '100%',
+        maxWidth: 360,
     },
     scrollContainer: {
         paddingVertical: CARD_MARGIN,

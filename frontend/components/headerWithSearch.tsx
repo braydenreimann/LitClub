@@ -16,8 +16,8 @@ export default function Header() {
         </Pressable>
       </Link>
 
-      <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 20 }}>
-        <SearchBar />
+      <View style={styles.searchWrapper}>
+        <SearchBar maxWidth={220} />
       </View>
     </View>
   );
@@ -38,5 +38,13 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     height: 150,
     flexDirection: 'row',
+    zIndex: 10,
+    elevation: 6,
+    position: 'relative',
+  },
+  searchWrapper: {
+    flex: 1,
+    alignItems: 'flex-end',
+    paddingRight: 20,
   },
 });

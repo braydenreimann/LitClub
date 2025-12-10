@@ -54,7 +54,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="bookrecs"
               options={{
-                title: 'Book Recommendations',
+                title: 'LitClub Library',
                 headerLeft: () => <HeaderBackButton />,
                 headerBackVisible: false,
               }}
