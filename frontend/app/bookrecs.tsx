@@ -27,6 +27,8 @@ import { searchBooks } from '@/services/searchservice';
 
 Dimensions.get('window');
 const CARD_MARGIN = 10;
+const CARD_WIDTH = 140;
+const CARD_HEIGHT = 210;
 
 export default function BookRecs() {
     const [searchInput, setSearchInput] = useState('');
@@ -192,15 +194,21 @@ export default function BookRecs() {
 // -------------------------
 const styles = StyleSheet.create({
     card: {
-        width: 120,
-        height: 180,
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
         margin: CARD_MARGIN / 2,
-        backgroundColor: colors.yellow,
-        borderColor: colors.darkest,
+        backgroundColor: '#ffffff',
+        borderColor: '#e5dfd6',
         borderRadius: 12,
+        borderWidth: StyleSheet.hairlineWidth,
+        overflow: 'hidden',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 10,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 1,
     },
     searchBarWrapper: {
         marginVertical: 10,
@@ -216,14 +224,14 @@ const styles = StyleSheet.create({
         width: 180,
     },
     bookImage: {
-        width: 120,
-        height: 160,
-        backgroundColor: colors.teal,
-        borderRadius: 8,
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
     },
     gridContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
+        justifyContent: 'center',
     },
     scrollContainer: {
         paddingVertical: CARD_MARGIN,
