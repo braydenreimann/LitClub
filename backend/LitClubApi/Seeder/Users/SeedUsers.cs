@@ -11,7 +11,7 @@ public static class SeedUsers
         List<LitClubUser> users =
         [
             new LitClubUser {
-                Id = "10",
+                Id = "1",
                 FirstName = "Brayden",
                 LastName = "Reimann",
                 UserName = "braydenreimann",
@@ -19,8 +19,19 @@ public static class SeedUsers
                 PasswordHash = "brpw",
                 Bio = "I enjoy books that sit at the intersection of technology and philosophy.",
                 PreferredGenres = ["Nonfiction"],
-                ProfilePhotoUrl = "severus-snape.jpg",
-                }
+                ProfilePhotoUrl = "severus-snape.jpg"
+            },
+            new LitClubUser {
+                Id = "2",
+                FirstName = "John",
+                LastName = "Green",
+                UserName = "johngreen",
+                Email = "johngreen@icloud.com",
+                PasswordHash = "johngreenpw",
+                Bio = "I'm a highly celebrated author and leader of the Nerdfighters.",
+                PreferredGenres = ["Fiction"],
+                ProfilePhotoUrl = "john-green.png"
+            }
         ];
 
         // Insert each user into the usersContainer
@@ -82,6 +93,44 @@ public static class SeedUsers
                         // It's OK to Be Angry About Capitalism
                         BookId = "978-0593238714",
                         Status = ShelfStatus.futureReads,
+                    }
+                ]
+            },
+            new Library {
+                OwnerId = users[1].Id,
+                LibraryBooks =
+                [
+                    new LibraryBook()
+                    {
+                        // Everything is Tuberculosis
+                        BookId = "978-0525556572",
+                        Status = ShelfStatus.pastReads,
+                        OnPedastal = true
+                    },
+                    new LibraryBook()
+                    {
+                        // The Fault in Our Stars
+                        BookId = "978-0142424179",
+                        Status = ShelfStatus.pastReads,
+                        OnPedastal = false
+                    },
+                    new LibraryBook()
+                    {
+                        // If Anyone Builds It, Everyone Dies
+                        BookId = "978-0316595643",
+                        Status = ShelfStatus.currentlyReading,
+                    },
+                    new LibraryBook()
+                    {
+                        // The Goldfinch
+                        BookId = "978-0316055437",
+                        Status = ShelfStatus.futureReads
+                    },
+                    new LibraryBook()
+                    {
+                        // The Underground Railroad
+                        BookId = "978-0385542364",
+                        Status = ShelfStatus.futureReads
                     }
                 ]
             }

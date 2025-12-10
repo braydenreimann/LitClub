@@ -1,10 +1,6 @@
 using Azure.Storage.Blobs; //dotnet add package Azure.Storage.Blobs in LitClubApi project folder
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
-using LitClubApi.Endpoints.Blobs;
-using LitClubApi.Endpoints.Books.AddBook;
-using LitClubApi.Endpoints.LitClubs.AddLitClub;
-using LitClubApi.Endpoints.LitClubUsers.AddUser;
 using LitClubApi.Infrastructure.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
@@ -187,94 +183,25 @@ using (var scope = app.Services.CreateScope())
 
     }
 
-    string coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Books", "BookCovers", "the-fault-in-our-stars.jpg");
+    // coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "John-Green.png"); //Default profile image for John Green
 
-    string blobName = "the-fault-in-our-stars.jpg";
-    var blobClient = blobContainer.GetBlobClient(blobName);
+    // blobName = "John-Green.png";
+    // blobClient = blobContainer.GetBlobClient(blobName);
 
-    using (var stream = File.OpenRead(coverPath))
-    {
-        await blobClient.UploadAsync(stream, overwrite: true);
-    }
+    // using (var stream = File.OpenRead(coverPath))
+    // {
+    //     await blobClient.UploadAsync(stream, overwrite: true);
+    // }
 
-    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "John-Green.png"); //Default profile image for John Green
+    // coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "severus-snape.jpeg"); //Default profile image for John Green
 
-    blobName = "John-Green.png";
-    blobClient = blobContainer.GetBlobClient(blobName);
+    // blobName = "severus-snape.jpeg";
+    // blobClient = blobContainer.GetBlobClient(blobName);
 
-    using (var stream = File.OpenRead(coverPath))
-    {
-        await blobClient.UploadAsync(stream, overwrite: true);
-    }
-
-    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "severus-snape.jpeg"); //Default profile image for John Green
-
-    blobName = "severus-snape.jpeg";
-    blobClient = blobContainer.GetBlobClient(blobName);
-
-    using (var stream = File.OpenRead(coverPath))
-    {
-        await blobClient.UploadAsync(stream, overwrite: true);
-    }
-
-
-    Book book = new()
-    {
-        Id = "978-0142424179",
-        Title = "The Fault in Our Stars",
-        Author = "John Green",
-        TotalChapters = 25,
-        Genre = "Young adult novel",
-        Description = "A book about two sick young lovers.",
-        CoverImageUrl = "the-fault-in-our-stars.jpg",
-        Editions =
-        [
-            new Edition
-            {
-                Format = BookFormat.Paperback,
-                Publisher = "Penguin Books",
-                PublicationDate = DateOnly.Parse("April 8, 2014"),
-                PrintLength = 352,
-                Isbn13s = ["978-0142424179"]
-            }
-        ],
-        ChapterThreadIds =
-        [
-            "thread-1", "thread-2", "thread-3", "thread-4", "thread-5",
-            "thread-6", "thread-7", "thread-8", "thread-9", "thread-10",
-            "thread-11", "thread-12", "thread-13", "thread-14", "thread-15",
-            "thread-16", "thread-17", "thread-18", "thread-19", "thread-20",
-            "thread-21", "thread-22", "thread-23", "thread-24", "thread-25"
-        ]
-    };
-
-    LitClubUser litClubUser = new()
-    {
-        Id = "1",
-        FirstName = "John",
-        LastName = "Green",
-        UserName = "johngreen",
-        Email = "johngreen@icloud.com",
-        PasswordHash = "johngreenpw",
-        Bio = "I'm just a Nerdfighter that loves reading and science",
-        PreferredGenres = ["Fiction", "Science-Fiction", "Romance", "Drama", "Thriller"],
-        ProfilePhotoUrl = "John-Green.png",
-        LitClubIds = ["1"]
-    };
-
-    LitClubUser litClubUser2 = new()
-    {
-        Id = "2",
-        FirstName = "Billy",
-        LastName = "Wayne",
-        UserName = "billywayne",
-        Email = "billywayne@gmail.com",
-        Bio = "I am a proud member of the LGBTQ+ community.",
-        PreferredGenres = ["Non-Fiction", "Science", "Podcasts", "Comedy"],
-        ProfilePhotoUrl = "John-Green.png",
-        PasswordHash = "billywaynepw",
-        LitClubIds = ["1"]
-    };
+    // using (var stream = File.OpenRead(coverPath))
+    // {
+    //     await blobClient.UploadAsync(stream, overwrite: true);
+    // }
 
     LitClub litClub = new()
     {
@@ -296,43 +223,9 @@ using (var scope = app.Services.CreateScope())
         MemberUserIds = ["1", "2"],
     };
 
-    Library library = new()
-    {
-        OwnerId = "1",
-        LibraryBooks =
-        [
-            new LibraryBook()
-            {
-                BookId = "1",
-                Status = ShelfStatus.currentlyReading,
-                StartedReading = DateOnly.Parse("October 11, 2025"),
-                CurrentPage = 114,
-                PercentComplete = 22,
-                OnPedastal = false
-            }
-        ]
-    };
-
     Library litClubLibrary = new()
     {
         OwnerId = "litclub-1",
-        LibraryBooks =
-        [
-            new LibraryBook()
-            {
-                BookId = "1",
-                Status = ShelfStatus.currentlyReading,
-                StartedReading = DateOnly.Parse("October 11, 2025"),
-                CurrentPage = 114,
-                PercentComplete = 22,
-                OnPedastal = false
-            }
-        ]
-    };
-
-    Library library2 = new()
-    {
-        OwnerId = "2",
         LibraryBooks =
         [
             new LibraryBook()
@@ -353,89 +246,13 @@ using (var scope = app.Services.CreateScope())
         Username = "johngreen",
     };
 
-    int i = 0;
-    foreach (Book b in booklist) //Default profile booklist for testing purposes
-    {
-        ShelfStatus status = (ShelfStatus)(i % 5);
-        DateOnly? started = null;
-        DateOnly? finished = null;
-        int currentpage = 0;
-        bool pedestal = false;
-        if (i % 8 == 0)
-        {
-            pedestal = true;
-        }
 
-        if (i % 4 == 0)
-        {
-            started = DateOnly.Parse("October 4, 2023");
-            finished = DateOnly.Parse("October 10, 2023");
-        }
-        else if (i % 4 == 1 || i % 4 == 2)
-        {
-            started = DateOnly.Parse("October 11, 2023");
-            currentpage = (b.Editions[0].PrintLength ?? 0) / 2;
-
-        }
-        LibraryBook lib = new LibraryBook()
-        {
-            BookId = b.Id,
-            Status = status,
-            StartedReading = started,
-            FinishedReading = finished,
-            CurrentPage = currentpage,
-            PercentComplete = 50,
-            OnPedastal = pedestal
-        };
-        library.LibraryBooks.Add(lib);
-        i++;
-    }
-
-    await books.UpsertItemAsync(book, new PartitionKey(book.Id));
-    await users.UpsertItemAsync(litClubUser, new PartitionKey(litClubUser.Id));
-    await users.UpsertItemAsync(litClubUser2, new PartitionKey(litClubUser2.Id));
     await clubs.UpsertItemAsync(litClub, new PartitionKey(litClub.Id));
     await clubs.UpsertItemAsync(litClub2, new PartitionKey(litClub2.Id));
-    await libs.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
-    await libs.UpsertItemAsync(library2, new PartitionKey(library2.OwnerId));
     await libs.UpsertItemAsync(litClubLibrary, new PartitionKey(litClubLibrary.OwnerId));
 
-    await SeedThreads.SeedFaultInOurStarsForumAsync(client, o);
+    await SeedThreads.SeedThreadsAsync(client, o, booklist);
     await SeedUsers.SeedUsersAsync(client, o, booklist);
-
-    //string usersCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Users", "users.csv");
-    //string litClubsCsvPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "LitClubs", "litclubs.csv");
-    // --------------------
-    // Seed Users
-    // --------------------
-    // var allUsers = new LitClubUser[]
-    // {
-    //     new() { Id="4", FirstName="Sofia", LastName="Hughes", UserName="sofghughes", Email="shughes@gmail.com", PasswordHash="sofghughespw", Bio="Hey!", PreferredGenres=new List<string>{"Fantasy","Romance"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="5", FirstName="firstever", LastName="user socool", UserName="socoolguy", Email="this@fake.com", PasswordHash="socoolguypw", Bio="Hi!", PreferredGenres=new List<string>{"Romance","Fiction"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="6", FirstName="Vidya", LastName="Madana", UserName="vidya", Email="vidya@fake.com", PasswordHash="vidyapw", Bio="Hello!", PreferredGenres=new List<string>{"Science-Fiction","Drama"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="7", FirstName="Kathleen", LastName="Lowe", UserName="katkit", Email="katkit@fake.com", PasswordHash="katkitpw", Bio="hiya", PreferredGenres=new List<string>{"Mystery","Non-Fiction"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="8", FirstName="Ben", LastName="Herrington", UserName="theben", Email="theben@fake.com", PasswordHash="thebenpw", Bio="how are you", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="9", FirstName="Brayden", LastName="Reimann", UserName="breimann", Email="breimann@fake.com", PasswordHash="breimannpw", Bio="bio", PreferredGenres=new List<string>{"Horror","Historical"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="10", FirstName="Domino", LastName="Pizza", UserName="pizzafan", Email="pizzafan@fake.com", PasswordHash="pizzafanpw", Bio="I love reading and science", PreferredGenres=new List<string>{"Fiction","Romance","Drama","Science-Fiction"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="11", FirstName="Pizza", LastName="Box", UserName="pepperoni", Email="pepperoni@fake.com", PasswordHash="pepperonipw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Young Adult"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="12", FirstName="Reader", LastName="Number 1", UserName="litclublover", Email="litclublover@fake.com", PasswordHash="litclubloverpw", Bio="No bio provided", PreferredGenres=new List<string>{"True Crime","Memoir"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="13", FirstName="Whale", LastName="Shark", UserName="whaleguy", Email="whaleguy@fake.com", PasswordHash="whaleguypw", Bio="No bio provided", PreferredGenres=new List<string>{"Historical","Poetry"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="14", FirstName="Crow", LastName="fella", UserName="crowfella", Email="crowfella@fake.com", PasswordHash="crowfellapw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance","Mystery"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="15", FirstName="Kitty", LastName="Cat", UserName="justacat", Email="justacat@fake.com", PasswordHash="justacatpw", Bio="No bio provided", PreferredGenres=new List<string>{"Horror","Poetry"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="16", FirstName="Magician", LastName="Dude", UserName="foreveralone", Email="foreveralone@fake.com", PasswordHash="foreveralonepw", Bio="No bio provided", PreferredGenres=new List<string>{"Memoir","Romance"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="17", FirstName="barbie", LastName="doll", UserName="barbiegirl", Email="barbiegirl@fake.com", PasswordHash="barbiegirlpw", Bio="No bio provided", PreferredGenres=new List<string>{"Young Adult","Biography"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="18", FirstName="just", LastName="ken", UserName="justken", Email="justken@fake.com", PasswordHash="justkenpw", Bio="No bio provided", PreferredGenres=new List<string>{"Science","Western Fiction"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="19", FirstName="Star", LastName="Celestial", UserName="starrynight", Email="starrynight@fake.com", PasswordHash="starrynightpw", Bio="No bio provided", PreferredGenres=new List<string>{"Romance"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="20", FirstName="Dino", LastName="Luvr", UserName="t-rex", Email="t-rex@fake.com", PasswordHash="t-rexpw", Bio="No bio provided", PreferredGenres=new List<string>{"Drama","Thriller"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="21", FirstName="Weevil", LastName="Fan", UserName="bugfan", Email="bugfan@fake.com", PasswordHash="bugfanpw", Bio="No bio provided", PreferredGenres=new List<string>{"Mystery"}, ProfilePhotoUrl="John-Green.png" },
-    //     new() { Id="22", FirstName="Alyssa", LastName="Collins", UserName="alyssa", Email="alyssa@fake.com", PasswordHash="alyssapw", Bio="No bio provided", PreferredGenres=new List<string>{"Poetry","Science Fiction"}, ProfilePhotoUrl="John-Green.png" }
-    // };
-
-    // foreach (var u in allUsers)
-    // {
-    //     try { await users.UpsertItemAsync(u, new PartitionKey(u.Id)); }
-    //     catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict) { }
-    // }
 
     // --------------------
     // Seed LitClubs
