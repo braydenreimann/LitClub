@@ -1,7 +1,6 @@
 using LitClubApi.Configuration;
 using Microsoft.Azure.Cosmos;
 using LitClubApi.Domain;
-using System.Linq;
 
 public static class SeedUsers
 {
@@ -104,6 +103,18 @@ public static class SeedUsers
                         Status = ShelfStatus.futureReads,
                         OnPedastal = true
                     },
+                    new LibraryBook()
+                    {
+                        // The Lightening Thief
+                        BookId = "978-1368051477",
+                        Status = ShelfStatus.pastReads,
+                    },
+                    new LibraryBook()
+                    {
+                        // The Hunger Games
+                        BookId = "978-0439023481",
+                        Status = ShelfStatus.pastReads
+                    }
                 ]
             },
             new Library {
@@ -155,6 +166,7 @@ public static class SeedUsers
         // Define two LitClubs
         var litclub1 = new LitClub()
         {
+            Id = "litclub-1",
             Name = "Brayden's LitClub",
             OwnerUserId = users[0].Id,
             OwnerUserName = "braydenreimann",
@@ -164,6 +176,7 @@ public static class SeedUsers
 
         var litclub2 = new LitClub()
         {
+            Id = "litclub-2",
             Name = "Nerdfighters",
             OwnerUserId = users[1].Id,
             OwnerUserName = "johngreen",
@@ -182,13 +195,18 @@ public static class SeedUsers
             LibraryBooks =
             [
                 new LibraryBook() { BookId = "978-0142424179", Status = ShelfStatus.pastReads },
-                new LibraryBook() { BookId = "978-1451648539", Status = ShelfStatus.pastReads, OnPedastal = true },
-                new LibraryBook() { BookId = "978-0593655030", Status = ShelfStatus.pastReads, OnPedastal = true },
-                new LibraryBook() { BookId = "978-1324076261", Status = ShelfStatus.pastReads, OnPedastal = true },
-                new LibraryBook() { BookId = "978-1847923523", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-1451648539", Status = ShelfStatus.futureReads },
+                new LibraryBook() { BookId = "978-0593655030", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-1324076261", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-1847923523", Status = ShelfStatus.currentlyReading },
                 new LibraryBook() { BookId = "978-0316595643", Status = ShelfStatus.currentlyReading },
                 new LibraryBook() { BookId = "978-0593238714", Status = ShelfStatus.futureReads },
-                new LibraryBook() { BookId = "978-0525556572", Status = ShelfStatus.futureReads, OnPedastal = true },
+                new LibraryBook() { BookId = "978-0525556572", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-0593816592", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-0593549667", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-0593732458", Status = ShelfStatus.futureReads },
+                new LibraryBook() { BookId = "978-1400064168", Status = ShelfStatus.futureReads },
+                new LibraryBook() { BookId = "978-0670026197", Status = ShelfStatus.pastReads }
             ]
         };
 
@@ -202,6 +220,11 @@ public static class SeedUsers
                 new LibraryBook() { BookId = "978-0316595643", Status = ShelfStatus.currentlyReading },
                 new LibraryBook() { BookId = "978-0316055437", Status = ShelfStatus.futureReads },
                 new LibraryBook() { BookId = "978-0385542364", Status = ShelfStatus.futureReads },
+                new LibraryBook() { BookId = "978-0670026197", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-0812995343", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-0679763888", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-0062060624", Status = ShelfStatus.pastReads },
+                new LibraryBook() { BookId = "978-0439023481", Status = ShelfStatus.pastReads }
             ]
         };
 

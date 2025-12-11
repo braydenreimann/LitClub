@@ -63,6 +63,15 @@ export default function RootLayout() {
                 headerBackVisible: false,
               }}
             />
+
+            <Stack.Screen
+              name="threads/[threadId]"
+              options={{
+                title: '',
+                headerLeft: () => <HeaderBackButton />,
+                headerBackVisible: false,
+              }}
+            />
           </Stack>
         </ThemeProvider>
       </LitClubProvider>

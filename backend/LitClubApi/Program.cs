@@ -205,6 +205,7 @@ using (var scope = app.Services.CreateScope())
 
     await SeedThreads.SeedThreadsAsync(client, o, booklist);
     await SeedUsers.SeedUsersAsync(client, o, booklist);
+    await SeedThreads.SeedTheFaultInOurStarsThreadAsync(client, o);
 }
 
 var updateSpec = args.Contains("--updateSpec");
