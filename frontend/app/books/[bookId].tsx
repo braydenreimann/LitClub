@@ -142,7 +142,7 @@ export default function BookInfoScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
-            <ScrollView>
+            <ScrollView contentContainerStyle={infoStyle.pageContent}>
 
                 {loading ? (
                     <ActivityIndicator size="large" color={colors.midBlue} />
@@ -185,33 +185,32 @@ export default function BookInfoScreen() {
                             </Pressable>
                         </View>
 
-                        <View style={infoStyle.descriptionBlock}>
-                            <Text style={[globalStyles.subheading, { fontSize: 16, paddingBottom: 6 }]}>
-                                Description
-                            </Text>
-                            {(() => {
-                                const desc =
-                                    (book.description ?? '') +
-                                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-                                const isLong = desc.length > 100;
-                                return (
-                                    <>
-                                        <Text style={globalStyles.body}>
-                                            {isExpanded || !isLong
-                                                ? desc
-                                                : `${desc.slice(0, 100)}...`}
-                                        </Text>
-                                        {isLong && (
-                                            <Pressable onPress={() => setIsExpanded((prev) => !prev)}>
-                                                <Text style={{ color: colors.midBlue, marginTop: 4 }}>
-                                                    {isExpanded ? 'Show less' : 'Show more'}
-                                                </Text>
-                                            </Pressable>
-                                        )}
-                                    </>
-                                );
-                            })()}
-                        </View>
+                        {!!(book.description?.trim()) && (
+                            <View style={infoStyle.descriptionBlock}>
+                                <Text style={[globalStyles.subheading, { fontSize: 16, paddingBottom: 6 }]}>
+                                    Description
+                                </Text>
+                                {(() => {
+                                    const desc = book.description?.trim() ?? '';
+                                    const isLong = desc.length > 100;
+                                    const displayText =
+                                        isExpanded || !isLong ? desc : `${desc.slice(0, 100)}...`;
+
+                                    return (
+                                        <>
+                                            <Text style={globalStyles.body}>{displayText}</Text>
+                                            {isLong && (
+                                                <Pressable onPress={() => setIsExpanded((prev) => !prev)}>
+                                                    <Text style={{ color: colors.midBlue, marginTop: 4 }}>
+                                                        {isExpanded ? 'Show less' : 'Show more'}
+                                                    </Text>
+                                                </Pressable>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                            </View>
+                        )}
                     </>
                 ) : (
                     <Text style={globalStyles.body}>Book information not available.</Text>
@@ -254,6 +253,9 @@ export default function BookInfoScreen() {
 }
 
 const infoStyle = StyleSheet.create({
+    pageContent: {
+        paddingBottom: 60,
+    },
     bookContainer: {
         width: 220,
         height: 320,
@@ -332,10 +334,12 @@ const infoStyle = StyleSheet.create({
         paddingTop: 8,
         paddingHorizontal: 16,
         paddingBottom: 16,
+        marginBottom: 16,
         gap: 8,
     },
     pedestalButton: {
         marginTop: 12,
+        marginBottom: 10,
         paddingVertical: 8,
         paddingHorizontal: 16,
         backgroundColor: colors.midBlue,

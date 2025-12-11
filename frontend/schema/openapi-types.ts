@@ -1096,6 +1096,73 @@ export interface paths {
         };
         trace?: never;
     };
+    "/libraries/{ownerId}/libraryBooks/{libraryBookId}/completedChapters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    ownerId: string;
+                    libraryBookId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EditCompletedChaptersBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LibraryBook"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
     "/libraries/{ownerId}": {
         parameters: {
             query?: never;
@@ -1594,6 +1661,7 @@ export interface components {
             /** Format: int32 */
             percentComplete?: number | null;
             onPedastal?: boolean;
+            completedChapters?: boolean[] | null;
         };
         AddLibraryRequest: {
             ownerId: string | null;
@@ -1691,6 +1759,9 @@ export interface components {
         EditCommentBody: {
             body?: string | null;
         };
+        EditCompletedChaptersBody: {
+            completedChapters: boolean[];
+        };
         EditEditionBody: {
             format?: components["schemas"]["EditionFormatContract"];
             publisher?: string | null;
@@ -1711,6 +1782,7 @@ export interface components {
             /** Format: int32 */
             percentComplete?: number | null;
             onPedastal?: boolean | null;
+            completedChapters?: boolean[] | null;
         };
         EditLitClubBody: {
             name?: string | null;
@@ -1763,6 +1835,21 @@ export interface components {
         LeaveLitClubBody: {
             userId: string | null;
         };
+        LibraryBook: {
+            id?: string | null;
+            bookId: string | null;
+            status: components["schemas"]["ShelfStatus"];
+            /** Format: date */
+            startedReading?: string | null;
+            /** Format: date */
+            finishedReading?: string | null;
+            /** Format: int32 */
+            currentPage?: number | null;
+            /** Format: int32 */
+            percentComplete?: number | null;
+            onPedastal?: boolean;
+            completedChapters?: boolean[] | null;
+        };
         LibraryBookResponse: {
             id: string | null;
             bookId: string | null;
@@ -1776,6 +1863,7 @@ export interface components {
             /** Format: int32 */
             percentComplete?: number | null;
             onPedastal?: boolean;
+            completedChapters?: boolean[] | null;
         };
         LibraryResponse: {
             ownerId: string | null;

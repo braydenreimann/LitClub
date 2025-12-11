@@ -15,7 +15,7 @@ import { useRouter } from "expo-router";
 import { useLitClubs } from '@/context/LitClubsContext';
 import { useLocalSearchParams } from 'expo-router';
 
- //
+//
 export default function AllLitClubs() {
   // Example data
 
@@ -99,15 +99,6 @@ export default function AllLitClubs() {
     );
   }
 
-  if (!litClubs.length) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>No Clubs Found.</Text>
-      </View>
-    );
-  }
-
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       {/* HEADER at the top */}
@@ -124,7 +115,6 @@ export default function AllLitClubs() {
           <EvilIcons name="plus" size={50} color={colors.midBlue} />
         </Pressable>
 
-
         {menuOpen && (
           <View style={[styles.dropdown, { zIndex: 100 }]}>
             <Pressable
@@ -140,32 +130,48 @@ export default function AllLitClubs() {
             >
               <Text style={globalStyles.body}>Join a LitClub</Text>
             </Pressable>
-
           </View>
         )}
 
-        {/* MAIN HEADING */}
-        <Text style={[globalStyles.heading, { paddingTop: 20 }]}>My LitClubs</Text>
+        {/* Optional global empty-state message */}
+        {leaderClubs.length === 0 &&
+          userClubs.length === 0 &&
+          archivedClubs.length === 0 && (
+            <View style={{ marginTop: 80, alignItems: "center" }}>
+              <Text style={globalStyles.body}>
+                You’re not in any LitClubs yet.
+              </Text>
+              <Text style={[globalStyles.body, { marginTop: 4 }]}>
+                Tap the + button to create or join one!
+              </Text>
+            </View>
+          )}
 
+        {/* My LitClubs / Active / Archived sections stay the same */}
+        <Text style={[globalStyles.heading, { paddingTop: 20 }]}>My LitClubs</Text>
         <View style={globalStyles.cardGroup}>
           {leaderClubs.length ? (
             leaderClubs.map((club, index) => (
-
               <Pressable
                 key={`${club.id}-${index}`}
-                style={globalStyles.litclubCard}            >
-                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >
-                  <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
+                style={globalStyles.litclubCard}
+              >
+                <Link
+                  href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name } }}
+                  asChild
+                >
+                  <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
+                    {club.name}
+                  </Text>
                 </Link>
               </Pressable>
-
             ))
-          ) : (<Text>No owned LitClubs yet.</Text>)
-          }
+          ) : (
+            <Text>No owned LitClubs yet.</Text>
+          )}
         </View>
 
         <Text style={globalStyles.heading}>Active LitClubs</Text>
-
         <View style={globalStyles.cardGroup}>
           {userClubs.length ? (
             userClubs.map((club, index) => (
@@ -173,36 +179,42 @@ export default function AllLitClubs() {
                 key={`${club.id}-${index}`}
                 style={globalStyles.litclubCard}
               >
-                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild >
-                  <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} > {club.name} </Text>
+                <Link
+                  href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name } }}
+                  asChild
+                >
+                  <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
+                    {club.name}
+                  </Text>
                 </Link>
               </Pressable>
-
             ))
-          ) : (<Text>No active LitClubs.</Text>)
-          }
+          ) : (
+            <Text>No active LitClubs.</Text>
+          )}
         </View>
 
         <Text style={globalStyles.heading}>Archived LitClubs</Text>
-
         <View style={globalStyles.cardGroup}>
           {archivedClubs.length ? (
             archivedClubs.map((club) => (
               <Pressable
                 key={club.id}
-                style={[globalStyles.litclubCard, { backgroundColor: colors.midBlue }]}>
-                <Link href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name }, }} asChild>
-                  <Text style={globalStyles.cardFont} adjustsFontSizeToFit={true} >
+                style={[globalStyles.litclubCard, { backgroundColor: colors.midBlue }]}
+              >
+                <Link
+                  href={{ pathname: '/myLitClub', params: { id: club.id, name: club.name } }}
+                  asChild
+                >
+                  <Text style={globalStyles.cardFont} adjustsFontSizeToFit>
                     {club.name}
                   </Text>
                 </Link>
               </Pressable>
-
             ))
           ) : (
             <Text>No archived LitClubs.</Text>
-          )
-          }
+          )}
         </View>
       </ScrollView>
     </View>

@@ -12,6 +12,9 @@ import { notifyBookshelfUpdate } from '@/utils/bookshelfEvents';
 type ShelfStatusContract = components['schemas']['ShelfStatusContract'];
 type AddLibraryBookBody = components['schemas']['AddLibraryBookBody'];
 type EditLibraryBookBody = components['schemas']['EditLibraryBookBody'];
+type EditCompletedChaptersBody = {
+    completedChapters: boolean[];
+};
 
 const toContractStatus = (
     status: DomainShelfStatus
@@ -107,6 +110,7 @@ export async function createLibraryBook(
             currentPage: null,
             percentComplete: null,
             onPedastal: false,
+            completedChapters: [],
         };
 
         const { data, error } = await client.POST(
@@ -233,6 +237,36 @@ export async function removeBookFromPedestal(
         return toDomainLibraryBook(data);
     } catch (err) {
         console.error('Error removing book from pedestal:', err);
+        return null;
+    }
+}
+
+export async function updateCompletedChapters(
+    ownerId: string,
+    libraryBookId: string,
+    completedChapters: boolean[]
+): Promise<LibraryBook | null> {
+    try {
+        const body: EditCompletedChaptersBody = { completedChapters };
+
+        const { data, error } = await client.PATCH(
+            '/libraries/{ownerId}/libraryBooks/{libraryBookId}/completedChapters',
+            {
+                params: {
+                    path: { ownerId, libraryBookId },
+                },
+                body,
+            }
+        );
+
+        if (error || !data) {
+            console.error('Failed to update completed chapters', error);
+            return null;
+        }
+
+        return toDomainLibraryBook(data as any);
+    } catch (err) {
+        console.error('Error updating completed chapters:', err);
         return null;
     }
 }

@@ -10,5 +10,6 @@
         public int? CurrentPage { get; set; }
         public int? PercentComplete { get; set; }
         public bool OnPedastal { get; set; }
+        public bool[] CompletedChapters { get; set; } = [];
     }
 }
