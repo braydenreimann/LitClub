@@ -10,6 +10,7 @@ import HiddenToggle from "@/features/threads/components/HiddenToggle";
 import ReplyComposer from "@/features/threads/components/ReplyComposer";
 import { useReplies } from "@/features/threads/hooks/useReplies";
 import { isHiddenByScore } from "@/features/threads/utils/commentVisbility";
+import { getUriRead } from "@/api/services/imagesService";
 
 const formatCreated = (created: string) => {
     const createdMs = new Date(created).getTime();
@@ -46,6 +47,8 @@ export default function CommentItem({
     const [showReplyBox, setShowReplyBox] = useState(false);
     const [showHiddenReplies, setShowHiddenReplies] = useState(false);
     const [replyPrefill, setReplyPrefill] = useState<string | null>(null);
+    const [avatarUri, setAvatarUri] = useState<string | null>(null);
+    const [replyAvatars, setReplyAvatars] = useState<Record<string, string | null>>({});
 
     const [localScore, setLocalScore] = useState(comment.score);
     const [localUserVote, setLocalUserVote] = useState<-1 | 0 | 1>((comment.userVote ?? 0) as -1 | 0 | 1);
@@ -70,6 +73,7 @@ export default function CommentItem({
         rollbackRemove,
         applyVote,
     } = useReplies(threadId, comment.id, currentUserId);
+    const avatarCache = useRef<Map<string, string>>(new Map());
 
     const hiddenRepliesCount = useMemo(
         () => replies.filter((r) => !r.isDeleted && isHiddenByScore(r.score)).length,
@@ -176,6 +180,66 @@ export default function CommentItem({
         [ensureLoaded]
     );
 
+    // Resolve profile photo SAS URLs (or pass through absolute URLs)
+    const resolveAvatarUri = useCallback(
+        async (raw?: string | null) => {
+            if (!raw) return null;
+            if (avatarCache.current.has(raw)) return avatarCache.current.get(raw)!;
+
+            // Already absolute URL? Use as-is.
+            if (/^https?:\/\//i.test(raw)) {
+                avatarCache.current.set(raw, raw);
+                return raw;
+            }
+
+            try {
+                const uri = await getUriRead(raw);
+                if (uri) {
+                    avatarCache.current.set(raw, uri);
+                    return uri;
+                }
+            } catch (err) {
+                console.warn("Failed to resolve avatar URI", err);
+            }
+            return null;
+        },
+        []
+    );
+
+    useEffect(() => {
+        let alive = true;
+        resolveAvatarUri(comment.author.profilePhotoUrl).then((uri) => {
+            if (alive) setAvatarUri(uri);
+        });
+        return () => {
+            alive = false;
+        };
+    }, [comment.author.profilePhotoUrl, resolveAvatarUri]);
+
+    useEffect(() => {
+        let alive = true;
+        const load = async () => {
+            const entries = await Promise.all(
+                replies.map(async (r) => {
+                    const uri = await resolveAvatarUri(r.author.profilePhotoUrl);
+                    return [r.id, uri] as const;
+                })
+            );
+            if (!alive) return;
+            setReplyAvatars((prev) => {
+                const next = { ...prev };
+                for (const [id, uri] of entries) {
+                    next[id] = uri;
+                }
+                return next;
+            });
+        };
+        load();
+        return () => {
+            alive = false;
+        };
+    }, [replies, resolveAvatarUri]);
+
     // Hide top-level if score <= threshold and hidden-not-shown
     if (comment.isDeleted) return null;
     if (!showHiddenComments && isHiddenByScore(localScore)) return null;
@@ -185,8 +249,8 @@ export default function CommentItem({
             <View style={styles.headerRow}>
                 <Image
                     source={
-                        comment.author.profilePhotoUrl
-                            ? { uri: comment.author.profilePhotoUrl }
+                        avatarUri
+                            ? { uri: avatarUri }
                             : require("@/assets/images/userprofile_icon.png")
                     }
                     style={styles.avatar}
@@ -246,8 +310,8 @@ export default function CommentItem({
                                 <View style={styles.replyHeaderRow}>
                                     <Image
                                         source={
-                                            r.author.profilePhotoUrl
-                                                ? { uri: r.author.profilePhotoUrl }
+                                            replyAvatars[r.id]
+                                                ? { uri: replyAvatars[r.id] as string }
                                                 : require("@/assets/images/userprofile_icon.png")
                                         }
                                         style={styles.replyAvatar}

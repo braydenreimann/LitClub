@@ -22,7 +22,7 @@ public static class SeedUsers
                 PasswordHash = "brpw",
                 Bio = "I enjoy books that sit at the intersection of technology and philosophy.",
                 PreferredGenres = ["Nonfiction"],
-                ProfilePhotoUrl = "severus-snape.jpg"
+                ProfilePhotoUrl = "severus-snape.jpeg"
             },
             new LitClubUser {
                 Id = "2",
