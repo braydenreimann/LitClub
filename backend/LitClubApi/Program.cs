@@ -183,10 +183,40 @@ using (var scope = app.Services.CreateScope())
 
     }
 
-    var coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "severus-snape.jpeg"); //Default profile image for John Green
+    var coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "augustus.jpeg"); //Default profile image for John Green
 
-    var blobName = "severus-snape.jpeg";
+    var blobName = "augustus.jpeg";
     var blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "hank-green.jpg"); //Default profile image for John Green
+
+    blobName = "hank-green.jpg";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "hazel.png"); //Default profile image for John Green
+
+    blobName = "hazel.png";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "hermione-granger.jpg"); //Default profile image for John Green
+
+    blobName = "hermione-granger.jpg";
+    blobClient = blobContainer.GetBlobClient(blobName);
 
     using (var stream = File.OpenRead(coverPath))
     {
@@ -196,6 +226,36 @@ using (var scope = app.Services.CreateScope())
     coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "john-green.png"); //Default profile image for John Green
 
     blobName = "john-green.png";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "katniss-everdeen.jpg"); //Default profile image for John Green
+
+    blobName = "katniss-everdeen.jpg";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "severus-snape.jpeg"); //Default profile image for John Green
+
+    blobName = "severus-snape.jpeg";
+    blobClient = blobContainer.GetBlobClient(blobName);
+
+    using (var stream = File.OpenRead(coverPath))
+    {
+        await blobClient.UploadAsync(stream, overwrite: true);
+    }
+
+    coverPath = Path.Combine(litClubFolder, "LitClubApi", "Seeder", "Images", "Data", "steve-jobs-headshot.jpg"); //Default profile image for John Green
+
+    blobName = "steve-jobs-headshot.jpg";
     blobClient = blobContainer.GetBlobClient(blobName);
 
     using (var stream = File.OpenRead(coverPath))

@@ -158,7 +158,7 @@ WHERE c.itemType = 'thread'
             }
         }
 
-        // 100 playful users with null profile photos
+        // 100 playful users with sample profile photos
         var random = new Random(42);
         var firstNames = new[]
         {
@@ -196,6 +196,18 @@ WHERE c.itemType = 'thread'
         };
         var pronounPool = new[] { "she/her", "he/him", "they/them" };
         var genrePool = new[] { "YA", "Romance", "Sci-Fi", "Poetry", "Memoir", "Fantasy", "Nonfiction", "Philosophy", "Humor" };
+        var profilePhotos = new[]
+        {
+            "augustus.jpeg",
+            "hank-green.jpg",
+            "hazel.png",
+            "hermione-granger.jpg",
+            "john-green.png",
+            "katniss-everdeen.jpg",
+            "severus-snape.jpeg",
+            "steve-jobs-headshot.jpg"
+        };
+        var profileRandom = new Random(137);
 
         var seededUsers = new List<LitClubUser>(capacity: 100);
         for (int i = 0; i < 100; i++)
@@ -217,7 +229,7 @@ WHERE c.itemType = 'thread'
                 PasswordHash = $"fault-seed-pw-{i + 1}",
                 Bio = bios[i % bios.Length],
                 Pronouns = [pronoun],
-                ProfilePhotoUrl = null,
+                ProfilePhotoUrl = profilePhotos[profileRandom.Next(profilePhotos.Length)],
                 PreferredGenres = [g1, g2]
             });
         }
@@ -314,7 +326,7 @@ WHERE c.itemType = 'thread'
                 {
                     AuthorId = authorUser.Id,
                     Username = authorUser.UserName,
-                    ProfilePhotoUrl = null
+                    ProfilePhotoUrl = authorUser.ProfilePhotoUrl
                 },
                 Body = $"{opener} {closer}{playfulTag}",
                 ParentCommentId = null,
@@ -338,7 +350,7 @@ WHERE c.itemType = 'thread'
                 {
                     AuthorId = authorUser.Id,
                     Username = authorUser.UserName,
-                    ProfilePhotoUrl = null
+                    ProfilePhotoUrl = authorUser.ProfilePhotoUrl
                 },
                 Body = line,
                 ParentCommentId = parent.Id,
