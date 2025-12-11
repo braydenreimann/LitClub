@@ -26,7 +26,7 @@ SplashScreen.preventAutoHideAsync();
 function BackButton() {
     const router = useRouter();
     return (
-        <Pressable>
+        <Pressable  style={{ paddingTop: 70 }}>
             <Link href="/litClubs" onPress={() => router.back()}>
                 <EvilIcons name="chevron-left" size={50} color="#193350" style={{ marginLeft: 0 }} />
             </Link>
@@ -182,8 +182,8 @@ export default function CreateLitClub() {
     return (
         <View style={{ flex: 1, backgroundColor: colors.cream }}>
             <View style={{ flexDirection: 'row', paddingTop: 20, margin: 10 }}>
-                <BackButton />
-                <Text style={[globalStyles.heading, { paddingTop: 7, paddingBottom: 10, fontSize: 20 }]}>
+                {/*<BackButton />*/}
+                <Text style={[globalStyles.heading, { fontSize: 30, paddingLeft: 10, paddingTop: 7, paddingBottom: 10}]}>
                     Create a New LitClub
                 </Text>
             </View>

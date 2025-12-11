@@ -302,8 +302,8 @@ export default function ProfileScreen() {
                 <BookShelf refreshKey={bookshelfRefreshKey} />
 
                 {/* Memberships */}
-                <Text style={globalStyles.subheading}> LitClub Memberships </Text>
-                <View style={globalStyles.cardGroup}>
+                <Text style={[globalStyles.subheading, {paddingLeft: 20}]}> LitClub Memberships </Text>
+                <View style={[globalStyles.cardGroup, {paddingLeft: 20}]}>
                     {loading ? (
                         <Text>Loading clubs...</Text>
                     ) : error ? (
@@ -330,8 +330,8 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* Leaderships */}
-                <Text style={globalStyles.subheading}> LitClub Leaderships </Text>
-                <View style={globalStyles.cardGroup}>
+                <Text style={[globalStyles.subheading, {paddingLeft: 20}]}> LitClub Leaderships </Text>
+                <View style={[globalStyles.cardGroup, {paddingLeft: 20}]}>
                     {leaderClubs.length ? (
                         leaderClubs.map((club, index) => (
                             <Pressable
@@ -355,8 +355,8 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* Archived Clubs */}
-                <Text style={globalStyles.subheading}> Archived LitClubs </Text>
-                <View style={globalStyles.cardGroup}>
+                <Text style={[globalStyles.subheading, {paddingLeft: 20}]}> Archived LitClubs </Text>
+                <View style={[globalStyles.cardGroup, {paddingLeft: 20}]}>
                     {archivedClubs.length ? (
                         archivedClubs.map((club) => (
                             <Pressable
