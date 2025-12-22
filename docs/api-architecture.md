@@ -1,5 +1,7 @@
 # LitClub API Architecture
 
+Author: Brayden Reimann
+
 The LitClub API is a RESTful API implemented using the REPR (Request–Endpoint–Response) design pattern.
 
 ## REST Basics

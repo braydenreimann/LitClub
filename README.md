@@ -1,5 +1,22 @@
-## LitClub Repository Setup Guide
+# LitClub
 
+LitClub is a chapter-based social reading and book discussion platform developed as part of Purdue CS 307.
+
+## Contributions (Brayden Reimann)
+- Owned backend architecture and domain modeling
+- Designed and implemented 30+ REST API endpoints
+- Led frontend-backend data integration
+- Applied production-grade API design patterns (REPR, RESTful conventions)
+
+## Tech Stack:
+- Frontend: React Native (Expo; iOS, Android)
+- Backend: ASP.NET Core Web API (.NET 8), Azure Cosmos DB
+- Infrastructure: Docker, Azure Cosmos DB Emulator, Azurite
+- Tooling: OpenAPI client generation
+
+Below are the instructions for running the project locally.
+
+## LitClub Setup Instructions
 ### 1. Install Required Dependencies
 
 #### 1. Install Node.js
