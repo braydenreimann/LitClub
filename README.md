@@ -14,6 +14,9 @@ LitClub is a chapter-based social reading and book discussion platform developed
 - Infrastructure: Docker, Cosmos DB Emulator, Azurite
 - Tooling: OpenAPI client generation
 
+Below are the instructions for running the project locally.
+
+## LitClub Setup Instructions
 ### 1. Install Required Dependencies
 
 #### 1. Install Node.js
