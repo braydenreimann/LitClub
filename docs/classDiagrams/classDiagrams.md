@@ -1,1 +1,0 @@
-Replace this file with a png of our class diagrams.
