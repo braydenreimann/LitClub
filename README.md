@@ -8,7 +8,7 @@ LitClub is a chapter-based social reading and book discussion platform developed
 - Led frontend-backend data integration
 - Applied production-grade API design patterns (REPR, RESTful conventions)
 
-## Tech stack:
+## Tech Stack:
 - Frontend: React Native (Expo; iOS, Android)
 - Backend: ASP.NET Core Web API (.NET 8), Azure Cosmos DB
 - Infrastructure: Docker, Cosmos DB Emulator, Azurite
