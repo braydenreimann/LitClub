@@ -1,4 +1,5 @@
 # LitClub API Integration Strategy
+Author: Brayden Reimann  
 
 ### OpenAPI TypeScript
 
