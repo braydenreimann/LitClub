@@ -53,7 +53,6 @@ public sealed class SeederRunner
 
         var dbResponse = await _cosmosClient.CreateDatabaseIfNotExistsAsync(
             _cosmosOptions.DatabaseId,
-            throughput: 400,
             cancellationToken: cancellationToken);
 
         var database = dbResponse.Database;
@@ -62,24 +61,6 @@ public sealed class SeederRunner
         await database.CreateContainerIfNotExistsAsync(_cosmosOptions.UsersContainerId, "/id", cancellationToken: cancellationToken);
         await database.CreateContainerIfNotExistsAsync(_cosmosOptions.LitClubsContainerId, "/id", cancellationToken: cancellationToken);
         await database.CreateContainerIfNotExistsAsync(_cosmosOptions.LibrariesContainerId, "/id", cancellationToken: cancellationToken);
-
-        await RecreateThreadsContainerAsync(database, cancellationToken);
-    }
-
-    private async Task RecreateThreadsContainerAsync(Database database, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await database
-                .GetContainer(_cosmosOptions.ThreadsContainerId)
-                .DeleteContainerAsync(cancellationToken: cancellationToken);
-
-            _logger.LogInformation("Existing threads container deleted to apply indexing policy.");
-        }
-        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-        {
-            // Container did not exist; nothing to clean up.
-        }
 
         var props = new ContainerProperties
         {
