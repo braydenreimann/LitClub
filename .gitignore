@@ -4,9 +4,6 @@
 
 /backend/LitClubApi/obj
 /backend/LitClubApi/bin
-/backend/TestProject/bin
-/backend/TestProject/obj
-/backend/TestProject/obj/Debug
+/backend/LitClubSeeder/bin
+/backend/LitClubSeeder/obj
 /.vs
-/backend/LitClubApi/.vs/LitClubApi
-generate_report/week_8_report.txt
