@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualBasic.FileIO;
 using LitClubApi.Domain;
+using Microsoft.VisualBasic.FileIO;
 
-public class CSVParserInsert
+namespace LitClubSeeder.Seeding;
+
+public static class CSVParserInsert
 {
     public static List<Book> Parse(string csvpath)
     {

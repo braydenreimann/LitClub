@@ -1,8 +1,11 @@
-using System.Net;
 using System.Linq;
+using System.Net;
 using LitClubApi.Configuration;
 using LitClubApi.Domain;
 using Microsoft.Azure.Cosmos;
+
+namespace LitClubSeeder.Seeding;
+
 using ThreadDoc = LitClubApi.Domain.Thread;
 
 public static class SeedThreads
