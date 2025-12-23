@@ -81,10 +81,30 @@ builder.Services.AddSingleton(sp =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var svcProvider = scope.ServiceProvider;
+    var cosmosOptions = svcProvider.GetRequiredService<IOptions<CosmosOptions>>().Value;
+    var blobOptions = svcProvider.GetRequiredService<IOptions<BlobOptions>>().Value;
+
+    app.Logger.LogInformation(
+        "Cosmos config: Endpoint={Endpoint}, DatabaseId={DatabaseId}, Containers: Books={BooksContainerId}, Users={UsersContainerId}, LitClubs={LitClubsContainerId}, Libraries={LibrariesContainerId}, Threads={ThreadsContainerId}",
+        cosmosOptions.Endpoint,
+        cosmosOptions.DatabaseId,
+        cosmosOptions.BooksContainerId,
+        cosmosOptions.UsersContainerId,
+        cosmosOptions.LitClubsContainerId,
+        cosmosOptions.LibrariesContainerId,
+        cosmosOptions.ThreadsContainerId);
+
+    app.Logger.LogInformation(
+        "Blob config: ContainerName={ContainerName}",
+        blobOptions.ContainerName);
+}
+
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
 
 var updateSpec = args.Contains("--updateSpec");
 
