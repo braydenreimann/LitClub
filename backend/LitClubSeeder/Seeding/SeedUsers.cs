@@ -1,6 +1,8 @@
 using LitClubApi.Configuration;
-using Microsoft.Azure.Cosmos;
 using LitClubApi.Domain;
+using Microsoft.Azure.Cosmos;
+
+namespace LitClubSeeder.Seeding;
 
 public static class SeedUsers
 {
@@ -42,8 +44,6 @@ public static class SeedUsers
             await usersContainer.UpsertItemAsync(user, new PartitionKey(user.Id));
 
         }
-
-        var libariesContainer = client.GetContainer(o.DatabaseId, o.LibrariesContainerId);
 
         List<Library> libraries =
         [
@@ -160,7 +160,7 @@ public static class SeedUsers
         // Insert a library for each user into the librariesContainer
         foreach (var library in libraries)
         {
-            await libariesContainer.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
+            await librariesContainer.UpsertItemAsync(library, new PartitionKey(library.OwnerId));
         }
 
         // Define two LitClubs

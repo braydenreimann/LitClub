@@ -154,6 +154,17 @@ using CosmosClient client = new(
 
 ---
 
+### 6. Seed the database (LitClubSeeder)
+After the emulators are running, populate Cosmos DB and blob storage with the shipped sample data:
+
+```bash
+dotnet run --project backend/LitClubSeeder
+```
+
+The seeder will create the database/containers (threads are recreated to apply indexing), ensure the blob container exists, upload book covers/profile images from `backend/LitClubSeeder/SeedData`, and upsert sample books, users, lit clubs, and threads. Override settings via environment variables (e.g., `Cosmos__Endpoint`, `Cosmos__PrimaryKey`, `Blob__ConnectionString`) if your emulators run on different ports.
+
+---
+
 ### 7. Emulator Management
 ```bash
 docker stop cosmos-emulator
