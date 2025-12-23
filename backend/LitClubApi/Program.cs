@@ -37,13 +37,16 @@ builder.Services.AddSingleton(sp =>
 
     var clientOptions = new CosmosClientOptions
     {
-        // Disable TSL/SSL validation for development only
-        HttpClientFactory = () => new HttpClient(new HttpClientHandler()
-        {
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-        }),
         ConnectionMode = ConnectionMode.Gateway
     };
+    if (builder.Environment.IsDevelopment())
+    {
+        // Disable TSL/SSL validation for development only
+        clientOptions.HttpClientFactory = () => new HttpClient(new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        });
+    }
 
     return new CosmosClient(o.Endpoint, o.PrimaryKey, clientOptions);
 });
