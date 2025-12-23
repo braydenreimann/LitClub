@@ -7,3 +7,5 @@
 /backend/LitClubSeeder/bin
 /backend/LitClubSeeder/obj
 /.vs
+/backend/LitClubSeeder/.env.local
+backend/LitClubSeeder/set_secrets.sh
