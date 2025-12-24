@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import Foundation from '@expo/vector-icons/Foundation';
-import Constants from 'expo-constants';
 import { colors, fonts } from '@/theme';
 import { User } from '@/domain/models';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { featureFlags } from 'react-native-screens';
+import { getUserFromId } from '@/api/services/usersService';
 
 type ClubMembersProps = {
   memberUserIds: string[];
   ownerUserId: string;
 };
-
-const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
-const LAN_IP = hostFromExpo ?? '10.0.0.252';
-const API_BASE_URL = `http://${LAN_IP}:5112`;
 
 export default function ClubMembers({ memberUserIds, ownerUserId }: ClubMembersProps) {
   // Mock user data (replace later with backend fetch)
@@ -32,11 +25,8 @@ export default function ClubMembers({ memberUserIds, ownerUserId }: ClubMembersP
         const fetchedMembers: User[] = await Promise.all(
           memberUserIds.map(async (id) => {
             try {
-              const res = await fetch(`${API_BASE_URL}/users/${id}`);
-              if (!res.ok) {
-                throw new Error('Failed to fetch users');
-              }
-              return await res.json();
+              const member = await getUserFromId(id);
+              return member;
             } catch (err) {
               console.warn(`Failed to fetch user ${id}:`, err);
               return null;

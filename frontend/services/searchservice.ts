@@ -1,12 +1,7 @@
-import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Edition, Book } from '../domain/models';
+import { User, Book } from '../domain/models';
+import { env } from 'config/env';
 
-
-const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
-// Fallback to your LAN IP if not available
-const LAN_IP = hostFromExpo ?? '10.0.0.252';
-const API_BASE_URL = `http://${LAN_IP}:5112`;
+const API_BASE_URL = env.API_BASE_URL;
 
 export async function searchBooks(query: string): Promise<Book[] | null> { //searchs both by book and author to return list of books for search bar.
 	try {

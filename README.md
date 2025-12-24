@@ -71,10 +71,19 @@ git clone git@github.com:braydenreimann/LitClub.git
    npm i openapi-fetch
    npm i -D openapi-typescript typescript
    ```
-3. Start the app:
-   ```bash
-   npx expo start
-   ```
+3. Choose the backend (dev vs. prod):
+   - Dev (default): points to your local API on port 5112. Expo will use the host in the QR URL; override with your LAN IP if needed:
+     ```bash
+     EXPO_PUBLIC_DEV_API_HOST=192.168.1.42 npx expo start
+     ```
+   - Prod (hosted API):
+     ```bash
+     EXPO_PUBLIC_API_ENV=prod npx expo start
+     ```
+     (optional) override the hosted URL:
+     ```bash
+     EXPO_PUBLIC_API_ENV=prod EXPO_PUBLIC_PROD_API_BASE_URL=https://your-api.example.com npx expo start
+     ```
 Follow the on-screen instructions to open the app in Expo Go.
 
 ---

@@ -12,17 +12,10 @@ import { NotoSansMono_400Regular } from '@expo-google-fonts/noto-sans-mono';
 import * as SplashScreen from 'expo-splash-screen';
 import { globalStyles } from '@/styles/globalStyles';
 import { useLitClubs } from '@/context/LitClubsContext';
-import Constants from 'expo-constants';
 import { User } from '@/domain/models';
 import { useSession } from '@/context/AuthContext';
 import { joinLitClub } from '@/api/services/litClubsService';
 import { getUser } from '@/api/services/usersService';
-
-
-const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
-const LAN_IP = hostFromExpo ?? '10.0.0.252'
-const API_BASE_URL = `http://${LAN_IP}:5112`
-const apiUrl = `${API_BASE_URL}/litclubs`;
 
 SplashScreen.preventAutoHideAsync();
 
@@ -214,4 +207,3 @@ const styles = StyleSheet.create({
     },
 
 });
-

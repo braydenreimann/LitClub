@@ -1,0 +1,54 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    services:
+      cosmos:
+        image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+        ports:
+          - 8081:8081
+          - 1234:1234
+      azurite:
+        image: mcr.microsoft.com/azure-storage/azurite
+        ports:
+          - 10000:10000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.x"
+
+      - name: Wait for emulators
+        run: |
+          for i in {1..60}; do
+            if curl -kfsS https://localhost:8081/_explorer/emulator.pem > /dev/null; then
+              echo "Cosmos up"; break
+            fi
+            sleep 2
+          done
+          for i in {1..30}; do
+            if curl -fsS http://localhost:10000/devstoreaccount1?comp=list > /dev/null; then
+              echo "Azurite up"; break
+            fi
+            sleep 1
+          done
+
+      - name: Test
+        env:
+          ASPNETCORE_ENVIRONMENT: Test
+          Cosmos__Endpoint: "https://localhost:8081"
+          Cosmos__PrimaryKey: "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+          Cosmos__DatabaseName: "LitClub_Test_${{ github.run_id }}"
+          Blob__ConnectionString: "UseDevelopmentStorage=true"
+        run: dotnet test -c Release

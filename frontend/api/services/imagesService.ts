@@ -1,11 +1,8 @@
 /* begin imagesService.ts */
 
-import Constants from 'expo-constants';
+import { env } from 'config/env';
 
-const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')[0];
-// Fallback to your LAN IP if not available
-const LAN_IP = hostFromExpo ?? '10.0.0.252';
-const API_BASE_URL = `http://${LAN_IP}:5112`;
+const API_BASE_URL = env.API_BASE_URL;
 
 export async function getUriRead(Path: string | undefined): Promise<string> {
     if (Path === undefined) {
